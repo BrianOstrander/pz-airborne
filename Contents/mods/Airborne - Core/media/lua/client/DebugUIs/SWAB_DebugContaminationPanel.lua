@@ -83,8 +83,24 @@ function SWAB_DebugContaminationPanel:prerender()
     end
 
     local getNeighboringSquare = function(_origin, _direction)
-        local offsetX = 0
-        local offsetY = 0
+        local SWAB_Building = {}
+
+        SWAB_Building.porousWallsNorth = {}
+        SWAB_Building.porousWallsNorth["walls_exterior_wooden_01_41"] = true
+        SWAB_Building.porousWallsNorth["walls_exterior_wooden_01_45"] = true
+        SWAB_Building.porousWallsNorth["walls_exterior_wooden_01_49"] = true
+        SWAB_Building.porousWallsNorth["walls_exterior_wooden_01_53"] = true
+        SWAB_Building.porousWallsNorth["constructedobjects_01_65"] = true
+        SWAB_Building.porousWallsNorth["constructedobjects_01_73"] = true
+
+        SWAB_Building.porousWallsWest = {}
+        SWAB_Building.porousWallsWest["walls_exterior_wooden_01_40"] = true
+        SWAB_Building.porousWallsWest["walls_exterior_wooden_01_44"] = true
+        SWAB_Building.porousWallsWest["walls_exterior_wooden_01_52"] = true
+        SWAB_Building.porousWallsWest["walls_exterior_wooden_01_48"] = true
+        SWAB_Building.porousWallsWest["constructedobjects_01_64"] = true
+        SWAB_Building.porousWallsWest["constructedobjects_01_72"] = true
+        -- ---- Begin copy ---
         local target = nil
         local neighbor = nil
         
@@ -102,34 +118,58 @@ function SWAB_DebugContaminationPanel:prerender()
             neighbor = getCell():getGridSquare(_origin:getX() - 1, _origin:getY(), _origin:getZ())
         end
         
+        if not target or not neighbor then
+            -- print("SWAB: Error, "..tostring(_direction).." neighbor of (".._origin:getX()..",".._origin:getY()..") is nil")
+            -- I think this can happen if we're requesting a square very far away from the player.
+            return nil
+        end
+
         local targetProperties = target:getProperties()
 
-        if _direction == IsoDirections.N then
-            -- North
-            if targetProperties:Is("WallN") or targetProperties:Is("WallNW") then
+        if targetProperties:Is("WallNW") then
+            -- This is a wall corner
+            return nil
+        end
+
+        if _direction == IsoDirections.N or _direction == IsoDirections.S then
+            -- North or South
+
+            if targetProperties:Is("WallN") and not SWAB_Building.porousWallsNorth[target:getWall(true):getTextureName()] then
+                -- This is a wall, and it's not a porous material
                 return nil
             end
 
             if targetProperties:Is("WindowN") and targetProperties:Val("WindowN") == "WindowN" then
-                return nil
-            end
-        elseif _direction == IsoDirections.S then
-            -- South
-            if targetProperties:Is("WallN") or targetProperties:Is("WallNW") then
-                return nil
-            end
-
-            if targetProperties:Is("WindowN") and targetProperties:Val("WindowN") == "WindowN" then
-                return nil
+                -- This is a window frame and it hase a closed window in it
+                local windowNorth = target:getWall(true)
+                -- It's possible for getWall to return nil if this is a wall-type window, like the floor to ceiling ones.
+                if windowNorth then
+                    -- We are a wall that a window can be placed into.
+                    if not SWAB_Building.porousWallsNorth[windowNorth:getTextureName()] then
+                        -- It's not a porous material
+                        return nil
+                    end
+                end
             end
         else
             -- East or West
-            if targetProperties:Is("WallW") or targetProperties:Is("WallNW") then
+
+            if targetProperties:Is("WallW") and not SWAB_Building.porousWallsWest[target:getWall(false):getTextureName()] then
+                -- This is a wall, and it's not a porous material
                 return nil
             end
 
             if targetProperties:Is("WindowW") and targetProperties:Val("WindowW") == "WindowW" then
-                return nil
+                -- This is a window frame and it hase a closed window in it
+                local windowWest = target:getWall(false)
+                -- It's possible for getWall to return nil if this is a wall-type window, like the floor to ceiling ones.
+                if windowWest then
+                    -- We are a wall that a window can be placed into.
+                    if not SWAB_Building.porousWallsWest[target:getWall(false):getTextureName()] then
+                        -- It's not a porous material
+                        return nil
+                    end
+                end
             end
         end
 
@@ -144,51 +184,23 @@ function SWAB_DebugContaminationPanel:prerender()
         return neighbor
     end
     
-    if getPlayer() and getPlayer():getSquare() then
-        local neighbor = getNeighboringSquare(getPlayer():getSquare(), IsoDirections.E)
-        z = self:drawField("Neighbor North", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.N)), x, z)
-        z = self:drawField("Neighbor East", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.E)), x, z)
-        z = self:drawField("Neighbor South", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.S)), x, z)
-        z = self:drawField("Neighbor West", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.W)), x, z)
-        --z = self:drawField("Square Props", tostring(getPlayerSquareProperties(getPlayer():getSquare())), x, z)
-    end
-
     -- if getPlayer() and getPlayer():getSquare() then
-    --     local neighbor = getNeighboringSquare(getPlayer():getSquare(), IsoDirections.E)
-    --     z = self:drawField("Neighbor", tostring(neighbor), x, z)
-    -- end
-
-    -- if getPlayer() and getPlayer():getSquare() then
-    --     local neighbor = getPlayer():getSquare():getE()
-    --     local door = getPlayer():getSquare():getDoorTo(neighbor)
-    --     local readout = "No Door"
-    --     if door then
-    --         readout = "IsOpen:"..tostring(door:IsOpen())
-    --         readout = readout.." IsDestroyed:"..tostring(door:isDestroyed())
-    --     end
-    --     z = self:drawField("East Door", readout, x, z)
-    -- end
-    -- if getPlayer() and getPlayer():getSquare() then
-    --     --local neighbor = getPlayer():getSquare():getE()
-    --     local neighbor = getCell():getGridSquare(getPlayer():getX() + 1, getPlayer():getY(), getPlayer():getZ())
-    --     local readout = "neighbor:"
-    --     if neighbor then
-    --         local objects = neighbor:getObjects()
-    --         if objects then
-    --             for i = 0, objects:size() - 1 do
-    --                 local object = objects:get(i)
-    --                 local objectProperties = object:getProperties()
-    --                 if props and props:Is("IsPaintable") then
-    --                 -- if objectProperties then
-    --                 --     for p = 0, objectProperties:size() - 1 do
-    --                 --         readout = readout..tostring(objectProperties.get(p))..","
-    --                 --     end
-    --                 --     readout = readout.."\n\t"
-    --                 -- end
-    --             end
+    --     z = self:drawField("Neighbor North", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.N)), x, z)
+    --     z = self:drawField("Neighbor East", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.E)), x, z)
+    --     z = self:drawField("Neighbor South", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.S)), x, z)
+    --     z = self:drawField("Neighbor West", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.W)), x, z)
+        
+    --     local objects = getPlayer():getSquare():getObjects()
+    --     if objects and 0 < objects:size() then
+    --         local objectsResult = ""
+    --         for i = 0, objects:size() - 1 do
+    --             local object = objects:get(i)
+    --             objectsResult = objectsResult..tostring(object:getType())..":"..tostring(object:getTextureName()).."\n"
     --         end
+    --         z = self:drawField("objs", objectsResult, x, z)
     --     end
-    --     z = self:drawField("East Objs", readout, x, z)
+    --     z = z + 60
+    --     z = self:drawField("curr", getPlayerSquareProperties(), x, z)
     -- end
 end
 

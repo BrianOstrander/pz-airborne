@@ -3,8 +3,25 @@ require "SWAB_Utilities"
 
 SWAB_Building = {}
 
+SWAB_Building.porousWallsNorth = {}
+SWAB_Building.porousWallsNorth["walls_exterior_wooden_01_41"] = true
+SWAB_Building.porousWallsNorth["walls_exterior_wooden_01_45"] = true
+SWAB_Building.porousWallsNorth["walls_exterior_wooden_01_49"] = true
+SWAB_Building.porousWallsNorth["walls_exterior_wooden_01_53"] = true
+SWAB_Building.porousWallsNorth["constructedobjects_01_65"] = true
+SWAB_Building.porousWallsNorth["constructedobjects_01_73"] = true
+
+SWAB_Building.porousWallsWest = {}
+SWAB_Building.porousWallsWest["walls_exterior_wooden_01_40"] = true
+SWAB_Building.porousWallsWest["walls_exterior_wooden_01_44"] = true
+SWAB_Building.porousWallsWest["walls_exterior_wooden_01_52"] = true
+SWAB_Building.porousWallsWest["walls_exterior_wooden_01_48"] = true
+SWAB_Building.porousWallsWest["constructedobjects_01_64"] = true
+SWAB_Building.porousWallsWest["constructedobjects_01_72"] = true
+
 SWAB_Building.lastTick = 0
 SWAB_Building.buildingUpdateTickDelay = 0
+
 
 function SWAB_Building.OnTick(_tick)
 
@@ -239,8 +256,6 @@ function SWAB_Building.CalculateSquareExposureFromNeighbor(_square, _neighbor)
 end
 
 function SWAB_Building.GetNeighboringSquare(_origin, _direction)
-    local offsetX = 0
-    local offsetY = 0
     local target = nil
     local neighbor = nil
     
@@ -258,34 +273,58 @@ function SWAB_Building.GetNeighboringSquare(_origin, _direction)
         neighbor = getCell():getGridSquare(_origin:getX() - 1, _origin:getY(), _origin:getZ())
     end
     
+    if not target or not neighbor then
+        -- print("SWAB: Error, "..tostring(_direction).." neighbor of (".._origin:getX()..",".._origin:getY()..") is nil")
+        -- I think this can happen if we're requesting a square very far away from the player.
+        return nil
+    end
+
     local targetProperties = target:getProperties()
 
-    if _direction == IsoDirections.N then
-        -- North
-        if targetProperties:Is("WallN") or targetProperties:Is("WallNW") then
+    if targetProperties:Is("WallNW") then
+        -- This is a wall corner
+        return nil
+    end
+
+    if _direction == IsoDirections.N or _direction == IsoDirections.S then
+        -- North or South
+
+        if targetProperties:Is("WallN") and not SWAB_Building.porousWallsNorth[target:getWall(true):getTextureName()] then
+            -- This is a wall, and it's not a porous material
             return nil
         end
 
         if targetProperties:Is("WindowN") and targetProperties:Val("WindowN") == "WindowN" then
-            return nil
-        end
-    elseif _direction == IsoDirections.S then
-        -- South
-        if targetProperties:Is("WallN") or targetProperties:Is("WallNW") then
-            return nil
-        end
-
-        if targetProperties:Is("WindowN") and targetProperties:Val("WindowN") == "WindowN" then
-            return nil
+            -- This is a window frame and it hase a closed window in it
+            local windowNorth = target:getWall(true)
+            -- It's possible for getWall to return nil if this is a wall-type window, like the floor to ceiling ones.
+            if windowNorth then
+                -- We are a wall that a window can be placed into.
+                if not SWAB_Building.porousWallsNorth[windowNorth:getTextureName()] then
+                    -- It's not a porous material
+                    return nil
+                end
+            end
         end
     else
         -- East or West
-        if targetProperties:Is("WallW") or targetProperties:Is("WallNW") then
+
+        if targetProperties:Is("WallW") and not SWAB_Building.porousWallsWest[target:getWall(false):getTextureName()] then
+            -- This is a wall, and it's not a porous material
             return nil
         end
 
         if targetProperties:Is("WindowW") and targetProperties:Val("WindowW") == "WindowW" then
-            return nil
+            -- This is a window frame and it hase a closed window in it
+            local windowWest = target:getWall(false)
+            -- It's possible for getWall to return nil if this is a wall-type window, like the floor to ceiling ones.
+            if windowWest then
+                -- We are a wall that a window can be placed into.
+                if not SWAB_Building.porousWallsWest[target:getWall(false):getTextureName()] then
+                    -- It's not a porous material
+                    return nil
+                end
+            end
         end
     end
 
