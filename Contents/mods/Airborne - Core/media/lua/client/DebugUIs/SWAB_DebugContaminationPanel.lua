@@ -66,6 +66,130 @@ function SWAB_DebugContaminationPanel:prerender()
         respiratoryExposure = string.format("%.2f", modData.respiratoryExposure)
     end
     z = self:drawField("Respiratory Exposure", respiratoryExposure, x, z)
+
+    local getPlayerSquareProperties = function()
+        square = getCell():getGridSquare(getPlayer():getX(), getPlayer():getY(), getPlayer():getZ())
+        if square then
+            local properties = square:getProperties()
+            if properties then
+                local propertiesResult = "propertylist:"
+                local propertyList = properties:getPropertyNames()
+                for i = 0, propertyList:size() -1 do
+                    propertiesResult = propertiesResult..tostring(propertyList:get(i))..":"..tostring(properties:Val(propertyList:get(i))).."\n"
+                end
+                return propertiesResult
+            end    
+        end
+    end
+
+    local getNeighboringSquare = function(_origin, _direction)
+        local offsetX = 0
+        local offsetY = 0
+        local target = nil
+        local neighbor = nil
+        
+        if _direction == IsoDirections.N then
+            target = _origin
+            neighbor = getCell():getGridSquare(_origin:getX(), _origin:getY() - 1, _origin:getZ())
+        elseif _direction == IsoDirections.E then
+            target = getCell():getGridSquare(_origin:getX() + 1, _origin:getY(), _origin:getZ())
+            neighbor = target
+        elseif _direction == IsoDirections.S then
+            target = getCell():getGridSquare(_origin:getX(), _origin:getY() + 1, _origin:getZ())
+            neighbor = target
+        elseif _direction == IsoDirections.W then
+            target = _origin
+            neighbor = getCell():getGridSquare(_origin:getX() - 1, _origin:getY(), _origin:getZ())
+        end
+        
+        local targetProperties = target:getProperties()
+
+        if _direction == IsoDirections.N then
+            -- North
+            if targetProperties:Is("WallN") or targetProperties:Is("WallNW") then
+                return nil
+            end
+
+            if targetProperties:Is("WindowN") and targetProperties:Val("WindowN") == "WindowN" then
+                return nil
+            end
+        elseif _direction == IsoDirections.S then
+            -- South
+            if targetProperties:Is("WallN") or targetProperties:Is("WallNW") then
+                return nil
+            end
+
+            if targetProperties:Is("WindowN") and targetProperties:Val("WindowN") == "WindowN" then
+                return nil
+            end
+        else
+            -- East or West
+            if targetProperties:Is("WallW") or targetProperties:Is("WallNW") then
+                return nil
+            end
+
+            if targetProperties:Is("WindowW") and targetProperties:Val("WindowW") == "WindowW" then
+                return nil
+            end
+        end
+
+        -- No obstructions so far
+
+        local door = _origin:getDoorTo(neighbor)
+
+        if door and not door:IsOpen() and not door:isDestroyed() then
+            return nil
+        end
+
+        return neighbor
+    end
+    
+    if getPlayer() and getPlayer():getSquare() then
+        local neighbor = getNeighboringSquare(getPlayer():getSquare(), IsoDirections.E)
+        z = self:drawField("Neighbor North", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.N)), x, z)
+        z = self:drawField("Neighbor East", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.E)), x, z)
+        z = self:drawField("Neighbor South", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.S)), x, z)
+        z = self:drawField("Neighbor West", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.W)), x, z)
+        --z = self:drawField("Square Props", tostring(getPlayerSquareProperties(getPlayer():getSquare())), x, z)
+    end
+
+    -- if getPlayer() and getPlayer():getSquare() then
+    --     local neighbor = getNeighboringSquare(getPlayer():getSquare(), IsoDirections.E)
+    --     z = self:drawField("Neighbor", tostring(neighbor), x, z)
+    -- end
+
+    -- if getPlayer() and getPlayer():getSquare() then
+    --     local neighbor = getPlayer():getSquare():getE()
+    --     local door = getPlayer():getSquare():getDoorTo(neighbor)
+    --     local readout = "No Door"
+    --     if door then
+    --         readout = "IsOpen:"..tostring(door:IsOpen())
+    --         readout = readout.." IsDestroyed:"..tostring(door:isDestroyed())
+    --     end
+    --     z = self:drawField("East Door", readout, x, z)
+    -- end
+    -- if getPlayer() and getPlayer():getSquare() then
+    --     --local neighbor = getPlayer():getSquare():getE()
+    --     local neighbor = getCell():getGridSquare(getPlayer():getX() + 1, getPlayer():getY(), getPlayer():getZ())
+    --     local readout = "neighbor:"
+    --     if neighbor then
+    --         local objects = neighbor:getObjects()
+    --         if objects then
+    --             for i = 0, objects:size() - 1 do
+    --                 local object = objects:get(i)
+    --                 local objectProperties = object:getProperties()
+    --                 if props and props:Is("IsPaintable") then
+    --                 -- if objectProperties then
+    --                 --     for p = 0, objectProperties:size() - 1 do
+    --                 --         readout = readout..tostring(objectProperties.get(p))..","
+    --                 --     end
+    --                 --     readout = readout.."\n\t"
+    --                 -- end
+    --             end
+    --         end
+    --     end
+    --     z = self:drawField("East Objs", readout, x, z)
+    -- end
 end
 
 function SWAB_DebugContaminationPanel:drawField(_name, _value, _x, _z)

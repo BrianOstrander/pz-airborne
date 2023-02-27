@@ -126,16 +126,31 @@ function SWAB_Building.CalculateSquareExposure(_square)
     for _, direction in ipairs(directions) do
         
         -- Doing it this way out of an ill concieved idea that it might be more efficient
-        local neighobr = nil
-        if direction == IsoDirections.N then
-            neighbor = _square:getN()
-        elseif direction == IsoDirections.E then
-            neighbor = _square:getE()
-        elseif direction == IsoDirections.S then
-            neighbor = _square:getS()
-        elseif direction == IsoDirections.W then
-            neighbor = _square:getW()
-        end
+        local neighbor = SWAB_Building.GetNeighboringSquare(_square, direction)
+        -- local neighborDirection = nil
+        -- local offsetX = 0
+        -- local offsetY = 0
+        -- if direction == IsoDirections.N then
+        --     neighborDirection = IsoDirections.S
+        --     offsetY = -1
+        -- elseif direction == IsoDirections.E then
+        --     neighborDirection = IsoDirections.W
+        --     offsetX = 1
+        -- elseif direction == IsoDirections.S then
+        --     neighborDirection = IsoDirections.N
+        --     offsetY = 1
+        -- elseif direction == IsoDirections.W then
+        --     neighborDirection = IsoDirections.E
+        --     offsetX = -1
+        -- end
+
+        -- if not neighbor then
+        --     local possibleNeighbor = getCell():getGridSquare(_square:getX() + offsetX, _square:getY() + offsetY, _square:getZ())
+        --     if SWAB_Building.GetNeighboringSquare(possibleNeighbor, neighborDirection) then
+        --         -- Furniture or something was blocking us from accessing this neighbor, but it is valid.
+        --         neighbor = possibleNeighbor
+        --     end
+        -- end
 
         local neighborExposure = SWAB_Building.CalculateSquareExposureFromNeighbor(_square, neighbor)
 
@@ -152,37 +167,135 @@ end
 function SWAB_Building.CalculateSquareExposureFromNeighbor(_square, _neighbor)
     if not _neighbor then
         return nil
-    end 
+    end
+    -- ----------------------------------------------------------
+    -- This is a valid neighbor, we haven't hit a wall, closed door, or closed window
+
+    local neighborExposure = nil
+    
+    if _neighbor:getRoomID() == -1 then
+        neighborExposure = 7
+    else
+        neighborExposure = _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
+    end
+
+    -- local window = _square:getWindowTo(_neighbor)
+    
+    -- if window then
+    --     if window:IsOpen() or window:isSmashed() then
+    --         -- Window open or smashed
+    --         return neighborExposure
+    --     end 
+    --     -- Window closed
+    --     return nil
+    -- end
+
+    -- local door = _square:getDoorTo(_neighbor)
+
+    -- if door then
+    --     if door:IsOpen() or door:isDestroyed() then
+    --         -- Door open or smashed
+    --         return neighborExposure
+    --     end
+    --     -- Door closed
+    --     return nil
+    -- end
+    
+    -- Missing window or door
+    return neighborExposure
+    -- ----------------------------------------------------------
 
     -- This is a valid neighbor, we haven't hit a wall, closed door, or closed window
-    if _neighbor:getRoomID() == -1 then
-        -- Outdoors
-        local window = _square:getWindowTo(_neighbor)
+    -- if _neighbor:getRoomID() == -1 then
+    --     -- Outdoors
+    --     local window = _square:getWindowTo(_neighbor)
         
-        if window then
-            if window:IsOpen() or window:isSmashed() then
-                -- Window open or smashed
-                return 7
-            end 
-            -- Window closed
-            return nil
-        end
+    --     if window then
+    --         if window:IsOpen() or window:isSmashed() then
+    --             -- Window open or smashed
+    --             return 7
+    --         end 
+    --         -- Window closed
+    --         return nil
+    --     end
 
-        local door = _square:getDoorTo(_neighbor)
+    --     local door = _square:getDoorTo(_neighbor)
 
-        if door then
-            if door:IsOpen() or door:isDestroyed() then
-                -- Door open or smashed
-                return 7
-            end
-            -- Door closed
-            return nil
-        end
+    --     if door then
+    --         if door:IsOpen() or door:isDestroyed() then
+    --             -- Door open or smashed
+    --             return 7
+    --         end
+    --         -- Door closed
+    --         return nil
+    --     end
         
-        -- Missing window or door
-        return 7
-    else
-        -- Indoors
-        return _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
+    --     -- Missing window or door
+    --     return 7
+    -- else
+    --     -- Indoors
+    --     return _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
+    -- end
+end
+
+function SWAB_Building.GetNeighboringSquare(_origin, _direction)
+    local offsetX = 0
+    local offsetY = 0
+    local target = nil
+    local neighbor = nil
+    
+    if _direction == IsoDirections.N then
+        target = _origin
+        neighbor = getCell():getGridSquare(_origin:getX(), _origin:getY() - 1, _origin:getZ())
+    elseif _direction == IsoDirections.E then
+        target = getCell():getGridSquare(_origin:getX() + 1, _origin:getY(), _origin:getZ())
+        neighbor = target
+    elseif _direction == IsoDirections.S then
+        target = getCell():getGridSquare(_origin:getX(), _origin:getY() + 1, _origin:getZ())
+        neighbor = target
+    elseif _direction == IsoDirections.W then
+        target = _origin
+        neighbor = getCell():getGridSquare(_origin:getX() - 1, _origin:getY(), _origin:getZ())
     end
+    
+    local targetProperties = target:getProperties()
+
+    if _direction == IsoDirections.N then
+        -- North
+        if targetProperties:Is("WallN") or targetProperties:Is("WallNW") then
+            return nil
+        end
+
+        if targetProperties:Is("WindowN") and targetProperties:Val("WindowN") == "WindowN" then
+            return nil
+        end
+    elseif _direction == IsoDirections.S then
+        -- South
+        if targetProperties:Is("WallN") or targetProperties:Is("WallNW") then
+            return nil
+        end
+
+        if targetProperties:Is("WindowN") and targetProperties:Val("WindowN") == "WindowN" then
+            return nil
+        end
+    else
+        -- East or West
+        if targetProperties:Is("WallW") or targetProperties:Is("WallNW") then
+            return nil
+        end
+
+        if targetProperties:Is("WindowW") and targetProperties:Val("WindowW") == "WindowW" then
+            return nil
+        end
+    end
+
+    -- No obstructions so far
+
+    local door = _origin:getDoorTo(neighbor)
+
+    if door and not door:IsOpen() and not door:isDestroyed() then
+        return nil
+    end
+
+    return neighbor
 end
