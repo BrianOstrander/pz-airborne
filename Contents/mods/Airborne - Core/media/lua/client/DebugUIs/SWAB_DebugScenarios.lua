@@ -39,7 +39,7 @@ function SWAB_DebugScenarios.EveryOneMinute()
         if SWAB_DebugScenarios.playerDistanceThreshold < playerDistance or (minutes and minutes == 1) then
             SWAB_DebugScenarios.CleanupZombies()
         end
-ee
+        
         SWAB_DebugScenarios.playerPosition = playerPosition
     end
 
