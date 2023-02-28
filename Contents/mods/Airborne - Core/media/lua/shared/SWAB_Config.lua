@@ -22,6 +22,8 @@ SWAB_Config.buildingContaminationBaseline = 4
 SWAB_Config.moodleId = "contamination"
 SWAB_Config.playerModDataId = "swab_player"
 SWAB_Config.squareExposureModDataId = "swab_square_exposure"
+SWAB_Config.squareFloorClaimDeltaModDataId = "swab_square_floor_claim_delta"
+SWAB_Config.squareCeilingHeightModDataId = "swab_square_ceiling_height"
 
 function SWAB_Config.getBuildingModDataId(_buildingDef)
     return "swab_building_".._buildingDef:getID()

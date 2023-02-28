@@ -72,7 +72,7 @@ function SWAB_Building.OnTick(_tick)
     table.sort(
         buildingsSorted,
         function(b1, b2)
-            return b2.lastUpdated < b1.lastUpdated
+            return b2.ticksSinceUpdate < b1.ticksSinceUpdate
         end
     )
 
@@ -88,7 +88,9 @@ function SWAB_Building.InitializeBuilding(_def, _modDataId, _modData)
     _modData.defId = _def:getID()
     _modData.x = _def:getX()
     _modData.y = _def:getY()
-    _modData.lastUpdated = 0
+    _modData.ticksSinceUpdate = 0
+    _modData.lastRoomIndexInitialized = -1
+    _modData.lastRoomIndexUpdated = -1
     
     if SWAB_Config.debug.logging then
         print("SWAB: SWAB_Building.InitializeBuilding ".._modDataId)
@@ -97,36 +99,75 @@ end
 
 function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _skip)
     if _skip then
-        _modData.lastUpdated = _modData.lastUpdated + _tickDelta
+        _modData.ticksSinceUpdate = _modData.ticksSinceUpdate + _tickDelta
         return
     end
 
-    _modData.lastUpdated = 0
+    _modData.ticksSinceUpdate = 0
 
+    --local buildingDef = getCell():getGridSquare(_modData.x, _modData.y, 0):getBuilding():getDef()
     local buildingDef = getWorld():getMetaGrid():getBuildingAt(_modData.x, _modData.y)
     local roomDefArray = buildingDef:getRooms()
 
-    for roomIndex = 0, roomDefArray:size() - 1 do
-        local room = roomDefArray:get(roomIndex):getIsoRoom()
-        local squares = room:getSquares()
-        for squareIndex = 0, squares:size() - 1 do
-            local square = squares:get(squareIndex)
-            local squareExposurePrevious = square:getModData()[SWAB_Config.squareExposureModDataId]
-            local squareExposure = SWAB_Building.CalculateSquareExposure(square)
-            
-            if not squareExposure then
-                squareExposure = squareExposurePrevious
+    if _modData.lastRoomIndexInitialized < (roomDefArray:size() - 1) then
+        -- We still have rooms to initialize
+        _modData.lastRoomIndexInitialized = _modData.lastRoomIndexInitialized + 1
+
+        SWAB_Building.InitializeRoom(roomDefArray:get(_modData.lastRoomIndexInitialized):getIsoRoom())
+    else
+        -- We can update a room
+        _modData.lastRoomIndexUpdated = _modData.lastRoomIndexUpdated + 1
+
+        if roomDefArray:size() <= _modData.lastRoomIndexUpdated then
+            _modData.lastRoomIndexUpdated = 0
+        end
+
+        SWAB_Building.UpdateRoom(roomDefArray:get(_modData.lastRoomIndexUpdated):getIsoRoom())
+    end
+end
+
+function SWAB_Building.InitializeRoom(_room)
+    local squares = _room:getSquares()
+    for squareIndex = 0, squares:size() - 1 do
+        local square = squares:get(squareIndex)
+        
+        local squareAbove = nil
+        local squareAboveX = square:getX()
+        local squareAboveY = square:getY()
+        local squareAboveZ = square:getZ() + 1
+        repeat
+            local squareAbove = getCell():getGridSquare(squareAboveX, squareAboveY, squareAboveZ)
+            if squareAbove and not squareAbove:Is(IsoFlagType.attachedFloor) then
+                squareAbove:getModData()[SWAB_Config.squareFloorClaimDeltaModDataId] = square:getZ() - squareAboveZ
             end
+            squareAboveZ = squareAboveZ + 1
+        until not squareAbove or squareAbove:Is(IsoFlagType.attachedFloor)
+        square:getModData()[SWAB_Config.squareCeilingHeightModDataId] = squareAboveZ - 1
+    end
+end
 
-            if squareExposure then
-                if squareExposure < SWAB_Config.buildingContaminationBaseline then
-                    squareExposure = PZMath.max(squareExposure - SWAB_Config.buildingContaminationDecayRate, 0)
-                else
-                    squareExposure = PZMath.max(squareExposure - SWAB_Config.buildingContaminationDecayRate, SWAB_Config.buildingContaminationBaseline)
-                end
-                square:getModData()[SWAB_Config.squareExposureModDataId] = squareExposure
+function SWAB_Building.UpdateRoom(_room)
+    local squares = _room:getSquares()
+    for squareIndex = 0, squares:size() - 1 do
+        local square = squares:get(squareIndex)
+        local squareExposurePrevious = square:getModData()[SWAB_Config.squareExposureModDataId]
+        local squareExposure = SWAB_Building.CalculateSquareExposure(square)
+        
+        if not squareExposure then
+            squareExposure = squareExposurePrevious
+        end
 
-                if SWAB_Config.debug.visualizeExposure then
+        if squareExposure then
+            if squareExposure < SWAB_Config.buildingContaminationBaseline then
+                squareExposure = PZMath.max(squareExposure - SWAB_Config.buildingContaminationDecayRate, 0)
+            else
+                squareExposure = PZMath.max(squareExposure - SWAB_Config.buildingContaminationDecayRate, SWAB_Config.buildingContaminationBaseline)
+            end
+            square:getModData()[SWAB_Config.squareExposureModDataId] = squareExposure
+
+            if SWAB_Config.debug.visualizeExposure then
+                local highlightedFloor = square:getFloor()
+                if highlightedFloor then
                     square:getFloor():setHighlighted(true, false)
                     square:getFloor():setHighlightColor(1.0, 0.0, 0.0, (squareExposure - 4)/3)
                 end
@@ -170,6 +211,10 @@ function SWAB_Building.CalculateSquareExposure(_square)
         -- end
 
         local neighborExposure = SWAB_Building.CalculateSquareExposureFromNeighbor(_square, neighbor)
+        -- local neighborExposure = nil
+        -- if neighbor then
+        --     neighborExposure = neighbor:getModData()[SWAB_Config.squareExposureModDataId]
+        -- end
 
         if neighborExposure then
             if not highestExposure or highestExposure < neighborExposure then
@@ -185,74 +230,15 @@ function SWAB_Building.CalculateSquareExposureFromNeighbor(_square, _neighbor)
     if not _neighbor then
         return nil
     end
-    -- ----------------------------------------------------------
-    -- This is a valid neighbor, we haven't hit a wall, closed door, or closed window
-
-    local neighborExposure = nil
     
     if _neighbor:getRoomID() == -1 then
-        neighborExposure = 7
+        if _neighbor:getModData()[SWAB_Config.squareFloorClaimDeltaModDataId] then
+            return _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
+        end
+        return 7
     else
-        neighborExposure = _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
+        return _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
     end
-
-    -- local window = _square:getWindowTo(_neighbor)
-    
-    -- if window then
-    --     if window:IsOpen() or window:isSmashed() then
-    --         -- Window open or smashed
-    --         return neighborExposure
-    --     end 
-    --     -- Window closed
-    --     return nil
-    -- end
-
-    -- local door = _square:getDoorTo(_neighbor)
-
-    -- if door then
-    --     if door:IsOpen() or door:isDestroyed() then
-    --         -- Door open or smashed
-    --         return neighborExposure
-    --     end
-    --     -- Door closed
-    --     return nil
-    -- end
-    
-    -- Missing window or door
-    return neighborExposure
-    -- ----------------------------------------------------------
-
-    -- This is a valid neighbor, we haven't hit a wall, closed door, or closed window
-    -- if _neighbor:getRoomID() == -1 then
-    --     -- Outdoors
-    --     local window = _square:getWindowTo(_neighbor)
-        
-    --     if window then
-    --         if window:IsOpen() or window:isSmashed() then
-    --             -- Window open or smashed
-    --             return 7
-    --         end 
-    --         -- Window closed
-    --         return nil
-    --     end
-
-    --     local door = _square:getDoorTo(_neighbor)
-
-    --     if door then
-    --         if door:IsOpen() or door:isDestroyed() then
-    --             -- Door open or smashed
-    --             return 7
-    --         end
-    --         -- Door closed
-    --         return nil
-    --     end
-        
-    --     -- Missing window or door
-    --     return 7
-    -- else
-    --     -- Indoors
-    --     return _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
-    -- end
 end
 
 function SWAB_Building.GetNeighboringSquare(_origin, _direction)
