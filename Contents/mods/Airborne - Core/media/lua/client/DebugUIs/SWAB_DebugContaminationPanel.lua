@@ -24,7 +24,16 @@ function SWAB_DebugContaminationPanel:initialise()
     local btnHgt = math.max(25, FONT_HGT_SMALL + 3 * 2)
     local padBottom = 10
 
-    self.ok = ISButton:new(10, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt, "Close", self, SWAB_DebugContaminationPanel.onClick)
+    self.ReInitializeBuilding = ISButton:new(10, self:getHeight() - (padBottom * 2) - (btnHgt * 2), btnWid, btnHgt, "ReInit Building", self, SWAB_DebugContaminationPanel.onClickReInitBuilding)
+    self.ReInitializeBuilding.internal = "REINIT_BUILDING"
+    self.ReInitializeBuilding.anchorTop = false
+    self.ReInitializeBuilding.anchorBottom = true
+    self.ReInitializeBuilding:initialise()
+    self.ReInitializeBuilding:instantiate()
+    self.ReInitializeBuilding.borderColor = {r=1, g=1, b=1, a=0.1}
+    self:addChild(self.ReInitializeBuilding)
+
+    self.ok = ISButton:new(10, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt, "Close", self, SWAB_DebugContaminationPanel.onClickClose)
     self.ok.internal = "CLOSE"
     self.ok.anchorTop = false
     self.ok.anchorBottom = true
@@ -67,10 +76,9 @@ function SWAB_DebugContaminationPanel:prerender()
     end
     z = self:drawField("Respiratory Exposure", respiratoryExposure, x, z)
 
-    local getPlayerSquareProperties = function()
-        square = getCell():getGridSquare(getPlayer():getX(), getPlayer():getY(), getPlayer():getZ())
-        if square then
-            local properties = square:getProperties()
+    local getSquareProperties = function(_square)
+        if _square then
+            local properties = _square:getProperties()
             if properties then
                 local propertiesResult = "propertylist:"
                 local propertyList = properties:getPropertyNames()
@@ -90,6 +98,7 @@ function SWAB_DebugContaminationPanel:prerender()
         SWAB_Building.porousWallsNorth["walls_exterior_wooden_01_45"] = true
         SWAB_Building.porousWallsNorth["walls_exterior_wooden_01_49"] = true
         SWAB_Building.porousWallsNorth["walls_exterior_wooden_01_53"] = true
+        --SWAB_Building.porousWallsNorth["walls_garage_01_12"] = true -- ADDED THIS ON 
         SWAB_Building.porousWallsNorth["constructedobjects_01_65"] = true
         SWAB_Building.porousWallsNorth["constructedobjects_01_73"] = true
 
@@ -184,24 +193,35 @@ function SWAB_DebugContaminationPanel:prerender()
         return neighbor
     end
     
-    -- if getPlayer() and getPlayer():getSquare() then
-    --     z = self:drawField("Neighbor North", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.N)), x, z)
-    --     z = self:drawField("Neighbor East", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.E)), x, z)
-    --     z = self:drawField("Neighbor South", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.S)), x, z)
-    --     z = self:drawField("Neighbor West", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.W)), x, z)
+    if getPlayer() and getPlayer():getSquare() then
+        z = self:drawField("Neighbor North", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.N)), x, z)
+        z = self:drawField("Neighbor East", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.E)), x, z)
+        z = self:drawField("Neighbor South", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.S)), x, z)
+        z = self:drawField("Neighbor West", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.W)), x, z)
+
+        --z = self:drawField("RoomModDataExp", tostring(getPlayer():getSquare():getModData()[SWAB_Config.squareExposureModDataId]), x, z)
+        if getNeighboringSquare(getPlayer():getSquare(), IsoDirections.S) and getNeighboringSquare(getPlayer():getSquare(), IsoDirections.S):getModData() then
+            z = self:drawField("Floor Claim Delta S", tostring(getNeighboringSquare(getPlayer():getSquare(), IsoDirections.S):getModData()[SWAB_Config.squareFloorClaimDeltaModDataId]), x, z)
+        else
+            z = self:drawField("Floor Claim Delta S", "No Claim", x, z)
+        end
         
-    --     local objects = getPlayer():getSquare():getObjects()
-    --     if objects and 0 < objects:size() then
-    --         local objectsResult = ""
-    --         for i = 0, objects:size() - 1 do
-    --             local object = objects:get(i)
-    --             objectsResult = objectsResult..tostring(object:getType())..":"..tostring(object:getTextureName()).."\n"
-    --         end
-    --         z = self:drawField("objs", objectsResult, x, z)
-    --     end
-    --     z = z + 60
-    --     z = self:drawField("curr", getPlayerSquareProperties(), x, z)
-    -- end
+        local northSquare = getNeighboringSquare(getPlayer():getSquare(), IsoDirections.N)
+        if northSquare then
+            z = self:drawField("Neighbor North", tostring(getSquareProperties(northSquare)), x, z)
+        end
+        -- local objects = getPlayer():getSquare():getObjects()
+        -- if objects and 0 < objects:size() then
+        --     local objectsResult = ""
+        --     for i = 0, objects:size() - 1 do
+        --         local object = objects:get(i)
+        --         objectsResult = objectsResult..tostring(object:getType())..":"..tostring(object:getTextureName()).."\n"
+        --     end
+        --     z = self:drawField("objs", objectsResult, x, z)
+        -- end
+        -- z = z + 60
+        -- z = self:drawField("curr", getPlayerSquareProperties(), x, z)
+    end
 end
 
 function SWAB_DebugContaminationPanel:drawField(_name, _value, _x, _z)
@@ -211,12 +231,18 @@ function SWAB_DebugContaminationPanel:drawField(_name, _value, _x, _z)
     return _z + 16
 end
 
-function SWAB_DebugContaminationPanel:onClick(_button)
-    if _button.internal == "CLOSE" then
-        
-        self:setVisible(false)
-        self:removeFromUIManager()
+function SWAB_DebugContaminationPanel:onClickReInitBuilding(_button)
+    if getPlayer():getSquare() and getPlayer():getSquare():getBuilding() then
+        local buildingModDataId = SWAB_Config.getBuildingModDataId(getPlayer():getSquare():getBuilding():getDef())
+        if ModData.exists(buildingModDataId) then
+            ModData.remove(buildingModDataId)
+        end
     end
+end
+
+function SWAB_DebugContaminationPanel:onClickClose(_button)
+    self:setVisible(false)
+    self:removeFromUIManager()
 end
 
 --************************************************************************--
