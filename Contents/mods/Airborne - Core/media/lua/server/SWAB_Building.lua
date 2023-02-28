@@ -105,7 +105,6 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _skip)
 
     _modData.ticksSinceUpdate = 0
 
-    --local buildingDef = getCell():getGridSquare(_modData.x, _modData.y, 0):getBuilding():getDef()
     local buildingDef = getWorld():getMetaGrid():getBuildingAt(_modData.x, _modData.y)
     local roomDefArray = buildingDef:getRooms()
 
@@ -185,39 +184,11 @@ function SWAB_Building.CalculateSquareExposure(_square)
         
         -- Doing it this way out of an ill concieved idea that it might be more efficient
         local neighbor = SWAB_Building.GetNeighboringSquare(_square, direction)
-        -- local neighborDirection = nil
-        -- local offsetX = 0
-        -- local offsetY = 0
-        -- if direction == IsoDirections.N then
-        --     neighborDirection = IsoDirections.S
-        --     offsetY = -1
-        -- elseif direction == IsoDirections.E then
-        --     neighborDirection = IsoDirections.W
-        --     offsetX = 1
-        -- elseif direction == IsoDirections.S then
-        --     neighborDirection = IsoDirections.N
-        --     offsetY = 1
-        -- elseif direction == IsoDirections.W then
-        --     neighborDirection = IsoDirections.E
-        --     offsetX = -1
-        -- end
-
-        -- if not neighbor then
-        --     local possibleNeighbor = getCell():getGridSquare(_square:getX() + offsetX, _square:getY() + offsetY, _square:getZ())
-        --     if SWAB_Building.GetNeighboringSquare(possibleNeighbor, neighborDirection) then
-        --         -- Furniture or something was blocking us from accessing this neighbor, but it is valid.
-        --         neighbor = possibleNeighbor
-        --     end
-        -- end
-
         local neighborExposure = SWAB_Building.CalculateSquareExposureFromNeighbor(_square, neighbor)
-        -- local neighborExposure = nil
-        -- if neighbor then
-        --     neighborExposure = neighbor:getModData()[SWAB_Config.squareExposureModDataId]
-        -- end
-
+        
         if neighborExposure then
             if not highestExposure or highestExposure < neighborExposure then
+                -- We take the highest level of exposure from our neighboring tiles
                 highestExposure = neighborExposure
             end
         end
@@ -260,7 +231,6 @@ function SWAB_Building.GetNeighboringSquare(_origin, _direction)
     end
     
     if not target or not neighbor then
-        -- print("SWAB: Error, "..tostring(_direction).." neighbor of (".._origin:getX()..",".._origin:getY()..") is nil")
         -- I think this can happen if we're requesting a square very far away from the player.
         return nil
     end
@@ -319,6 +289,7 @@ function SWAB_Building.GetNeighboringSquare(_origin, _direction)
     local door = _origin:getDoorTo(neighbor)
 
     if door and not door:IsOpen() and not door:isDestroyed() then
+        -- Found a door that is closed.
         return nil
     end
 
