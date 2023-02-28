@@ -95,6 +95,7 @@ function SWAB_Building.InitializeBuilding(_def, _modDataId, _modData)
     _modData.lastRoomIndexInitialized = -1
     _modData.lastRoomIndexUpdated = -1
     _modData.lastRoomSquareIndex = -1
+    _modData.buildingSquareUpdateBudgetMaximum = -1
     
     if SWAB_Config.debug.logging then
         print("SWAB: SWAB_Building.InitializeBuilding ".._modDataId)
@@ -112,39 +113,53 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _skip)
     local buildingDef = getWorld():getMetaGrid():getBuildingAt(_modData.x, _modData.y)
     local roomDefArray = buildingDef:getRooms()
 
-    if _modData.lastRoomIndexInitialized < roomDefArray:size() then
-        -- We still have rooms to initialize
-        _modData.lastRoomIndexInitialized = PZMath.max(0, _modData.lastRoomIndexInitialized)
-        SWAB_Building.IterateRoomSquares(
-            _modData,
-            roomDefArray:get(_modData.lastRoomIndexInitialized):getIsoRoom(),
-            SWAB_Building.InitializeRoomSquare,
-            SWAB_Building.InitializeRoomDone
-        )
-        --SWAB_Building.InitializeRoom(_modData, roomDefArray:get(_modData.lastRoomIndexInitialized):getIsoRoom())
-    else
-        -- We can update a room
-        _modData.lastRoomIndexUpdated = PZMath.max(0, _modData.lastRoomIndexUpdated)
+    local buildingSquareBudgetRemaining = SWAB_Config.buildingSquareUpdateBudget
 
-        if roomDefArray:size() <= _modData.lastRoomIndexUpdated then
-            -- We've updated all the rooms, roll back to the first one
-            _modData.lastRoomIndexUpdated = 0
+    if -1 < _modData.lastRoomIndexUpdated then
+        -- This building has been initialized, so lets set a proper update budget
+        buildingSquareBudgetRemaining = PZMath.min(buildingSquareBudgetRemaining, _modData.buildingSquareUpdateBudgetMaximum)
+    end
+
+    while 0 < buildingSquareBudgetRemaining do
+        
+        local squareUpdateCount = 0
+        
+        if _modData.lastRoomIndexInitialized < roomDefArray:size() then
+            -- We still have rooms to initialize
+            _modData.lastRoomIndexInitialized = PZMath.max(0, _modData.lastRoomIndexInitialized)
+            squareUpdateCount = SWAB_Building.IterateRoomSquares(
+                _modData,
+                roomDefArray:get(_modData.lastRoomIndexInitialized):getIsoRoom(),
+                SWAB_Building.InitializeRoomSquare,
+                SWAB_Building.InitializeRoomDone
+            )
+        else
+            -- We can update a room
+            _modData.lastRoomIndexUpdated = PZMath.max(0, _modData.lastRoomIndexUpdated)
+    
+            if roomDefArray:size() <= _modData.lastRoomIndexUpdated then
+                -- We've updated all the rooms, roll back to the first one
+                _modData.lastRoomIndexUpdated = 0
+            end
+    
+            squareUpdateCount = SWAB_Building.IterateRoomSquares(
+                _modData,
+                roomDefArray:get(_modData.lastRoomIndexUpdated):getIsoRoom(),
+                SWAB_Building.UpdateRoomSquare,
+                SWAB_Building.UpdateRoomDone
+            )
         end
 
-        SWAB_Building.IterateRoomSquares(
-            _modData,
-            roomDefArray:get(_modData.lastRoomIndexUpdated):getIsoRoom(),
-            SWAB_Building.UpdateRoomSquare,
-            SWAB_Building.UpdateRoomDone
-        )
-        --SWAB_Building.UpdateRoom(roomDefArray:get(_modData.lastRoomIndexUpdated):getIsoRoom())
+        buildingSquareBudgetRemaining = buildingSquareBudgetRemaining - squareUpdateCount
     end
 end
 
 function SWAB_Building.IterateRoomSquares(_modData, _room, _onIterate, _onDone)
     _modData.lastRoomSquareIndex = PZMath.max(0, _modData.lastRoomSquareIndex)
     local squares = _room:getSquares()
-    for squareIndex = _modData.lastRoomSquareIndex, PZMath.min(squares:size() - 1, _modData.lastRoomSquareIndex + SWAB_Config.buildingSquareUpdateBudget) do
+    local squareBeginIndex = _modData.lastRoomSquareIndex
+    local squareEndIndex = PZMath.min(squares:size() - 1, _modData.lastRoomSquareIndex + SWAB_Config.buildingSquareUpdateBudget)
+    for squareIndex = squareBeginIndex, squareEndIndex do
         _modData.lastRoomSquareIndex = _modData.lastRoomSquareIndex + 1
         local square = squares:get(squareIndex)
 
@@ -154,8 +169,10 @@ function SWAB_Building.IterateRoomSquares(_modData, _room, _onIterate, _onDone)
     if squares:size() <= _modData.lastRoomSquareIndex  then
         -- We completed iterating over an entire room
         _modData.lastRoomSquareIndex = -1
-        _onDone(_modData, _room)
+        _onDone(_modData, _room, squares:size())
     end
+
+    return squareEndIndex - squareBeginIndex
 end
 
 function SWAB_Building.InitializeRoomSquare(_modData, _room, _square)
@@ -173,10 +190,10 @@ function SWAB_Building.InitializeRoomSquare(_modData, _room, _square)
     _square:getModData()[SWAB_Config.squareCeilingHeightModDataId] = squareAboveZ - 1
 end
 
-function SWAB_Building.InitializeRoomDone(_modData, _room)
-    print("Initialized Room ".._room:getName())
+function SWAB_Building.InitializeRoomDone(_modData, _room, _squareCount)
     -- Increment the room initialization index, so we know we can move onto the next one.
     _modData.lastRoomIndexInitialized = _modData.lastRoomIndexInitialized + 1
+    _modData.buildingSquareUpdateBudgetMaximum = PZMath.max(0, _modData.buildingSquareUpdateBudgetMaximum) + _squareCount
 end
 
 function SWAB_Building.UpdateRoomSquare(_modData, _room, _square)
@@ -205,7 +222,7 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square)
     end
 end
 
-function SWAB_Building.UpdateRoomDone(_modData, _room)
+function SWAB_Building.UpdateRoomDone(_modData, _room, _squareCount)
     -- Increment the room update index, so we know we can move onto the next one.
     _modData.lastRoomIndexUpdated = _modData.lastRoomIndexUpdated + 1
 end
