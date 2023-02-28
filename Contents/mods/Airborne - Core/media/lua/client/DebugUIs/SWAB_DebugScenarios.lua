@@ -8,6 +8,10 @@ SWAB_DebugScenarios.scenarios = {
         location = { x = 10660, y = 9392, z = 0 },
     },
     {
+        name = "Firehouse",
+        location = { x = 8146, y = 11753, z = 0 },
+    },
+    {
         name = "Warehouse",
         location = { x = 10612, y = 9324, z = 0 },
     },
@@ -21,13 +25,24 @@ SWAB_DebugScenarios.scenarios = {
     },
 }
 
+-- Last player position
+SWAB_DebugScenarios.playerPosition = { x = 0, y = 0 }
+-- How far they can move in 1 minute before we do a cleanup
+SWAB_DebugScenarios.playerDistanceThreshold = 1000
+
 function SWAB_DebugScenarios.EveryOneMinute()
     if GameTime:getInstance() then
         local minutes = GameTime:getInstance():getMinutes()
-        if minutes and minutes == 1 then
+        local playerPosition = { x = getPlayer():getX(), y = getPlayer():getY() }
+        local playerDistance = PZMath.max(PZMath.abs(playerPosition.x - SWAB_DebugScenarios.playerPosition.x), PZMath.abs(playerPosition.y - SWAB_DebugScenarios.playerPosition.y))
+
+        if SWAB_DebugScenarios.playerDistanceThreshold < playerDistance or (minutes and minutes == 1) then
             SWAB_DebugScenarios.CleanupZombies()
         end
+ee
+        SWAB_DebugScenarios.playerPosition = playerPosition
     end
+
 end
 
 function SWAB_DebugScenarios.CleanupZombies()

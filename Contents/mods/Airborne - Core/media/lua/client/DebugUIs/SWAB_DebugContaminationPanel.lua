@@ -59,7 +59,7 @@ function SWAB_DebugContaminationPanel:prerender()
     local buildingModDataId = "< Outside >"
     local roomModDataId = "< Outside >"
 
-    if getPlayer():getSquare():getRoom() then
+    if getPlayer() and getPlayer():getSquare() and getPlayer():getSquare():getRoom() then
         buildingModDataId = SWAB_Config.getBuildingModDataId(getPlayer():getSquare():getBuilding():getDef())
         roomModDataId = SWAB_Config.getRoomModDataId(getPlayer():getSquare():getRoom():getRoomDef())
     end

@@ -5,9 +5,11 @@ SWAB_Config.isInitialized = false
 
 -- A single building will never be updated more often than this many ticks.
 -- However, multiple buildings may still get updated during this time.
-SWAB_Config.buildingUpdateTickDelay = 1
+SWAB_Config.buildingUpdateTickDelay = 10
 -- How many buildings may be updated per tick.
 SWAB_Config.buildingUpdatesPerTick = 3
+-- How many squares can we update per building.
+SWAB_Config.buildingSquareUpdateBudget = 100
 -- Lower decay rates mean buildings take more time to decontaminate.
 SWAB_Config.buildingContaminationDecayRate = 0.01
 -- An entirely enclosed space with no filtration will decay to this level

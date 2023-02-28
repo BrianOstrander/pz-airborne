@@ -47,16 +47,19 @@ function SWAB_Building.OnTick(_tick)
 
     local buildings = {}
     for _, player in ipairs(SWAB_Utilities.GetPlayers()) do
-        local room = player:getSquare():getRoom()
-        if room then
+        -- Teleporting players may not have squares
+        if player:getSquare() then 
+            local room = player:getSquare():getRoom()
+            if room then
 
-            local entry = {}
-            entry.def = room:getRoomDef():getBuilding()
-            entry.modDataId = SWAB_Config.getBuildingModDataId(entry.def)
-            entry.modData = ModData.getOrCreate(entry.modDataId)
+                local entry = {}
+                entry.def = room:getRoomDef():getBuilding()
+                entry.modDataId = SWAB_Config.getBuildingModDataId(entry.def)
+                entry.modData = ModData.getOrCreate(entry.modDataId)
 
-            buildings[entry.modDataId] = entry
-        end 
+                buildings[entry.modDataId] = entry
+            end
+        end
     end
 
     local buildingsSorted = {}
@@ -91,6 +94,7 @@ function SWAB_Building.InitializeBuilding(_def, _modDataId, _modData)
     _modData.ticksSinceUpdate = 0
     _modData.lastRoomIndexInitialized = -1
     _modData.lastRoomIndexUpdated = -1
+    _modData.lastRoomSquareIndex = -1
     
     if SWAB_Config.debug.logging then
         print("SWAB: SWAB_Building.InitializeBuilding ".._modDataId)
@@ -108,71 +112,102 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _skip)
     local buildingDef = getWorld():getMetaGrid():getBuildingAt(_modData.x, _modData.y)
     local roomDefArray = buildingDef:getRooms()
 
-    if _modData.lastRoomIndexInitialized < (roomDefArray:size() - 1) then
+    if _modData.lastRoomIndexInitialized < roomDefArray:size() then
         -- We still have rooms to initialize
-        _modData.lastRoomIndexInitialized = _modData.lastRoomIndexInitialized + 1
-
-        SWAB_Building.InitializeRoom(roomDefArray:get(_modData.lastRoomIndexInitialized):getIsoRoom())
+        _modData.lastRoomIndexInitialized = PZMath.max(0, _modData.lastRoomIndexInitialized)
+        SWAB_Building.IterateRoomSquares(
+            _modData,
+            roomDefArray:get(_modData.lastRoomIndexInitialized):getIsoRoom(),
+            SWAB_Building.InitializeRoomSquare,
+            SWAB_Building.InitializeRoomDone
+        )
+        --SWAB_Building.InitializeRoom(_modData, roomDefArray:get(_modData.lastRoomIndexInitialized):getIsoRoom())
     else
         -- We can update a room
-        _modData.lastRoomIndexUpdated = _modData.lastRoomIndexUpdated + 1
+        _modData.lastRoomIndexUpdated = PZMath.max(0, _modData.lastRoomIndexUpdated)
 
         if roomDefArray:size() <= _modData.lastRoomIndexUpdated then
+            -- We've updated all the rooms, roll back to the first one
             _modData.lastRoomIndexUpdated = 0
         end
 
-        SWAB_Building.UpdateRoom(roomDefArray:get(_modData.lastRoomIndexUpdated):getIsoRoom())
+        SWAB_Building.IterateRoomSquares(
+            _modData,
+            roomDefArray:get(_modData.lastRoomIndexUpdated):getIsoRoom(),
+            SWAB_Building.UpdateRoomSquare,
+            SWAB_Building.UpdateRoomDone
+        )
+        --SWAB_Building.UpdateRoom(roomDefArray:get(_modData.lastRoomIndexUpdated):getIsoRoom())
     end
 end
 
-function SWAB_Building.InitializeRoom(_room)
+function SWAB_Building.IterateRoomSquares(_modData, _room, _onIterate, _onDone)
+    _modData.lastRoomSquareIndex = PZMath.max(0, _modData.lastRoomSquareIndex)
     local squares = _room:getSquares()
-    for squareIndex = 0, squares:size() - 1 do
+    for squareIndex = _modData.lastRoomSquareIndex, PZMath.min(squares:size() - 1, _modData.lastRoomSquareIndex + SWAB_Config.buildingSquareUpdateBudget) do
+        _modData.lastRoomSquareIndex = _modData.lastRoomSquareIndex + 1
         local square = squares:get(squareIndex)
-        
-        local squareAbove = nil
-        local squareAboveX = square:getX()
-        local squareAboveY = square:getY()
-        local squareAboveZ = square:getZ() + 1
-        repeat
-            local squareAbove = getCell():getGridSquare(squareAboveX, squareAboveY, squareAboveZ)
-            if squareAbove and not squareAbove:Is(IsoFlagType.attachedFloor) then
-                squareAbove:getModData()[SWAB_Config.squareFloorClaimDeltaModDataId] = square:getZ() - squareAboveZ
-            end
-            squareAboveZ = squareAboveZ + 1
-        until not squareAbove or squareAbove:Is(IsoFlagType.attachedFloor)
-        square:getModData()[SWAB_Config.squareCeilingHeightModDataId] = squareAboveZ - 1
+
+        _onIterate(_modData, _room, square)
+    end
+
+    if squares:size() <= _modData.lastRoomSquareIndex  then
+        -- We completed iterating over an entire room
+        _modData.lastRoomSquareIndex = -1
+        _onDone(_modData, _room)
     end
 end
 
-function SWAB_Building.UpdateRoom(_room)
-    local squares = _room:getSquares()
-    for squareIndex = 0, squares:size() - 1 do
-        local square = squares:get(squareIndex)
-        local squareExposurePrevious = square:getModData()[SWAB_Config.squareExposureModDataId]
-        local squareExposure = SWAB_Building.CalculateSquareExposure(square)
-        
-        if not squareExposure then
-            squareExposure = squareExposurePrevious
+function SWAB_Building.InitializeRoomSquare(_modData, _room, _square)
+    local squareAbove = nil
+    local squareAboveX = _square:getX()
+    local squareAboveY = _square:getY()
+    local squareAboveZ = _square:getZ() + 1
+    repeat
+        local squareAbove = getCell():getGridSquare(squareAboveX, squareAboveY, squareAboveZ)
+        if squareAbove and not squareAbove:Is(IsoFlagType.attachedFloor) then
+            squareAbove:getModData()[SWAB_Config.squareFloorClaimDeltaModDataId] = _square:getZ() - squareAboveZ
         end
+        squareAboveZ = squareAboveZ + 1
+    until not squareAbove or squareAbove:Is(IsoFlagType.attachedFloor)
+    _square:getModData()[SWAB_Config.squareCeilingHeightModDataId] = squareAboveZ - 1
+end
 
-        if squareExposure then
-            if squareExposure < SWAB_Config.buildingContaminationBaseline then
-                squareExposure = PZMath.max(squareExposure - SWAB_Config.buildingContaminationDecayRate, 0)
-            else
-                squareExposure = PZMath.max(squareExposure - SWAB_Config.buildingContaminationDecayRate, SWAB_Config.buildingContaminationBaseline)
-            end
-            square:getModData()[SWAB_Config.squareExposureModDataId] = squareExposure
+function SWAB_Building.InitializeRoomDone(_modData, _room)
+    print("Initialized Room ".._room:getName())
+    -- Increment the room initialization index, so we know we can move onto the next one.
+    _modData.lastRoomIndexInitialized = _modData.lastRoomIndexInitialized + 1
+end
 
-            if SWAB_Config.debug.visualizeExposure then
-                local highlightedFloor = square:getFloor()
-                if highlightedFloor then
-                    square:getFloor():setHighlighted(true, false)
-                    square:getFloor():setHighlightColor(1.0, 0.0, 0.0, (squareExposure - 4)/3)
-                end
+function SWAB_Building.UpdateRoomSquare(_modData, _room, _square)
+    local squareExposurePrevious = _square:getModData()[SWAB_Config.squareExposureModDataId]
+    local squareExposure = SWAB_Building.CalculateSquareExposure(_square)
+    
+    if not squareExposure then
+        squareExposure = squareExposurePrevious
+    end
+
+    if squareExposure then
+        if squareExposure < SWAB_Config.buildingContaminationBaseline then
+            squareExposure = PZMath.max(squareExposure - SWAB_Config.buildingContaminationDecayRate, 0)
+        else
+            squareExposure = PZMath.max(squareExposure - SWAB_Config.buildingContaminationDecayRate, SWAB_Config.buildingContaminationBaseline)
+        end
+        _square:getModData()[SWAB_Config.squareExposureModDataId] = squareExposure
+
+        if SWAB_Config.debug.visualizeExposure then
+            local highlightedFloor = _square:getFloor()
+            if highlightedFloor then
+                _square:getFloor():setHighlighted(true, false)
+                _square:getFloor():setHighlightColor(1.0, 0.0, 0.0, (squareExposure - 4)/3)
             end
         end
     end
+end
+
+function SWAB_Building.UpdateRoomDone(_modData, _room)
+    -- Increment the room update index, so we know we can move onto the next one.
+    _modData.lastRoomIndexUpdated = _modData.lastRoomIndexUpdated + 1
 end
 
 function SWAB_Building.CalculateSquareExposure(_square)

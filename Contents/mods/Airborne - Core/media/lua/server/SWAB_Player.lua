@@ -24,7 +24,8 @@ function SWAB_Player.OnUpdate(_player)
     local modData = _player:getModData()[SWAB_Config.playerModDataId]
 
     if modData then
-        modData.respiratoryExposure = SWAB_Player.CalculateRespiratoryExposure(_player)
+        -- If the player is teleporting, it's possible for this to be nil, so we keep the value the same.
+        modData.respiratoryExposure = SWAB_Player.CalculateRespiratoryExposure(_player) or modData.respiratoryExposure
     end
 end
 Events.OnPlayerUpdate.Add(SWAB_Player.OnUpdate)
@@ -88,7 +89,12 @@ function SWAB_Player.CalculateRespiratoryExposure(_player)
         else
             -- Inside a room
 
-            return _player:getSquare():getModData()[SWAB_Config.squareExposureModDataId]
+            if _player:getSquare() then
+                return _player:getSquare():getModData()[SWAB_Config.squareExposureModDataId]
+            end
         end
     end
+
+    -- Player must have been teleporting, be dead, or some other edge case
+    return nil
 end
