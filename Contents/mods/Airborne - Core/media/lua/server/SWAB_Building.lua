@@ -248,6 +248,20 @@ function SWAB_Building.CalculateSquareExposure(_square)
         end
     end
 
+    if 1 < _square:getModData()[SWAB_Config.squareCeilingHeightModDataId] then
+        -- There is a tile above this
+        local neighborAbove = getCell():getGridSquare(_square:getX(), _square:getY(), _square:getZ() + 1)
+        if neighborAbove then
+            local neighborAboveExposure = neighborAbove:getModData()[SWAB_Config.squareExposureModDataId]
+            if neighborAboveExposure then
+                if not highestExposure or highestExposure < neighborAboveExposure then
+                    -- The neighbor above us is more contaminated
+                    highestExposure = neighborAboveExposure
+                end
+            end
+        end
+    end
+
     return highestExposure
 end
 
