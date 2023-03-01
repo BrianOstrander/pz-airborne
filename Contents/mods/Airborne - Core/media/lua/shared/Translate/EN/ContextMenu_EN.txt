@@ -1,3 +1,5 @@
 ContextMenu_EN = {
-    ContextMenu_CheckAirtight = "Check Airtight",
+    -- Needs ContextMenu before them, not sure why
+    ContextMenu_SWAB_ContaminatedPrefix = "",
+    ContextMenu_SWAB_ContaminatedSuffix = " - Contaminated",
 }

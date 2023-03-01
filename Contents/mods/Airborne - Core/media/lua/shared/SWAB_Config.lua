@@ -5,17 +5,18 @@ SWAB_Config.isInitialized = false
 
 -- A single building will never be updated more often than this many ticks.
 -- However, multiple buildings may still get updated during this time.
-SWAB_Config.buildingUpdateTickDelay = 10
+SWAB_Config.buildingUpdateTickDelay = 1
 -- How many buildings may be updated per tick.
 SWAB_Config.buildingUpdatesPerTick = 3
 -- How many squares can we update per building.
 SWAB_Config.buildingSquareUpdateBudget = 100
 -- Lower decay rates mean buildings take more time to decontaminate.
-SWAB_Config.buildingContaminationDecayRate = 0.01
+SWAB_Config.buildingContaminationDecayRate = 0.025
 -- An entirely enclosed space with no filtration will decay to this level
 -- of contamination.
 SWAB_Config.buildingContaminationBaseline = 4
-
+-- Multiplier for how long consumables like masks, filters, and air tanks last.
+SWAB_Config.itemConsumptionDurationMultiplier = 1 --60
 -------------------------------------------------------
 -- CONSTANTS --
 -- DO NOT MESS WITH EVER
@@ -44,9 +45,9 @@ SWAB_Config.debug = {}
 
 -- Forces mod to reinitialize game state every time a game is loaded.
 SWAB_Config.debug.forceInitialize = true
--- Enables logging of various events
+-- Enables logging of various events.
 SWAB_Config.debug.logging = true
--- desc here
+-- Display red tiles for indoor spaces that are contaminated.
 SWAB_Config.debug.visualizeExposure = true
 
 -------------------------------------------------------

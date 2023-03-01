@@ -14,21 +14,86 @@ function SWAB_Player.OnCreatePlayer(_, _player)
         modData = {}
         modData.isInitialized = true
         modData.respiratoryExposure = 0
+        modData.respiratoryAbsorptionRate = 0
         _player:getModData()[SWAB_Config.playerModDataId] = modData
         _player:transmitModData()
     end
 end
 Events.OnCreatePlayer.Add(SWAB_Player.OnCreatePlayer)
 
-function SWAB_Player.OnUpdate(_player)
-    local modData = _player:getModData()[SWAB_Config.playerModDataId]
+function SWAB_Player.EveryOneMinute()
+    for _, player in ipairs(SWAB_Utilities.GetPlayers()) do
+        local modData = player:getModData()[SWAB_Config.playerModDataId]
 
-    if modData then
+        if not modData then
+            -- Must be before mod data is initialized by the game.
+            return
+        end
+
         -- If the player is teleporting, it's possible for this to be nil, so we keep the value the same.
-        modData.respiratoryExposure = SWAB_Player.CalculateRespiratoryExposure(_player) or modData.respiratoryExposure
+        modData.respiratoryExposure = SWAB_Player.CalculateRespiratoryExposure(player) or modData.respiratoryExposure
+
+        if modData.respiratoryExposure then
+            -- TODO: make clothing and such affect the exchange below
+            modData.respiratoryAbsorptionRate = SWAB_Player.CalculateRespiratoryAbsorptionRate(player, modData.respiratoryExposure)
+        end
     end
 end
-Events.OnPlayerUpdate.Add(SWAB_Player.OnUpdate)
+Events.EveryOneMinute.Add(SWAB_Player.EveryOneMinute)
+
+function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryExposure)
+    local items = _player:getInventory():getItems()
+    for i = 0, items:size() - 1 do
+        local item = items:get(i)
+        if item:IsClothing() and item:isEquipped() then
+            local itemModData = item:getModData()
+            if itemModData then
+                local itemConsumedDuration = itemModData["SwabRespiratoryExposure_ConsumedDuration"]
+                if itemConsumedDuration then
+                    itemConsumedDuration = itemConsumedDuration * SWAB_Config.itemConsumptionDurationMultiplier
+                    -- We've established this is an item that provides respiratory protection.
+                    local itemReduction = nil
+                    local itemMinimum = nil
+                    
+                    local itemConsumedElapsed = itemModData["SwabRespiratoryExposure_ConsumedElapsed"]
+                    local itemConsumedElapsedUpdated = PZMath.min(itemConsumedDuration, itemConsumedElapsed + 1)
+                    if itemConsumedElapsed ~= itemConsumedElapsedUpdated then
+                        itemConsumedElapsed = itemConsumedElapsedUpdated
+
+                        if itemConsumedDuration <= itemConsumedElapsed then
+                            -- Item has been contaminated
+                            local itemNamePrefix = getText("ContextMenu_SWAB_ContaminatedPrefix")
+                            local itemNameSuffix = getText("ContextMenu_SWAB_ContaminatedSuffix")
+
+                            if itemNamePrefix == "ContextMenu_SWAB_ContaminatedPrefix" then
+                                itemNamePrefix = ""
+                            end
+
+                            if itemNameSuffix == "ContextMenu_SWAB_ContaminatedSuffix" then
+                                itemNameSuffix = ""
+                            end
+
+                            item:setName(itemNamePrefix..getText(item:getDisplayName())..itemNameSuffix)
+                        end
+
+                        itemModData["SwabRespiratoryExposure_ConsumedElapsed"] = itemConsumedElapsed
+                    end
+
+                    
+                    if itemConsumedElapsed < itemConsumedDuration then
+                        itemReduction = itemModData["SwabRespiratoryExposure_Reduction"]
+                        itemMinimum = itemModData["SwabRespiratoryExposure_Minimum"]
+                    else
+                        itemReduction = itemModData["SwabRespiratoryExposure_ConsumedReduction"]
+                        itemMinimum = itemModData["SwabRespiratoryExposure_ConsumedMinimum"]
+                    end
+                    
+                    return PZMath.max(_respiratoryExposure + itemReduction, itemMinimum)
+                end
+            end
+        end
+    end
+end
 
 function SWAB_Player.CalculateRespiratoryExposure(_player)
     local vehicle = _player:getVehicle()
