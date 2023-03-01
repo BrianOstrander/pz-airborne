@@ -150,7 +150,8 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _skip)
             )
         end
 
-        buildingSquareBudgetRemaining = buildingSquareBudgetRemaining - squareUpdateCount
+        -- For the rare circumstance that we run into a building with zero tiles, we make sure to decrement this by at least 1.
+        buildingSquareBudgetRemaining = buildingSquareBudgetRemaining - PZMath.max(squareUpdateCount, 1)
     end
 end
 
@@ -269,7 +270,7 @@ function SWAB_Building.CalculateSquareExposureFromNeighbor(_square, _neighbor)
     if not _neighbor then
         return nil
     end
-    
+
     if _neighbor:getRoomID() == -1 then
         if _neighbor:getModData()[SWAB_Config.squareFloorClaimDeltaModDataId] then
             return _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
@@ -297,7 +298,7 @@ function SWAB_Building.GetNeighboringSquare(_origin, _direction)
         target = _origin
         neighbor = getCell():getGridSquare(_origin:getX() - 1, _origin:getY(), _origin:getZ())
     end
-    
+
     if not target or not neighbor then
         -- I think this can happen if we're requesting a square very far away from the player.
         return nil
@@ -320,13 +321,15 @@ function SWAB_Building.GetNeighboringSquare(_origin, _direction)
 
         if targetProperties:Is("WindowN") and targetProperties:Val("WindowN") == "WindowN" then
             -- This is a window frame and it hase a closed window in it
-            local windowNorth = target:getWall(true)
+            local windowNorth = target:getWindow(true)
             -- It's possible for getWall to return nil if this is a wall-type window, like the floor to ceiling ones.
             if windowNorth then
                 -- We are a wall that a window can be placed into.
-                if not SWAB_Building.porousWallsNorth[windowNorth:getTextureName()] then
-                    -- It's not a porous material
+                if not windowNorth:isSmashed() and not SWAB_Building.porousWallsNorth[windowNorth:getTextureName()] then
+                    -- It's not a smashed window and the wall around it is not a porous material
                     return nil
+                else
+                    return neighbor
                 end
             end
         end
@@ -340,13 +343,15 @@ function SWAB_Building.GetNeighboringSquare(_origin, _direction)
 
         if targetProperties:Is("WindowW") and targetProperties:Val("WindowW") == "WindowW" then
             -- This is a window frame and it hase a closed window in it
-            local windowWest = target:getWall(false)
+            local windowWest = target:getWindow(false)
             -- It's possible for getWall to return nil if this is a wall-type window, like the floor to ceiling ones.
             if windowWest then
                 -- We are a wall that a window can be placed into.
-                if not SWAB_Building.porousWallsWest[target:getWall(false):getTextureName()] then
-                    -- It's not a porous material
+                if not windowWest:isSmashed() and not SWAB_Building.porousWallsWest[windowWest:getTextureName()] then
+                    -- It's not a smashed window and the wall around it is not a porous material
                     return nil
+                else
+                    return neighbor
                 end
             end
         end
