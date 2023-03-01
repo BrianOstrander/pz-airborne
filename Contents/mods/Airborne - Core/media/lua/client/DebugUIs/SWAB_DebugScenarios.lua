@@ -2,6 +2,16 @@ debugScenarios = debugScenarios or {}
 
 SWAB_DebugScenarios = {}
 
+SWAB_DebugScenarios.items = {
+    "WristWatch_Right_DigitalBlack",
+    "Crowbar",
+    "Hammer",
+    "Screwdriver",
+    "Hat_BandanaMask",
+    "Hat_SurgicalMask_Green",
+    "Hat_DustMask",
+}
+
 SWAB_DebugScenarios.scenarios = {
     {
         name = "Shed",
@@ -79,10 +89,10 @@ function SWAB_DebugScenarios.OnStart()
     getPlayer():setInvisible(true)
     ISFastTeleportMove.cheat = true
     --ISWorldMap.setHideUnvisitedAreas(false)
-    getPlayer():getInventory():AddItem("WristWatch_Right_DigitalBlack")
-    getPlayer():getInventory():AddItem("Crowbar")
-    getPlayer():getInventory():AddItem("Hammer")
-    getPlayer():getInventory():AddItem("Screwdriver")
+
+    for _, itemId in ipairs(SWAB_DebugScenarios.items) do
+        getPlayer():getInventory():AddItem(itemId)
+    end
 
     for i = 1, 10 do
         getPlayer():LevelPerk(Perks.Woodwork)
