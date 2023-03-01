@@ -70,11 +70,17 @@ function SWAB_DebugContaminationPanel:prerender()
     z = self:drawField("Building ModData ID", buildingModDataId, x, z)
     z = self:drawField("Room ModData ID", roomModDataId, x, z)
 
-    local respiratoryExposure = playerModData.respiratoryExposure
-    if respiratoryExposure then
-        respiratoryExposure = string.format("%.2f", playerModData.respiratoryExposure)
+    z = self:drawFloat("Resp. Exposure", playerModData.respiratoryExposure, x, z)
+    z = self:drawFloat("Resp. Absorption Rate", playerModData.respiratoryAbsorptionRate, x, z)
+end
+
+function SWAB_DebugContaminationPanel:drawFloat(_name, _value, _x, _z)
+    if _value and type(_value) == "number" then
+        _value = string.format("%.2f", _value)
+    else
+        _value = tostring(_value)
     end
-    z = self:drawField("Respiratory Exposure", respiratoryExposure, x, z)
+    return self:drawField(_name, _value, _x, _z)
 end
 
 function SWAB_DebugContaminationPanel:drawField(_name, _value, _x, _z)
