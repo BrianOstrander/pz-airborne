@@ -116,25 +116,3 @@ function SWAB_DebugScenarios.Initialize()
 end
 
 SWAB_DebugScenarios.Initialize()
-
--- function ISSpawnHordeUI:onRemoveZombies()
--- 	local radius = self:getRadius() + 1;
--- 	if isClient() then
--- 		SendCommandToServer(string.format("/removezombies -x %d -y %d -z %d -radius %d", self.selectX, self.selectY, self.selectZ, radius))
--- 		return
--- 	end
--- 	for x=self.selectX-radius, self.selectX + radius do
--- 		for y=self.selectY-radius, self.selectY + radius do
--- 			local sq = getCell():getGridSquare(x,y,self.selectZ);
--- 			if sq then
--- 				for i=sq:getMovingObjects():size(),1,-1 do
--- 					local testZed = sq:getMovingObjects():get(i-1);
--- 					if instanceof(testZed, "IsoZombie") then
--- 						testZed:removeFromWorld();
--- 						testZed:removeFromSquare();
--- 					end
--- 				end
--- 			end
--- 		end
--- 	end
--- end
