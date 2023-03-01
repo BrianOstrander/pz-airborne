@@ -187,6 +187,8 @@ function SWAB_Building.InitializeRoomSquare(_modData, _room, _square)
         end
         squareAboveZ = squareAboveZ + 1
     until not squareAbove or squareAbove:Is(IsoFlagType.attachedFloor)
+    -- TODO: Figure out how to see if this is a spawn building, and if so set the contamination to zero.
+    _square:getModData()[SWAB_Config.squareExposureModDataId] = SWAB_Config.buildingContaminationBaseline
     _square:getModData()[SWAB_Config.squareCeilingHeightModDataId] = squareAboveZ - 1
 end
 
@@ -234,7 +236,7 @@ function SWAB_Building.CalculateSquareExposure(_square)
 
     for _, direction in ipairs(directions) do
         
-        -- Doing it this way out of an ill concieved idea that it might be more efficient
+        -- Doing it this way out of an ill concieved idea that it might be more efficient.
         local neighbor = SWAB_Building.GetNeighboringSquare(_square, direction)
         local neighborExposure = SWAB_Building.CalculateSquareExposureFromNeighbor(_square, neighbor)
         
