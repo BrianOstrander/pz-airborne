@@ -1,5 +1,6 @@
 ContextMenu_EN = {
     -- Needs ContextMenu before them, not sure why
+    ContextMenu_SWAB_Tooltip_Contamination = "Contamination",
     ContextMenu_SWAB_ContaminatedPrefix = "",
     ContextMenu_SWAB_ContaminatedSuffix = " - Contaminated",
 }

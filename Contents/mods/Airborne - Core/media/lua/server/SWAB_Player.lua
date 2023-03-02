@@ -48,10 +48,9 @@ function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryExp
         if item:IsClothing() and item:isEquipped() then
             local itemModData = item:getModData()
             if itemModData then
-                local itemConsumedDuration = itemModData["SwabRespiratoryExposure_ConsumedDuration"]
-                if itemConsumedDuration then
-                    itemConsumedDuration = itemConsumedDuration * SWAB_Config.itemConsumptionDurationMultiplier
+                if itemModData["SwabRespiratoryItem"] then
                     -- We've established this is an item that provides respiratory protection.
+                    local itemConsumedDuration = itemModData["SwabRespiratoryExposure_ConsumedDuration"] * SWAB_Config.itemConsumptionDurationMultiplier
                     local itemReduction = nil
                     local itemMinimum = nil
                     
