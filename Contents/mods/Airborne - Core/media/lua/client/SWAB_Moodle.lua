@@ -52,22 +52,3 @@ function SWAB_Moodle.EveryOneMinute()
     end
 end
 Events.EveryOneMinute.Add(SWAB_Moodle.EveryOneMinute)
--- function SWAB_Moodle.EveryTenMinutes()
---     print("10min")
---     if SWAB_Moodle.Initialize() then
-
---         local moodle = MF.getMoodle(SWAB_Config.moodleId)
-
---         print("uhhhh initialized?")
---         if moodle then
---             local modData = getPlayer():getModData()[SWAB_Config.playerModDataId]
---             print("getting mod data")
---             if modData then
---                 print("mod data got lol")
---                 moodle:setValue(modData.contaminationAbsorbed)
---                 print(modData.contaminationAbsorbed)
---             end
---         end
---     end
--- end
--- Events.EveryTenMinutes.Add(SWAB_Moodle.EveryTenMinutes)
