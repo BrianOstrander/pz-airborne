@@ -22,7 +22,7 @@ SWAB_Config.itemConsumptionDurationMultiplier = 1 --60
 -- DO NOT MESS WITH EVER
 -------------------------------------------------------
 
-SWAB_Config.moodleId = "contamination"
+SWAB_Config.moodleId = "contamination_exposure"
 SWAB_Config.playerModDataId = "swab_player"
 SWAB_Config.squareExposureModDataId = "swab_square_exposure"
 SWAB_Config.squareFloorClaimDeltaModDataId = "swab_square_floor_claim_delta"

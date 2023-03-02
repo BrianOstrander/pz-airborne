@@ -34,7 +34,6 @@ function SWAB_Player.EveryOneMinute()
         modData.respiratoryExposure = SWAB_Player.CalculateRespiratoryExposure(player) or modData.respiratoryExposure
 
         if modData.respiratoryExposure then
-            -- TODO: make clothing and such affect the exchange below
             modData.respiratoryAbsorptionRate = SWAB_Player.CalculateRespiratoryAbsorptionRate(player, modData.respiratoryExposure)
         end
     end
@@ -51,8 +50,8 @@ function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryExp
                 if itemModData["SwabRespiratoryItem"] then
                     -- We've established this is an item that provides respiratory protection.
                     local itemConsumedDuration = itemModData["SwabRespiratoryExposure_ConsumedDuration"] * SWAB_Config.itemConsumptionDurationMultiplier
-                    local itemReduction = nil
-                    local itemMinimum = nil
+                    local itemReduction = 0
+                    local itemMinimum = 0
                     
                     local itemConsumedElapsed = itemModData["SwabRespiratoryExposure_ConsumedElapsed"]
                     local itemConsumedElapsedUpdated = PZMath.min(itemConsumedDuration, itemConsumedElapsed + 1)
@@ -80,18 +79,23 @@ function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryExp
 
                     
                     if itemConsumedElapsed < itemConsumedDuration then
+                        -- Still not entirely contaminated.
                         itemReduction = itemModData["SwabRespiratoryExposure_Reduction"]
                         itemMinimum = itemModData["SwabRespiratoryExposure_Minimum"]
-                    else
-                        itemReduction = itemModData["SwabRespiratoryExposure_ConsumedReduction"]
-                        itemMinimum = itemModData["SwabRespiratoryExposure_ConsumedMinimum"]
                     end
-                    
-                    return PZMath.max(_respiratoryExposure + itemReduction, itemMinimum)
+
+                    -- We can never reduce our exposure below the item's rated minimum.
+                    local itemExposure = PZMath.max(_respiratoryExposure + itemReduction, itemMinimum)
+
+                    -- There's a chance that wearing this item is no better than going without it.
+                    return PZMath.min(itemExposure, _respiratoryExposure)
                 end
             end
         end
     end
+
+    -- There's nothing protecting us.
+    return _respiratoryExposure
 end
 
 function SWAB_Player.CalculateRespiratoryExposure(_player)
@@ -148,7 +152,8 @@ function SWAB_Player.CalculateRespiratoryExposure(_player)
                 return 6
             else
                 -- Outside and entirely unprotected
-                return 8
+                -- TODO: rain adds + 1, and fog adds + 2
+                return 7
             end
         else
             -- Inside a room

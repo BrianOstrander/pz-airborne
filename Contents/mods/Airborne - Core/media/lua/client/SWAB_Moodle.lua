@@ -24,13 +24,13 @@ function SWAB_Moodle.Initialize()
 
         if moodle then
             -- MF.getMoodle(*):setThresholds(bad4, bad3, bad2, bad1,   good1, good2, good3, good4)
-            moodle:setThresholds(0.2, 0.50, 0.75, 0.99,  nil, nil, nil, nil)
+            moodle:setThresholds(0.19, 0.39, 0.59, 1,  nil, nil, nil, nil)
             moodle:setValue(1.0)
 
-            moodle:setPicture(2, 1, getTexture("media/ui/swab_moodles_contamination_bad_1.png"))
-            moodle:setPicture(2, 2, getTexture("media/ui/swab_moodles_contamination_bad_2.png"))
-            moodle:setPicture(2, 3, getTexture("media/ui/swab_moodles_contamination_bad_3.png"))
-            moodle:setPicture(2, 4, getTexture("media/ui/swab_moodles_contamination_bad_4.png"))
+            moodle:setPicture(2, 1, getTexture("media/ui/swab_moodles_contamination_exposure_bad_1.png"))
+            moodle:setPicture(2, 2, getTexture("media/ui/swab_moodles_contamination_exposure_bad_2.png"))
+            moodle:setPicture(2, 3, getTexture("media/ui/swab_moodles_contamination_exposure_bad_3.png"))
+            moodle:setPicture(2, 4, getTexture("media/ui/swab_moodles_contamination_exposure_bad_4.png"))
 
             SWAB_Moodle.isInitialized = true
         end
@@ -39,6 +39,20 @@ function SWAB_Moodle.Initialize()
 end
 Events.OnCreatePlayer.Add(SWAB_Moodle.Initialize)
 
+function SWAB_Moodle.EveryOneMinute()
+    if SWAB_Moodle.Initialize() then
+        local moodle = MF.getMoodle(SWAB_Config.moodleId)
+        if moodle then
+            local modData = getPlayer():getModData()[SWAB_Config.playerModDataId]
+            if modData and modData.respiratoryAbsorptionRate then
+                local moodleValue = 1 - (PZMath.min(modData.respiratoryAbsorptionRate / 10, 1))
+                print(moodleValue)
+                moodle:setValue(moodleValue)
+            end
+        end
+    end
+end
+Events.EveryOneMinute.Add(SWAB_Moodle.EveryOneMinute)
 -- function SWAB_Moodle.EveryTenMinutes()
 --     print("10min")
 --     if SWAB_Moodle.Initialize() then
