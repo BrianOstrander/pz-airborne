@@ -44,8 +44,8 @@ function SWAB_Moodle.EveryOneMinute()
         local moodle = MF.getMoodle(SWAB_Config.moodleId)
         if moodle then
             local modData = getPlayer():getModData()[SWAB_Config.playerModDataId]
-            if modData and modData.respiratoryAbsorptionRate then
-                local moodleValue = 1 - (PZMath.min(modData.respiratoryAbsorptionRate / 10, 1))
+            if modData and modData.respiratoryAbsorptionLevel then
+                local moodleValue = 1 - (PZMath.min(modData.respiratoryAbsorptionLevel / 10, 1))
                 print(moodleValue)
                 moodle:setValue(moodleValue)
             end

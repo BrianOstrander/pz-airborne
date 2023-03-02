@@ -275,7 +275,7 @@ function SWAB_Building.CalculateSquareExposureFromNeighbor(_square, _neighbor)
         if _neighbor:getModData()[SWAB_Config.squareFloorClaimDeltaModDataId] then
             return _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
         end
-        return 7
+        return 6
     else
         return _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
     end

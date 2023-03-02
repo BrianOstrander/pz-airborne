@@ -14,7 +14,8 @@ function SWAB_Player.OnCreatePlayer(_, _player)
         modData = {}
         modData.isInitialized = true
         modData.respiratoryExposure = 0
-        modData.respiratoryAbsorptionRate = 0
+        modData.respiratoryAbsorptionLevel = 0
+        modData.respiratoryAbsorption = 0
         _player:getModData()[SWAB_Config.playerModDataId] = modData
         _player:transmitModData()
     end
@@ -34,13 +35,13 @@ function SWAB_Player.EveryOneMinute()
         modData.respiratoryExposure = SWAB_Player.CalculateRespiratoryExposure(player) or modData.respiratoryExposure
 
         if modData.respiratoryExposure then
-            modData.respiratoryAbsorptionRate = SWAB_Player.CalculateRespiratoryAbsorptionRate(player, modData.respiratoryExposure)
+            modData.respiratoryAbsorptionLevel = SWAB_Player.CalculateRespiratoryAbsorptionLevel(player, modData.respiratoryExposure)
         end
     end
 end
 Events.EveryOneMinute.Add(SWAB_Player.EveryOneMinute)
 
-function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryExposure)
+function SWAB_Player.CalculateRespiratoryAbsorptionLevel(_player, _respiratoryExposure)
     local items = _player:getInventory():getItems()
     for i = 0, items:size() - 1 do
         local item = items:get(i)
