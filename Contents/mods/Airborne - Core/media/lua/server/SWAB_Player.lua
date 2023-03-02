@@ -36,6 +36,9 @@ function SWAB_Player.EveryOneMinute()
 
         if modData.respiratoryExposure then
             modData.respiratoryAbsorptionLevel = SWAB_Player.CalculateRespiratoryAbsorptionLevel(player, modData.respiratoryExposure)
+            local levelRate = SWAB_Config.respiratoryAbsorptionLevels[PZMath.floor(modData.respiratoryAbsorptionLevel) + 1].rate
+            -- Level rate is divided by minutes in day.
+            modData.respiratoryAbsorption = PZMath.max(0, modData.respiratoryAbsorption + (levelRate / 1440))
         end
     end
 end

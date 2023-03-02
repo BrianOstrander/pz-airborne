@@ -34,6 +34,16 @@ function SWAB_DebugContaminationPanel:initialise()
     self.reInitBuildingButton.borderColor = {r=1, g=1, b=1, a=0.1}
     self:addChild(self.reInitBuildingButton)
 
+    -- ReInit Building Button
+    self.decontaminateRoomButton = ISButton:new(10 + btnWid + 10, self:getHeight() - (padBottom * 2) - (btnHgt * 2), btnWid, btnHgt, "Decon. Room", self, SWAB_DebugContaminationPanel.onClickDecontaminateRoomButton)
+    self.decontaminateRoomButton.internal = "DECON_ROOM"
+    self.decontaminateRoomButton.anchorTop = false
+    self.decontaminateRoomButton.anchorBottom = true
+    self.decontaminateRoomButton:initialise()
+    self.decontaminateRoomButton:instantiate()
+    self.decontaminateRoomButton.borderColor = {r=1, g=1, b=1, a=0.1}
+    self:addChild(self.decontaminateRoomButton)
+
     -- Close Button
     self.closeButton = ISButton:new(10, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt, "Close", self, SWAB_DebugContaminationPanel.onClickCloseButton)
     self.closeButton.internal = "CLOSE"
@@ -71,7 +81,8 @@ function SWAB_DebugContaminationPanel:prerender()
     z = self:drawField("Room ModData ID", roomModDataId, x, z)
 
     z = self:drawFloat("Resp. Exposure", playerModData.respiratoryExposure, x, z)
-    z = self:drawFloat("Resp. Absorption Level", playerModData.respiratoryAbsorptionLevel, x, z)
+    z = self:drawFloat("Resp. Absorption Lvl.", playerModData.respiratoryAbsorptionLevel, x, z)
+    z = self:drawFloat("Resp. Absorption", playerModData.respiratoryAbsorption, x, z)
 end
 
 function SWAB_DebugContaminationPanel:drawFloat(_name, _value, _x, _z)
@@ -94,6 +105,19 @@ function SWAB_DebugContaminationPanel:onClickReInitBuildingButton(_button)
         local buildingModDataId = SWAB_Config.getBuildingModDataId(getPlayer():getSquare():getBuilding():getDef())
         if ModData.exists(buildingModDataId) then
             ModData.remove(buildingModDataId)
+        end
+    end
+end
+
+function SWAB_DebugContaminationPanel:onClickDecontaminateRoomButton(_button)
+    if getPlayer():getSquare() and getPlayer():getSquare():getRoom() then
+        local squares = getPlayer():getSquare():getRoom():getSquares()
+        for squareIndex = 0, squares:size() - 1 do
+            local square = squares:get(squareIndex)
+            squareModData = square:getModData()
+            if squareModData and squareModData[SWAB_Config.squareExposureModDataId] then
+                squareModData[SWAB_Config.squareExposureModDataId] = 0
+            end
         end
     end
 end

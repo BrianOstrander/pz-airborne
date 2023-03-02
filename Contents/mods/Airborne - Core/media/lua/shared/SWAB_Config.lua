@@ -23,7 +23,7 @@ SWAB_Config.itemConsumptionDurationMultiplier = 1 --60
 SWAB_Config.respiratoryAbsorptionLevels = {
     {
         level = 0,
-        rate = 0,
+        rate = -1,
     },
     {
         level = 1,
