@@ -37,6 +37,51 @@ function SWAB_Player.EveryOneMinute()
         if modData.respiratoryExposure then
             modData.respiratoryAbsorptionLevel = SWAB_Player.CalculateRespiratoryAbsorptionLevel(player, modData.respiratoryExposure)
             local levelRate = SWAB_Config.respiratoryAbsorptionLevels[PZMath.floor(modData.respiratoryAbsorptionLevel) + 1].rate
+
+            if levelRate < 0 then
+                -- Player is recovering from exposure
+                -- Full to bursting above 4800
+                -- Stuffed above 3200
+                -- Well Fed above 1600
+                -- Satiated above 0
+
+                -- Hungry 0.25
+                -- Very Hungry 0.45
+                -- Starving 0.7
+
+                local hunger = getPlayer():getStats():getHunger()
+                local healthFromFoodTimer = getPlayer():getBodyDamage():getHealthFromFoodTimer()
+                local levelRateMultiplier = 1
+                if 0.7 < hunger then
+                    -- Starving
+                    levelRateMultiplier = 0
+                elseif 0.45 < hunger then
+                    -- Very Hungry
+                    levelRateMultiplier = 0.40
+                elseif 0.25 < hunger then
+                    -- Hungry
+                    levelRateMultiplier = 0.65
+                elseif 0 < healthFromFoodTimer then
+                    -- Satiated/Well Fed/Stuffed/Full to Bursting
+                    -- I think the higher food timers just affect how long the healing buff lasts
+                    levelRateMultiplier = 2
+
+                    -- Times for health timer incase needed:
+                    -- Satiated = healthFromFoodTimer < 1600 then
+                    -- Well Fed = healthFromFoodTimer < 3200 then
+                    -- Stuffed = healthFromFoodTimer < 4800 then
+                    -- Full to Bursting is above 4800
+                end
+
+                if player:getTraits():contains("SlowHealer") then
+                    levelRate = levelRate * 0.75
+                elseif player:getTraits():contains("FastHealer") then
+                    levelRate = levelRate * 2
+                end
+
+                levelRate = levelRate * levelRateMultiplier
+            end
+            
             -- Level rate is divided by minutes in day.
             modData.respiratoryAbsorption = PZMath.max(0, modData.respiratoryAbsorption + (levelRate / 1440))
         end
