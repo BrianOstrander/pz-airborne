@@ -15,6 +15,7 @@ function SWAB_Player.OnCreatePlayer(_, _player)
         modData.isInitialized = true
         modData.respiratoryExposure = 0
         modData.respiratoryAbsorptionLevel = 0
+        modData.respiratoryAbsorptionRate = 0
         modData.respiratoryAbsorption = 0
         _player:getModData()[SWAB_Config.playerModDataId] = modData
         _player:transmitModData()
@@ -26,7 +27,7 @@ function SWAB_Player.EveryOneMinute()
     for _, player in ipairs(SWAB_Utilities.GetPlayers()) do
         local modData = player:getModData()[SWAB_Config.playerModDataId]
 
-        if not modData then
+        if not modData or not modData.isInitialized then
             -- Must be before mod data is initialized by the game.
             return
         end
@@ -35,56 +36,12 @@ function SWAB_Player.EveryOneMinute()
         modData.respiratoryExposure = SWAB_Player.CalculateRespiratoryExposure(player) or modData.respiratoryExposure
 
         if modData.respiratoryExposure then
-            modData.respiratoryAbsorptionLevel = SWAB_Player.CalculateRespiratoryExposureWithProtection(player, modData.respiratoryExposure)
-            -- todo move this into the method above
-            local levelRate = SWAB_Config.respiratoryAbsorptionLevels[PZMath.floor(modData.respiratoryAbsorptionLevel) + 1].rate
-
-            if levelRate < 0 then
-                -- Player is recovering from exposure
-                -- Full to bursting above 4800
-                -- Stuffed above 3200
-                -- Well Fed above 1600
-                -- Satiated above 0
-
-                -- Hungry 0.25
-                -- Very Hungry 0.45
-                -- Starving 0.7
-
-                local hunger = getPlayer():getStats():getHunger()
-                local healthFromFoodTimer = getPlayer():getBodyDamage():getHealthFromFoodTimer()
-                local levelRateMultiplier = 1
-                if 0.7 < hunger then
-                    -- Starving
-                    levelRateMultiplier = 0
-                elseif 0.45 < hunger then
-                    -- Very Hungry
-                    levelRateMultiplier = 0.40
-                elseif 0.25 < hunger then
-                    -- Hungry
-                    levelRateMultiplier = 0.65
-                elseif 0 < healthFromFoodTimer then
-                    -- Satiated/Well Fed/Stuffed/Full to Bursting
-                    -- I think the higher food timers just affect how long the healing buff lasts
-                    levelRateMultiplier = 2
-
-                    -- Times for health timer incase needed:
-                    -- Satiated = healthFromFoodTimer < 1600 then
-                    -- Well Fed = healthFromFoodTimer < 3200 then
-                    -- Stuffed = healthFromFoodTimer < 4800 then
-                    -- Full to Bursting is above 4800
-                end
-
-                if player:getTraits():contains("SlowHealer") then
-                    levelRate = levelRate * 0.75
-                elseif player:getTraits():contains("FastHealer") then
-                    levelRate = levelRate * 2
-                end
-
-                levelRate = levelRate * levelRateMultiplier
-            end
-            
+            modData.respiratoryExposure = SWAB_Player.CalculateRespiratoryExposureWithProtection(player, modData.respiratoryExposure)
+            modData.respiratoryAbsorptionLevel = SWAB_Player.CalculateRespiratoryAbsorptionLevel(player, modData.respiratoryExposure)
+            modData.respiratoryAbsorptionRate = SWAB_Player.CalculateRespiratoryAbsorptionRate(player, modData.respiratoryAbsorptionLevel)
+           
             -- Level rate is divided by minutes in day.
-            modData.respiratoryAbsorption = PZMath.max(0, modData.respiratoryAbsorption + (levelRate / 1440))
+            modData.respiratoryAbsorption = PZMath.max(0, modData.respiratoryAbsorption + (modData.respiratoryAbsorptionRate / 1440))
         end
     end
 end
@@ -221,4 +178,59 @@ function SWAB_Player.CalculateRespiratoryExposureWithProtection(_player, _respir
 
     -- There's nothing protecting us.
     return _respiratoryExposure
+end
+
+function SWAB_Player.CalculateRespiratoryAbsorptionLevel(_player, _respiratoryExposure)
+    -- TODO: Certain traits will raise or lower this.
+    return PZMath.floor(_respiratoryExposure) + 1
+end
+
+function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryAbsorptionLevel)
+    local levelRate = SWAB_Config.respiratoryAbsorptionLevels[_respiratoryAbsorptionLevel].rate
+
+    if levelRate < 0 then
+        -- Player is recovering from exposure
+        -- Full to bursting above 4800
+        -- Stuffed above 3200
+        -- Well Fed above 1600
+        -- Satiated above 0
+
+        -- Hungry 0.25
+        -- Very Hungry 0.45
+        -- Starving 0.7
+
+        local hunger = _player:getStats():getHunger()
+        local healthFromFoodTimer = _player:getBodyDamage():getHealthFromFoodTimer()
+        local levelRateMultiplier = 1
+        if 0.7 < hunger then
+            -- Starving
+            levelRateMultiplier = 0
+        elseif 0.45 < hunger then
+            -- Very Hungry
+            levelRateMultiplier = 0.40
+        elseif 0.25 < hunger then
+            -- Hungry
+            levelRateMultiplier = 0.65
+        elseif 0 < healthFromFoodTimer then
+            -- Satiated/Well Fed/Stuffed/Full to Bursting
+            -- I think the higher food timers just affect how long the healing buff lasts
+            levelRateMultiplier = 2
+
+            -- Times for health timer incase needed:
+            -- Satiated = healthFromFoodTimer < 1600 then
+            -- Well Fed = healthFromFoodTimer < 3200 then
+            -- Stuffed = healthFromFoodTimer < 4800 then
+            -- Full to Bursting is above 4800
+        end
+
+        if _player:getTraits():contains("SlowHealer") then
+            levelRate = levelRate * 0.75
+        elseif _player:getTraits():contains("FastHealer") then
+            levelRate = levelRate * 2
+        end
+
+        levelRate = levelRate * levelRateMultiplier
+    end
+
+    return levelRate
 end
