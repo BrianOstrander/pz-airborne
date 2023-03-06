@@ -18,54 +18,82 @@ SWAB_Config.buildingContaminationBaseline = 4
 -- Multiplier for how long consumables like masks, filters, and air tanks last.
 SWAB_Config.itemConsumptionDurationMultiplier = 1 --60
 
--- When the respiratoryAbsorptionLevel floors to these values, the deltas are
--- used to increase the respiratoryAbsorption
+-- When the respiratoryAbsorptionLevel floors to these values, the rates are
+-- used to increase the respiratoryAbsorption, and the moodle value maps to
+-- the threshold for exposure moodles.
 SWAB_Config.respiratoryAbsorptionLevels = {
     {
-        level = 0,
-        rate = -1,
+        -- Exposure  0
+        -- Moodle    0
+        rate       = -1,
+        moodle     = 0.5,
     },
     {
-        level = 1,
-        rate = 0.1,
+        -- Exposure  1
+        -- Moodle    1
+        rate       = 0.1,
+        moodle     = 0.4,
     },
     {
-        level = 2,
-        rate = 0.25,
+        -- Exposure  2
+        -- Moodle    1
+        rate       = 0.25,
+        moodle     = 0.4,
     },
     {
-        level = 3,
-        rate = 0.5,
+        -- Exposure  3
+        -- Moodle    1
+        rate       = 0.5,
+        moodle     = 0.4,
     },
     {
-        level = 4,
-        rate = 1,
+        -- Exposure  4
+        -- Moodle    1
+        rate       = 1,
+        moodle     = 0.4,
     },
     {
-        level = 5,
-        rate = 4,
+        -- Exposure  5
+        -- Moodle    2
+        rate       = 4,
+        moodle     = 0.3,
     },
     {
-        level = 6,
-        rate = 10,
+        -- Exposure  6
+        -- Moodle    2
+        rate       = 10,
+        moodle     = 0.3,
     },
     {
-        level = 7,
-        rate = 18,
+        -- Exposure  7
+        -- Moodle    3
+        rate       = 18,
+        moodle     = 0.2,
     },
     {
-        level = 8,
-        rate = 28,
+        -- Exposure  8
+        -- Moodle    3
+        rate       = 28,
+        moodle     = 0.2,
     },
     {
-        level = 9,
-        rate = 40,
+        -- Exposure  9
+        -- Moodle    4
+        rate       = 40,
+        moodle     = 0.1,
     },
     {
-        level = 10,
-        rate = 75,
+        -- Exposure  10
+        -- Moodle    4
+        rate       = 75,
+        moodle     = 0.1,
     },
 }
+
+function SWAB_Config.getRespiratoryAbsorptionLevel(_respiratoryAbsorptionLevel)
+    -- Just wrapping some confusion caused by Lua's table indexing.
+    return SWAB_Config.respiratoryAbsorptionLevels[_respiratoryAbsorptionLevel + 1]
+end
 
 -------------------------------------------------------
 -- CONSTANTS --

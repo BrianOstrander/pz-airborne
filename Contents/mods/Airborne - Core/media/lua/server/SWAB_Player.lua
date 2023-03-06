@@ -182,11 +182,11 @@ end
 
 function SWAB_Player.CalculateRespiratoryAbsorptionLevel(_player, _respiratoryExposure)
     -- TODO: Certain traits will raise or lower this.
-    return PZMath.floor(_respiratoryExposure) + 1
+    return PZMath.floor(_respiratoryExposure)
 end
 
 function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryAbsorptionLevel)
-    local levelRate = SWAB_Config.respiratoryAbsorptionLevels[_respiratoryAbsorptionLevel].rate
+    local levelRate = SWAB_Config.getRespiratoryAbsorptionLevel(_respiratoryAbsorptionLevel).rate
 
     if levelRate < 0 then
         -- Player is recovering from exposure

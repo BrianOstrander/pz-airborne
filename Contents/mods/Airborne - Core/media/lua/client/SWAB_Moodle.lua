@@ -24,7 +24,7 @@ function SWAB_Moodle.Initialize()
 
         if moodle then
             -- MF.getMoodle(*):setThresholds(bad4, bad3, bad2, bad1,   good1, good2, good3, good4)
-            moodle:setThresholds(0.19, 0.39, 0.59, 0.99,  nil, nil, nil, nil)
+            moodle:setThresholds(0.1, 0.2, 0.3, 0.4,  nil, nil, nil, nil)
             moodle:setValue(1.0)
 
             moodle:setPicture(2, 1, getTexture("media/ui/swab_moodles_contamination_exposure_bad_1.png"))
@@ -45,8 +45,7 @@ function SWAB_Moodle.EveryOneMinute()
         if moodle then
             local modData = getPlayer():getModData()[SWAB_Config.playerModDataId]
             if modData and modData.respiratoryAbsorptionLevel then
-                local moodleValue = 1 - (PZMath.min(modData.respiratoryAbsorptionLevel / 10, 1))
-                moodle:setValue(moodleValue)
+                moodle:setValue(SWAB_Config.getRespiratoryAbsorptionLevel(modData.respiratoryAbsorptionLevel).moodle)
             end
         end
     end
