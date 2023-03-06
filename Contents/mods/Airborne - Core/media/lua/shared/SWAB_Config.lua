@@ -90,6 +90,8 @@ SWAB_Config.respiratoryAbsorptionLevels = {
     },
 }
 
+SWAB_Config.respiratoryAbsorptionLevelMaximum = 10
+
 function SWAB_Config.getRespiratoryAbsorptionLevel(_respiratoryAbsorptionLevel)
     -- Just wrapping some confusion caused by Lua's table indexing.
     return SWAB_Config.respiratoryAbsorptionLevels[_respiratoryAbsorptionLevel + 1]

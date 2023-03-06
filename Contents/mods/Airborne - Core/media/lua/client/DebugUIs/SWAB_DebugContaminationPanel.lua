@@ -81,6 +81,7 @@ function SWAB_DebugContaminationPanel:prerender()
     z = self:drawField("Room ModData ID", roomModDataId, x, z)
 
     z = self:drawFloat("Resp. Exposure", playerModData.respiratoryExposure, x, z)
+    z = self:drawField("Resp. Exposure Level", playerModData.respiratoryExposureLevel, x, z)
     z = self:drawField("Resp. Absorption Level", playerModData.respiratoryAbsorptionLevel, x, z)
     z = self:drawFloat("Resp. Absorption Rate", playerModData.respiratoryAbsorptionRate, x, z)
     z = self:drawFloat("Resp. Absorption", playerModData.respiratoryAbsorption, x, z)

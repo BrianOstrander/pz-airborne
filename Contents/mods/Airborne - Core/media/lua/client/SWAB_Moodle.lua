@@ -44,8 +44,13 @@ function SWAB_Moodle.EveryOneMinute()
         local moodle = MF.getMoodle(SWAB_Config.moodleId)
         if moodle then
             local modData = getPlayer():getModData()[SWAB_Config.playerModDataId]
-            if modData and modData.respiratoryAbsorptionLevel then
-                moodle:setValue(SWAB_Config.getRespiratoryAbsorptionLevel(modData.respiratoryAbsorptionLevel).moodle)
+            if modData and modData.respiratoryExposureLevel then
+                -- We use respiratoryExposureLevel instead of respiratoryAbsorptionLevel so that there 
+                -- is no confusion between players with different traits and professions. The moodle
+                -- should always indicate exposure to a typical player, with gear taken into account.
+                -- TODO: Find a way to illustrate when a player has trait or profession bonuses that
+                -- are protecting them more than the average player.
+                moodle:setValue(SWAB_Config.getRespiratoryAbsorptionLevel(modData.respiratoryExposureLevel).moodle)
             end
         end
     end

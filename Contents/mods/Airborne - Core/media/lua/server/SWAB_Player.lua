@@ -13,9 +13,17 @@ function SWAB_Player.OnCreatePlayer(_, _player)
         end
         modData = {}
         modData.isInitialized = true
+        -- A float between 0-10, measures raw exposure to respiratory toxins.
         modData.respiratoryExposure = 0
+        -- An integer between 0-10, measures raw exposure to respiratory toxins.
+        modData.respiratoryExposureLevel = 0
+        -- An integer between 0-10, measures how respiratory toxins that are
+        -- actually affecting the player, incase they have trait or profession
+        -- modifiers that change their sensitivities to toxins.
         modData.respiratoryAbsorptionLevel = 0
+        -- A float, the rate at which their toxin absorption is going up per day.
         modData.respiratoryAbsorptionRate = 0
+        -- A float, the total toxins absorbed.
         modData.respiratoryAbsorption = 0
         _player:getModData()[SWAB_Config.playerModDataId] = modData
         _player:transmitModData()
@@ -37,7 +45,8 @@ function SWAB_Player.EveryOneMinute()
 
         if modData.respiratoryExposure then
             modData.respiratoryExposure = SWAB_Player.CalculateRespiratoryExposureWithProtection(player, modData.respiratoryExposure)
-            modData.respiratoryAbsorptionLevel = SWAB_Player.CalculateRespiratoryAbsorptionLevel(player, modData.respiratoryExposure)
+            modData.respiratoryExposureLevel = SWAB_Player.CalculateRespiratoryExposureLevel(player, modData.respiratoryExposure)
+            modData.respiratoryAbsorptionLevel = SWAB_Player.CalculateRespiratoryAbsorptionLevel(player, modData.respiratoryExposureLevel)
             modData.respiratoryAbsorptionRate = SWAB_Player.CalculateRespiratoryAbsorptionRate(player, modData.respiratoryAbsorptionLevel)
            
             -- Level rate is divided by minutes in day.
@@ -180,11 +189,28 @@ function SWAB_Player.CalculateRespiratoryExposureWithProtection(_player, _respir
     return _respiratoryExposure
 end
 
-function SWAB_Player.CalculateRespiratoryAbsorptionLevel(_player, _respiratoryExposure)
-    -- TODO: Certain traits will raise or lower this.
+-- Simply wrapping this
+function SWAB_Player.CalculateRespiratoryExposureLevel(_player, _respiratoryExposure)
     return PZMath.floor(_respiratoryExposure)
 end
 
+-- Traits affect the absorption levels the player uses to calculate their absorption rate.
+function SWAB_Player.CalculateRespiratoryAbsorptionLevel(_player, _respiratoryExposureLevel)
+    local level = _respiratoryExposureLevel
+    local traits = _player:getTraits()
+    
+    if traits:contains("Resilient") then
+        level = level - 1
+    elseif 0 < level and traits:contains("ProneToIllness") then
+        -- We have to check to make sure exposure levels are above zero so players with
+        -- Prone to Illness have a way to escape exposure.
+        level = level + 1
+    end
+
+    return PZMath.clamp(level, 0, SWAB_Config.respiratoryAbsorptionLevelMaximum)
+end
+
+-- Various moodles are taken into account when calculating the absorption rate
 function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryAbsorptionLevel)
     local levelRate = SWAB_Config.getRespiratoryAbsorptionLevel(_respiratoryAbsorptionLevel).rate
 
