@@ -23,7 +23,7 @@ SWAB_Config.itemConsumptionDurationMultiplier = 1 --60
 --      moodle                      : Exposure moodle value
 --      enduranceDepletionDuration  : Hours to reach the endurance minimum
 --      enduranceMaximum            : Endurance maximum for this level
-SWAB_Config.respiratoryEffectLevels = {
+SWAB_Config.respiratoryEffects = {
     {
         -- Exposure  0
         -- Moodle    0
@@ -116,9 +116,9 @@ SWAB_Config.respiratoryEffectLevels = {
 
 SWAB_Config.respiratoryAbsorptionLevelMaximum = 10
 
-function SWAB_Config.getRespiratoryEffectLevel(_respiratoryAbsorptionLevel)
+function SWAB_Config.getRespiratoryEffects(_respiratoryAbsorptionLevel)
     -- Just wrapping some confusion caused by Lua's table indexing.
-    return SWAB_Config.respiratoryEffectLevels[_respiratoryAbsorptionLevel + 1]
+    return SWAB_Config.respiratoryEffects[_respiratoryAbsorptionLevel + 1]
 end
 
 -------------------------------------------------------

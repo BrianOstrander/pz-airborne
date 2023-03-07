@@ -213,7 +213,7 @@ end
 
 -- Various moodles are taken into account when calculating the absorption rate
 function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryAbsorptionLevel)
-    local levelRate = SWAB_Config.getRespiratoryEffectLevel(_respiratoryAbsorptionLevel).rate
+    local levelRate = SWAB_Config.getRespiratoryEffects(_respiratoryAbsorptionLevel).rate
 
     if levelRate < 0 then
         -- Player is recovering from exposure
@@ -265,5 +265,5 @@ end
 -- Each level of resperatory absorption affects various player stats
 function SWAB_Player.ApplyRespiratoryAbsorptionLevelEffects(_player, _respiratoryAbsorptionLevel)
     -- TODO: this
-    --local levelRate = SWAB_Config.getRespiratoryEffectLevel(_respiratoryAbsorptionLevel)
+    --local levelRate = SWAB_Config.getRespiratoryEffects(_respiratoryAbsorptionLevel)
 end

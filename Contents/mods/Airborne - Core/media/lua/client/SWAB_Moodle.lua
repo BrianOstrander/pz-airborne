@@ -50,7 +50,7 @@ function SWAB_Moodle.EveryOneMinute()
                 -- should always indicate exposure to a typical player, with gear taken into account.
                 -- TODO: Find a way to illustrate when a player has trait or profession bonuses that
                 -- are protecting them more than the average player.
-                moodle:setValue(SWAB_Config.getRespiratoryEffectLevel(modData.respiratoryExposureLevel).moodle)
+                moodle:setValue(SWAB_Config.getRespiratoryEffects(modData.respiratoryExposureLevel).moodle)
             end
         end
     end
