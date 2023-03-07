@@ -116,7 +116,7 @@ SWAB_Config.respiratoryEffects = {
 
 SWAB_Config.respiratoryAbsorptionLevelMaximum = 10
 
-function SWAB_Config.getRespiratoryEffects(_respiratoryAbsorptionLevel)
+function SWAB_Config.GetRespiratoryEffects(_respiratoryAbsorptionLevel)
     -- Just wrapping some confusion caused by Lua's table indexing.
     return SWAB_Config.respiratoryEffects[_respiratoryAbsorptionLevel + 1]
 end
