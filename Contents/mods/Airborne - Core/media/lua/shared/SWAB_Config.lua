@@ -18,83 +18,107 @@ SWAB_Config.buildingContaminationBaseline = 4
 -- Multiplier for how long consumables like masks, filters, and air tanks last.
 SWAB_Config.itemConsumptionDurationMultiplier = 1 --60
 
--- When the respiratoryAbsorptionLevel floors to these values, the rates are
--- used to increase the respiratoryAbsorption, and the moodle value maps to
--- the threshold for exposure moodles.
-SWAB_Config.respiratoryAbsorptionLevels = {
+-- Floor respiratoryAbsorptionLevel to get your level
+--      rate                        : Per day increase in absorption
+--      moodle                      : Exposure moodle value
+--      enduranceDepletionDuration  : Hours to reach the endurance minimum
+--      enduranceMaximum            : Endurance maximum for this level
+SWAB_Config.respiratoryEffectLevels = {
     {
         -- Exposure  0
         -- Moodle    0
-        rate       = -1,
-        moodle     = 0.5,
+        rate                        = -1,
+        moodle                      = 0.5,
+        enduranceDepletionDuration  = 0,
+        enduranceMaximum            = 1,
     },
     {
         -- Exposure  1
         -- Moodle    1
-        rate       = 0.1,
-        moodle     = 0.4,
+        rate                        = 0.1,
+        moodle                      = 0.4,
+        enduranceDepletionDuration  = 24,
+        enduranceMaximum            = 0.77,
     },
     {
         -- Exposure  2
         -- Moodle    1
-        rate       = 0.25,
-        moodle     = 0.4,
+        rate                        = 0.25,
+        moodle                      = 0.4,
+        enduranceDepletionDuration  = 24,
+        enduranceMaximum            = 0.52,
     },
     {
         -- Exposure  3
         -- Moodle    1
-        rate       = 0.5,
-        moodle     = 0.4,
+        rate                        = 0.5,
+        moodle                      = 0.4,
+        enduranceDepletionDuration  = 16,
+        enduranceMaximum            = 0.52,
     },
     {
         -- Exposure  4
         -- Moodle    1
-        rate       = 1,
-        moodle     = 0.4,
+        rate                        = 1,
+        moodle                      = 0.4,
+        enduranceDepletionDuration  = 10,
+        enduranceMaximum            = 0.52,
     },
     {
         -- Exposure  5
         -- Moodle    2
-        rate       = 4,
-        moodle     = 0.3,
+        rate                        = 4,
+        moodle                      = 0.3,
+        enduranceDepletionDuration  = 8,
+        enduranceMaximum            = 0.27,
     },
     {
         -- Exposure  6
         -- Moodle    2
-        rate       = 10,
-        moodle     = 0.3,
+        rate                        = 10,
+        moodle                      = 0.3,
+        enduranceDepletionDuration  = 8,
+        enduranceMaximum            = 0.27,
     },
     {
         -- Exposure  7
         -- Moodle    3
-        rate       = 18,
-        moodle     = 0.2,
+        rate                        = 18,
+        moodle                      = 0.2,
+        enduranceDepletionDuration  = 6,
+        enduranceMaximum            = 0.12,
     },
     {
         -- Exposure  8
         -- Moodle    3
-        rate       = 28,
-        moodle     = 0.2,
+        rate                        = 28,
+        moodle                      = 0.2,
+        enduranceDepletionDuration  = 6,
+        enduranceMaximum            = 0.12,
     },
     {
         -- Exposure  9
         -- Moodle    4
-        rate       = 40,
-        moodle     = 0.1,
+        rate                        = 40,
+        moodle                      = 0.1,
+        enduranceDepletionDuration  = 4,
+        enduranceMaximum            = 0,
     },
     {
         -- Exposure  10
         -- Moodle    4
-        rate       = 75,
-        moodle     = 0.1,
+        rate                        = 75,
+        moodle                      = 0.1,
+        enduranceDepletionDuration  = 2,
+        enduranceMaximum            = 0,
     },
 }
 
 SWAB_Config.respiratoryAbsorptionLevelMaximum = 10
 
-function SWAB_Config.getRespiratoryAbsorptionLevel(_respiratoryAbsorptionLevel)
+function SWAB_Config.getRespiratoryEffectLevel(_respiratoryAbsorptionLevel)
     -- Just wrapping some confusion caused by Lua's table indexing.
-    return SWAB_Config.respiratoryAbsorptionLevels[_respiratoryAbsorptionLevel + 1]
+    return SWAB_Config.respiratoryEffectLevels[_respiratoryAbsorptionLevel + 1]
 end
 
 -------------------------------------------------------
