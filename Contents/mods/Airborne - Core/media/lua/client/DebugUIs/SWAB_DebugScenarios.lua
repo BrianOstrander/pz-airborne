@@ -10,12 +10,17 @@ SWAB_DebugScenarios.items = {
     "Hat_BandanaMask",
     "Hat_SurgicalMask_Green",
     "Hat_DustMask",
+    "Generator",
 }
 
 SWAB_DebugScenarios.scenarios = {
     {
         name = "Shed",
         location = { x = 10660, y = 9392, z = 0 },
+    },
+    {
+        name = "Field",
+        location = { x = 8129, y = 11844, z = 0 },
     },
     {
         name = "Firehouse",
@@ -83,7 +88,7 @@ function SWAB_DebugScenarios.SetSandbox()
 end
 
 function SWAB_DebugScenarios.OnStart()
-    -- getPlayer():setGodMod(true)
+    getPlayer():setGodMod(true)
     getPlayer():setUnlimitedCarry(true)
     getPlayer():setNoClip(true)
     getPlayer():setInvisible(true)
@@ -98,6 +103,8 @@ function SWAB_DebugScenarios.OnStart()
         getPlayer():LevelPerk(Perks.Woodwork)
         getPlayer():LevelPerk(Perks.Mechanics)
     end
+
+    getPlayer():getKnownRecipes():add("Generator")
 
     Events.EveryOneMinute.Add(SWAB_DebugScenarios.EveryOneMinute)
 end
