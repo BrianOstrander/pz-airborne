@@ -19,98 +19,121 @@ SWAB_Config.buildingContaminationBaseline = 4
 SWAB_Config.itemConsumptionDurationMultiplier = 1 --60
 
 -- Floor respiratoryAbsorptionLevel to get your level
---      rate                        : Per day increase in absorption
---      moodle                      : Exposure moodle value
---      enduranceDepletionDuration  : Hours to reach the endurance minimum
---      enduranceMaximum            : Endurance maximum for this level
+--      rate              : Per day increase in absorption
+--      moodle            : Exposure moodle value
+--      endurance         : Endurance effects
+--          duration      : Hours to reach the limit
+--          limit         : Endurance maximum for this level
 SWAB_Config.respiratoryEffects = {
     {
         -- Exposure  0
         -- Moodle    0
-        rate                        = -1,
-        moodle                      = 0.5,
-        enduranceDepletionDuration  = 0,
-        enduranceMaximum            = 1,
+        rate                = -1,
+        moodle              = 0.5,
+        endurance = {
+            duration        = 0,
+            limit           = 1,
+        },
     },
     {
         -- Exposure  1
         -- Moodle    1
-        rate                        = 0.1,
-        moodle                      = 0.4,
-        enduranceDepletionDuration  = 24,
-        enduranceMaximum            = 0.77,
+        rate                = 0.1,
+        moodle              = 0.4,
+        endurance = {
+            duration        = 24,
+            limit           = 0.77,
+        },
     },
     {
         -- Exposure  2
         -- Moodle    1
-        rate                        = 0.25,
-        moodle                      = 0.4,
-        enduranceDepletionDuration  = 24,
-        enduranceMaximum            = 0.52,
+        rate                = 0.25,
+        moodle              = 0.4,
+        endurance = {
+            duration        = 24,
+            limit           = 0.52,
+        },
     },
     {
         -- Exposure  3
         -- Moodle    1
-        rate                        = 0.5,
-        moodle                      = 0.4,
-        enduranceDepletionDuration  = 16,
-        enduranceMaximum            = 0.52,
+        rate                = 0.5,
+        moodle              = 0.4,
+        endurance = {
+            duration        = 16,
+            limit           = 0.52,
+        },
     },
     {
         -- Exposure  4
         -- Moodle    1
-        rate                        = 1,
-        moodle                      = 0.4,
-        enduranceDepletionDuration  = 10,
-        enduranceMaximum            = 0.52,
+        rate                = 1,
+        moodle              = 0.4,
+        endurance = {
+            duration        = 10,
+            limit           = 0.52,
+        },
     },
     {
         -- Exposure  5
         -- Moodle    2
-        rate                        = 4,
-        moodle                      = 0.3,
-        enduranceDepletionDuration  = 8,
-        enduranceMaximum            = 0.27,
+        rate                = 4,
+        moodle              = 0.3,
+        endurance = {
+            duration        = 8,
+            limit           = 0.27,
+        },
     },
     {
         -- Exposure  6
         -- Moodle    2
-        rate                        = 10,
-        moodle                      = 0.3,
-        enduranceDepletionDuration  = 8,
-        enduranceMaximum            = 0.27,
+        rate                = 10,
+        moodle              = 0.3,
+        endurance = {
+            duration        = 8,
+            limit           = 0.27,
+        },
     },
     {
         -- Exposure  7
         -- Moodle    3
-        rate                        = 18,
-        moodle                      = 0.2,
-        enduranceDepletionDuration  = 6,
-        enduranceMaximum            = 0.12,
+        rate                = 18,
+        moodle              = 0.2,
+        endurance = {
+            duration        = 6,
+            limit           = 0.12,
+        },
     },
     {
         -- Exposure  8
         -- Moodle    3
-        rate                        = 28,
-        moodle                      = 0.2,
-        enduranceDepletionDuration  = 6,
-        enduranceMaximum            = 0.12,
+        rate                = 28,
+        moodle              = 0.2,
+        endurance = {
+            duration        = 6,
+            limit           = 0.12,
+        },
     },
     {
         -- Exposure  9
         -- Moodle    4
-        rate                        = 40,
-        moodle                      = 0.1,
-        enduranceDepletionDuration  = 4,
-        enduranceMaximum            = 0,
+        rate                = 40,
+        moodle              = 0.1,
+        endurance = {
+            duration        = 4,
+            limit           = 0,
+        },
     },
     {
         -- Exposure  10
         -- Moodle    4
-        rate                        = 75,
-        moodle                      = 0.1,
-        enduranceDepletionDuration  = 2,
-        enduranceMaximum            = 0,
+        rate                = 75,
+        moodle              = 0.1,
+        endurance = {
+            duration        = 2,
+            limit           = 0,
+        },
     },
 }
 

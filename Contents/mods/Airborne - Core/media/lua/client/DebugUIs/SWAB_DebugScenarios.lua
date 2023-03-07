@@ -83,7 +83,7 @@ function SWAB_DebugScenarios.SetSandbox()
 end
 
 function SWAB_DebugScenarios.OnStart()
-    getPlayer():setGodMod(true)
+    -- getPlayer():setGodMod(true)
     getPlayer():setUnlimitedCarry(true)
     getPlayer():setNoClip(true)
     getPlayer():setInvisible(true)

@@ -25,6 +25,9 @@ function SWAB_Player.OnCreatePlayer(_, _player)
         modData.respiratoryAbsorptionRate = 0
         -- A float, the total toxins absorbed.
         modData.respiratoryAbsorption = 0
+        -- Maximum the endurance modifier is allowed to be.
+        modData.enduranceMaximum = 1
+
         _player:getModData()[SWAB_Config.playerModDataId] = modData
         _player:transmitModData()
     end
@@ -48,14 +51,28 @@ function SWAB_Player.EveryOneMinute()
             modData.respiratoryExposureLevel = SWAB_Player.CalculateRespiratoryExposureLevel(player, modData.respiratoryExposure)
             modData.respiratoryAbsorptionLevel = SWAB_Player.CalculateRespiratoryAbsorptionLevel(player, modData.respiratoryExposureLevel)
             modData.respiratoryAbsorptionRate = SWAB_Player.CalculateRespiratoryAbsorptionRate(player, modData.respiratoryAbsorptionLevel)
-            SWAB_Player.ApplyRespiratoryAbsorptionLevelEffects(player, SWAB_Config.GetRespiratoryEffects(modData.respiratoryAbsorptionLevel))
-           
+            SWAB_Player.ApplyEnduranceEffects(player, SWAB_Config.GetRespiratoryEffects(modData.respiratoryAbsorptionLevel).endurance)
+            
             -- Level rate is divided by minutes in day.
             modData.respiratoryAbsorption = PZMath.max(0, modData.respiratoryAbsorption + (modData.respiratoryAbsorptionRate / 1440))
         end
     end
 end
 Events.EveryOneMinute.Add(SWAB_Player.EveryOneMinute)
+
+function SWAB_Player.OnTick(_ticks)
+    for _, player in ipairs(SWAB_Utilities.GetPlayers()) do
+        local modData = player:getModData()[SWAB_Config.playerModDataId]
+        if modData and modData.enduranceMaximum then
+            local stats = player:getStats()
+            if modData.enduranceMaximum < stats:getEndurance() then
+                -- Apply the enduranceMaximum we calculated on the last minute, doing it on tick to minimize ping-ponging.
+                player:getStats():setEndurance(modData.enduranceMaximum)
+            end
+        end
+    end
+end
+Events.OnTick.Add(SWAB_Player.OnTick)
 
 -- Calculates the amount of respiratory toxins the player would be exposed to without
 -- wearing any protective gear, from the environment.
@@ -263,6 +280,35 @@ function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryAbs
 end
 
 -- Each level of resperatory absorption affects various player stats
-function SWAB_Player.ApplyRespiratoryAbsorptionLevelEffects(_player, _effects)
+function SWAB_Player.ApplyEnduranceEffects(_player, _enduranceEffects)
+    local modData = _player:getModData()[SWAB_Config.playerModDataId]
     
+    if not _enduranceEffects or _enduranceEffects.limit == 1 then
+        modData.enduranceMaximum = 1
+        -- No endurance effects or no debuff for this level.
+        return
+    end
+
+    local stats = _player:getStats()
+    local endurance = stats:getEndurance()
+
+    -- This stops the player from going briefly inside to reset their enduranceMaximum, 
+    -- now it will never be higher than their current endurance. This means running around
+    -- will push your enduranceMaximum down faster, not allowing you to recoup any endurance
+    -- above the current effects limit.
+    modData.enduranceMaximum = PZMath.max(PZMath.min(endurance, modData.enduranceMaximum), _enduranceEffects.limit)
+
+    if _enduranceEffects.limit < modData.enduranceMaximum then
+        -- We haven't bottomed out on our enduranceMaximum yet...
+        local enduranceDepletionRemaining = modData.enduranceMaximum - _enduranceEffects.limit
+        -- Since duration is in hours, and we call this function every minute,
+        -- we need to calculate our own modifier to enduranceMaximum by the minute.
+        local enduranceDelta = (1 - _enduranceEffects.limit) / (_enduranceEffects.duration * 60)    
+        -- Ensure we don't overshoot the limit when the delta is added.
+        enduranceDelta = PZMath.min(enduranceDepletionRemaining, enduranceDelta)
+        modData.enduranceMaximum = modData.enduranceMaximum - enduranceDelta
+        -- enduranceMaximum is now the maximum the player's endurance should ever be.
+    end
+
+    -- We don't apply the enduranceMaximum here, we wait until OnTick.
 end

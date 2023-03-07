@@ -95,6 +95,7 @@ function SWAB_DebugContaminationPanel:prerender()
     z = self:drawField("Resp. Absorption Level", playerModData.respiratoryAbsorptionLevel, x, z)
     z = self:drawFloat("Resp. Absorption Rate", playerModData.respiratoryAbsorptionRate, x, z)
     z = self:drawFloat("Resp. Absorption", playerModData.respiratoryAbsorption, x, z)
+    z = self:drawFloat("Endurance Maximum", playerModData.enduranceMaximum, x, z)
 end
 
 function SWAB_DebugContaminationPanel:drawFloat(_name, _value, _x, _z)
