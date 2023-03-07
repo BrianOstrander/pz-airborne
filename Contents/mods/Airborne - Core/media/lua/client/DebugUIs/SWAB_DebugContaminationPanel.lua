@@ -34,7 +34,7 @@ function SWAB_DebugContaminationPanel:initialise()
     self.reInitBuildingButton.borderColor = {r=1, g=1, b=1, a=0.1}
     self:addChild(self.reInitBuildingButton)
 
-    -- ReInit Building Button
+    -- Decontaminate Room Button
     self.decontaminateRoomButton = ISButton:new(10 + btnWid + 10, self:getHeight() - (padBottom * 2) - (btnHgt * 2), btnWid, btnHgt, "Decon. Room", self, SWAB_DebugContaminationPanel.onClickDecontaminateRoomButton)
     self.decontaminateRoomButton.internal = "DECON_ROOM"
     self.decontaminateRoomButton.anchorTop = false
@@ -43,6 +43,16 @@ function SWAB_DebugContaminationPanel:initialise()
     self.decontaminateRoomButton:instantiate()
     self.decontaminateRoomButton.borderColor = {r=1, g=1, b=1, a=0.1}
     self:addChild(self.decontaminateRoomButton)
+
+    -- Decontaminate Player Button
+    self.decontaminatePlayerButton = ISButton:new(10 + btnWid + 10, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt, "Decon. Player", self, SWAB_DebugContaminationPanel.onClickDecontaminatePlayerButton)
+    self.decontaminatePlayerButton.internal = "DECON_PLAYER"
+    self.decontaminatePlayerButton.anchorTop = false
+    self.decontaminatePlayerButton.anchorBottom = true
+    self.decontaminatePlayerButton:initialise()
+    self.decontaminatePlayerButton:instantiate()
+    self.decontaminatePlayerButton.borderColor = {r=1, g=1, b=1, a=0.1}
+    self:addChild(self.decontaminatePlayerButton)
 
     -- Close Button
     self.closeButton = ISButton:new(10, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt, "Close", self, SWAB_DebugContaminationPanel.onClickCloseButton)
@@ -123,6 +133,12 @@ function SWAB_DebugContaminationPanel:onClickDecontaminateRoomButton(_button)
         end
     end
 end
+
+function SWAB_DebugContaminationPanel:onClickDecontaminatePlayerButton(_button)
+    local modData = getPlayer():getModData()[SWAB_Config.playerModDataId]
+    modData.respiratoryAbsorption = 0
+end
+
 
 function SWAB_DebugContaminationPanel:onClickCloseButton(_button)
     self:setVisible(false)
