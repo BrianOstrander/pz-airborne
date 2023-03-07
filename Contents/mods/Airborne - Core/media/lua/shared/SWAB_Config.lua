@@ -10,8 +10,10 @@ SWAB_Config.buildingUpdateTickDelay = 1
 SWAB_Config.buildingUpdatesPerTick = 3
 -- How many squares can we update per building.
 SWAB_Config.buildingSquareUpdateBudget = 100
--- Lower decay rates mean buildings take more time to decontaminate.
-SWAB_Config.buildingContaminationDecayRate = 0.025
+-- Difference allowed between contaminated squares before we start spreading contamination.
+SWAB_Config.squareContaminationTargetDelta = 0.02
+-- Amount of contamination taken from a neighbor square.
+SWAB_Config.squareContaminationSourceDelta = 0.01
 -- An entirely enclosed space with no filtration will decay to this level
 -- of contamination.
 SWAB_Config.buildingContaminationBaseline = 4

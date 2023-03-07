@@ -201,25 +201,34 @@ end
 
 function SWAB_Building.UpdateRoomSquare(_modData, _room, _square)
     local squareExposurePrevious = _square:getModData()[SWAB_Config.squareExposureModDataId]
-    local squareExposure = SWAB_Building.CalculateSquareExposure(_square)
+    local neighbor = SWAB_Building.CalculateSquareExposure(_square)
     
-    if not squareExposure then
-        squareExposure = squareExposurePrevious
+    if not neighbor or not neighbor.exposure then
+        return
     end
 
-    if squareExposure then
-        if squareExposure < SWAB_Config.buildingContaminationBaseline then
-            squareExposure = PZMath.max(squareExposure - SWAB_Config.buildingContaminationDecayRate, 0)
-        else
-            squareExposure = PZMath.max(squareExposure - SWAB_Config.buildingContaminationDecayRate, SWAB_Config.buildingContaminationBaseline)
-        end
-        _square:getModData()[SWAB_Config.squareExposureModDataId] = squareExposure
+    -- CalculateSquareExposure will sometimes return an outdoor square, which should not have
+    -- a contamination value specified. If so we don't bother decreasing its contamination.
+    local isContaminationFinite = neighbor.square:getModData()[SWAB_Config.squareExposureModDataId] ~= nil
 
-        if SWAB_Config.debug.visualizeExposure then
-            local highlightedFloor = _square:getFloor()
-            if highlightedFloor then
-                _square:getFloor():setHighlighted(true, false)
-                _square:getFloor():setHighlightColor(1.0, 0.0, 0.0, (squareExposure - 4)/3)
+    if not squareExposurePrevious or squareExposurePrevious < (neighbor.exposure - SWAB_Config.squareContaminationTargetDelta) then
+        -- We don't currently have any contamination, or we have a neighbor that can contaminate us.
+        _square:getModData()[SWAB_Config.squareExposureModDataId] = PZMath.max(0, neighbor.exposure - SWAB_Config.squareContaminationTargetDelta)
+        if isContaminationFinite then
+            -- Our neighbor is not an outdoor source, so we decrement it accordingly.
+            neighbor.square:getModData()[SWAB_Config.squareExposureModDataId] = PZMath.max(0, neighbor.exposure - SWAB_Config.squareContaminationSourceDelta)
+        end
+    end
+
+    if SWAB_Config.debug.visualizeExposure then
+        local highlightedFloor = _square:getFloor()
+        if highlightedFloor then
+            _square:getFloor():setHighlighted(true, false)
+            local squareAlpha = (neighbor.exposure - 4)/3
+            if squareExposurePrevious ~= _square:getModData()[SWAB_Config.squareExposureModDataId] then
+                _square:getFloor():setHighlightColor(1.0, 1.0, 0.0, squareAlpha)
+            else
+                _square:getFloor():setHighlightColor(1.0, 0.0, 0.0, squareAlpha)
             end
         end
     end
@@ -234,6 +243,7 @@ function SWAB_Building.CalculateSquareExposure(_square)
     local directions = { IsoDirections.N, IsoDirections.E, IsoDirections.S, IsoDirections.W }
 
     local highestExposure = nil
+    local highestExposureNeighbor = nil
 
     for _, direction in ipairs(directions) do
         
@@ -245,6 +255,7 @@ function SWAB_Building.CalculateSquareExposure(_square)
             if not highestExposure or highestExposure < neighborExposure then
                 -- We take the highest level of exposure from our neighboring tiles
                 highestExposure = neighborExposure
+                highestExposureNeighbor = neighbor
             end
         end
     end
@@ -258,12 +269,13 @@ function SWAB_Building.CalculateSquareExposure(_square)
                 if not highestExposure or highestExposure < neighborAboveExposure then
                     -- The neighbor above us is more contaminated
                     highestExposure = neighborAboveExposure
+                    highestExposureNeighbor = neighborAbove
                 end
             end
         end
     end
 
-    return highestExposure
+    return { square = highestExposureNeighbor, exposure = highestExposure }
 end
 
 function SWAB_Building.CalculateSquareExposureFromNeighbor(_square, _neighbor)
