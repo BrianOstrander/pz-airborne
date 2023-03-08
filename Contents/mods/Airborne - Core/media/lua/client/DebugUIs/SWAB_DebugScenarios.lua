@@ -21,8 +21,8 @@ SWAB_DebugScenarios.scenarios = {
         location = { x = 10660, y = 9392, z = 0 },
     },
     {
-        name = "Field",
-        location = { x = 8129, y = 11844, z = 0 },
+        name = "Motel",
+        location = { x = 10612, y = 9823, z = 0 },
     },
     {
         name = "Firehouse",
@@ -39,6 +39,10 @@ SWAB_DebugScenarios.scenarios = {
     {
         name = "Crossroads",
         location = { x = 13935, y = 5920, z = 0 },
+    },
+    {
+        name = "Field",
+        location = { x = 8129, y = 11844, z = 0 },
     },
 }
 

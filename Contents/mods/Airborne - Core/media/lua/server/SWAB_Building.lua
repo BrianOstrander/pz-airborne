@@ -46,6 +46,7 @@ function SWAB_Building.OnTick(_tick)
     SWAB_Building.buildingUpdateTickDelay = SWAB_Config.buildingUpdateTickDelay
 
     local buildings = {}
+    local buildingCount = 0
     for _, player in ipairs(SWAB_Utilities.GetPlayers()) do
         -- Teleporting players may not have squares
         if player:getSquare() then 
@@ -58,8 +59,13 @@ function SWAB_Building.OnTick(_tick)
                 entry.modData = ModData.getOrCreate(entry.modDataId)
 
                 buildings[entry.modDataId] = entry
+                buildingCount = buildingCount + 1
             end
         end
+    end
+
+    if buildingCount == 0 then
+        return
     end
 
     local buildingsSorted = {}
@@ -79,8 +85,15 @@ function SWAB_Building.OnTick(_tick)
         end
     )
 
-    for count, building in ipairs(buildingsSorted) do
-        SWAB_Building.UpdateBuilding(building, ticksSinceLastUpdate, SWAB_Config.buildingUpdatesPerTick < count)
+    local squareUpdatesPerTickRemaining = SWAB_Config.squareUpdatesPerTick
+    local buildingIndex = 1
+
+    while 0 < squareUpdatesPerTickRemaining do
+        squareUpdatesPerTickRemaining = squareUpdatesPerTickRemaining - SWAB_Building.UpdateBuilding(buildingsSorted[buildingIndex], ticksSinceLastUpdate, squareUpdatesPerTickRemaining)
+        buildingIndex = buildingIndex + 1
+        if buildingCount < buildingIndex then
+            buildingIndex = 1
+        end
     end
 end
 Events.OnTick.Add(SWAB_Building.OnTick)
@@ -96,17 +109,36 @@ function SWAB_Building.InitializeBuilding(_def, _modDataId, _modData)
     _modData.lastRoomIndexUpdated = -1
     _modData.lastRoomSquareIndex = -1
     _modData.buildingSquareUpdateBudgetMaximum = -1
-    _modData.roomData = {}
+    _modData.roomDatas = {}
+    _modData.activeRoomCount = 0
+
+    local rooms = _def:getRooms()
+
+    -- TODO: check if this iteration causes lag in buildings with a high room count.
+    for roomIndex = 0, rooms:size() - 1 do
+        local room = rooms:get(roomIndex):getIsoRoom()
+        local ignore = SWAB_Config.squareUpdateMaximum < room:getSquares():size()
+        _modData.roomDatas[roomIndex] = {
+            ignore                  = ignore,
+            squareUpdateCount       = 0,
+            staleUpdatesCount       = 0,
+            skipUpdatesRemaining    = 0,
+        }
+        if not ignore then
+            _modData.activeRoomCount = _modData.activeRoomCount + 1
+        end
+    end
     
     if SWAB_Config.debug.logging then
         print("SWAB: SWAB_Building.InitializeBuilding ".._modDataId)
     end
 end
 
-function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _skip)
-    if _skip then
+function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _squareBudget)
+    if _squareBudget == 0 then
         _modData.ticksSinceUpdate = _modData.ticksSinceUpdate + _tickDelta
-        return
+        -- We're skipping this building, returning that no squares were updated.
+        return 0
     end
 
     _modData.ticksSinceUpdate = 0
@@ -114,26 +146,36 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _skip)
     local buildingDef = getWorld():getMetaGrid():getBuildingAt(_modData.x, _modData.y)
     local roomDefArray = buildingDef:getRooms()
 
-    local buildingSquareBudgetRemaining = SWAB_Config.buildingSquareUpdateBudget
+    local squareBudgetRemaining = _squareBudget
 
     if -1 < _modData.lastRoomIndexUpdated then
         -- This building has been initialized, so lets set a proper update budget
-        buildingSquareBudgetRemaining = PZMath.min(buildingSquareBudgetRemaining, _modData.buildingSquareUpdateBudgetMaximum)
+        squareBudgetRemaining = PZMath.min(squareBudgetRemaining, _modData.buildingSquareUpdateBudgetMaximum)
     end
 
-    while 0 < buildingSquareBudgetRemaining do
+    local activeRoomsRemaining = _modData.activeRoomCount
+
+    while 0 < squareBudgetRemaining and 0 < activeRoomsRemaining do
         
         local iterationResult = nil
         
         if _modData.lastRoomIndexInitialized < roomDefArray:size() then
             -- We still have rooms to initialize
             _modData.lastRoomIndexInitialized = PZMath.max(0, _modData.lastRoomIndexInitialized)
-            iterationResult = SWAB_Building.IterateRoomSquares(
-                _modData,
-                roomDefArray:get(_modData.lastRoomIndexInitialized):getIsoRoom(),
-                SWAB_Building.InitializeRoomSquare,
-                SWAB_Building.InitializeRoomDone
-            )
+
+            if not _modData.roomDatas[_modData.lastRoomIndexInitialized].ignore then
+                -- This room is small enough for us to initialize.
+                iterationResult = SWAB_Building.IterateRoomSquares(
+                    _modData,
+                    roomDefArray:get(_modData.lastRoomIndexInitialized):getIsoRoom(),
+                    squareBudgetRemaining,
+                    SWAB_Building.InitializeRoomSquare,
+                    SWAB_Building.InitializeRoomDone
+                )
+            else
+                -- Room is too big, we're ignoring it.
+                _modData.lastRoomIndexInitialized = _modData.lastRoomIndexInitialized + 1
+            end
         else
             -- We can update a room
             _modData.lastRoomIndexUpdated = PZMath.max(0, _modData.lastRoomIndexUpdated)
@@ -143,24 +185,62 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _skip)
                 _modData.lastRoomIndexUpdated = 0
             end
     
-            iterationResult = SWAB_Building.IterateRoomSquares(
-                _modData,
-                roomDefArray:get(_modData.lastRoomIndexUpdated):getIsoRoom(),
-                SWAB_Building.UpdateRoomSquare,
-                SWAB_Building.UpdateRoomDone
-            )
+            local roomData = _modData.roomDatas[_modData.lastRoomIndexUpdated]
+
+            if not roomData.ignore then
+                -- This room is small enough for us to update.
+
+                if 0 < roomData.skipUpdatesRemaining then
+                    -- This room went to sleep earlier from having too many staleUpdates, or updates without changes,
+                    -- so we are skipping it for a bit.
+                    roomData.skipUpdatesRemaining = roomData.skipUpdatesRemaining - _tickDelta
+                else
+                    iterationResult = SWAB_Building.IterateRoomSquares(
+                        _modData,
+                        roomDefArray:get(_modData.lastRoomIndexUpdated):getIsoRoom(),
+                        squareBudgetRemaining,
+                        SWAB_Building.UpdateRoomSquare,
+                        SWAB_Building.UpdateRoomDone
+                    )
+
+                    roomData.squareUpdateCount = roomData.squareUpdateCount + iterationResult.updateCount
+
+                    if iterationResult.isDone then
+                        -- We've moved on to the next room
+                        if roomData.squareUpdateCount == 0 then
+                            -- No updates happened.
+                            if SWAB_Config.roomStaleUpdateCountMaximum <= (roomData.staleUpdatesCount + 1) then
+                                roomData.staleUpdatesCount = 0
+                                roomData.skipUpdatesRemaining = SWAB_Config.roomSkipUpdateCount
+                            else
+                                roomData.staleUpdatesCount = roomData.staleUpdatesCount + 1
+                            end
+                        else
+                            -- We had updates.
+                            roomData.squareUpdateCount = 0
+                            roomData.staleUpdatesCount = 0
+                        end
+                    end
+                end
+            end
         end
 
-        -- For the rare circumstance that we run into a building with zero tiles, we make sure to decrement this by at least 1.
-        buildingSquareBudgetRemaining = buildingSquareBudgetRemaining - PZMath.max(iterationResult.checkCount, 1)
+        activeRoomsRemaining = activeRoomsRemaining - 1
+        if iterationResult then
+            -- Encountering stale or ignored rooms prevents us from iterating on them, causing this to be nil.
+            squareBudgetRemaining = squareBudgetRemaining - iterationResult.checkCount
+        end
     end
+
+    -- Return the amount of squares we checked in this building.
+    return _squareBudget - squareBudgetRemaining
 end
 
-function SWAB_Building.IterateRoomSquares(_modData, _room, _onIterate, _onDone)
+function SWAB_Building.IterateRoomSquares(_modData, _room, _squareBudget, _onIterate, _onDone)
     _modData.lastRoomSquareIndex = PZMath.max(0, _modData.lastRoomSquareIndex)
     local squares = _room:getSquares()
     local squareBeginIndex = _modData.lastRoomSquareIndex
-    local squareEndIndex = PZMath.min(squares:size() - 1, _modData.lastRoomSquareIndex + SWAB_Config.buildingSquareUpdateBudget)
+    local squareEndIndex = PZMath.min(squares:size() - 1, _modData.lastRoomSquareIndex + _squareBudget)
     local squareUpdateCount = 0
     for squareIndex = squareBeginIndex, squareEndIndex do
         _modData.lastRoomSquareIndex = _modData.lastRoomSquareIndex + 1
@@ -171,13 +251,18 @@ function SWAB_Building.IterateRoomSquares(_modData, _room, _onIterate, _onDone)
         end
     end
 
-    if squares:size() <= _modData.lastRoomSquareIndex  then
+    local isDone = squares:size() <= _modData.lastRoomSquareIndex
+    if isDone then
         -- We completed iterating over an entire room
         _modData.lastRoomSquareIndex = -1
         _onDone(_modData, _room, squares:size())
     end
 
-    return { checkCount = squareEndIndex - squareBeginIndex, updateCount = squareUpdateCount }
+    return { 
+        checkCount = squareEndIndex - squareBeginIndex,
+        updateCount = squareUpdateCount,
+        isDone = isDone,
+    }
 end
 
 function SWAB_Building.InitializeRoomSquare(_modData, _room, _square)
@@ -201,10 +286,6 @@ function SWAB_Building.InitializeRoomSquare(_modData, _room, _square)
 end
 
 function SWAB_Building.InitializeRoomDone(_modData, _room, _squareCount)
-    _modData.roomData[_modData.lastRoomIndexInitialized] = {
-        staleUpdatesCount       = 0,
-        skipUpdatesRemaining    = 0,
-    }
     -- Increment the room initialization index, so we know we can move onto the next one.
     _modData.lastRoomIndexInitialized = _modData.lastRoomIndexInitialized + 1
     _modData.buildingSquareUpdateBudgetMaximum = PZMath.max(0, _modData.buildingSquareUpdateBudgetMaximum) + _squareCount
@@ -229,18 +310,18 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square)
     end
 
     
-    if squareExposurePrevious < neighbor.exposure and SWAB_Config.squareContaminationTargetDelta < (neighbor.exposure - squareExposurePrevious) then
+    if squareExposurePrevious < neighbor.exposure and SWAB_Config.squareContaminationThreshold < (neighbor.exposure - squareExposurePrevious) then
         -- We don't currently have any contamination, or we have a neighbor that can contaminate us.
         -- The contamination difference is also larger than the minimum allowed.
 
         if isContaminationFinite then
             -- Our neighbor is not an outdoor source, so we spread exposure instead of simply pumping it up.
-            local squareExposureDelta = PZMath.max(0, (neighbor.exposure - SWAB_Config.squareContaminationSourceDelta) - squareExposurePrevious) * 0.5
+            local squareExposureDelta = PZMath.max(0, (neighbor.exposure - SWAB_Config.squareContaminationDeltaMinimum) - squareExposurePrevious) * 0.5
             _square:getModData()[SWAB_Config.squareExposureModDataId] = squareExposurePrevious + squareExposureDelta
             neighbor.square:getModData()[SWAB_Config.squareExposureModDataId] = neighbor.exposure - squareExposureDelta
         else
             -- Our neighbor is an outdoor source, so we just pump it in.
-            _square:getModData()[SWAB_Config.squareExposureModDataId] = neighbor.exposure - SWAB_Config.squareContaminationSourceDelta
+            _square:getModData()[SWAB_Config.squareExposureModDataId] = neighbor.exposure - SWAB_Config.squareContaminationDeltaMinimum
         end
     end
 
