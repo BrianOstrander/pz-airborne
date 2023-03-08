@@ -96,6 +96,7 @@ function SWAB_Building.InitializeBuilding(_def, _modDataId, _modData)
     _modData.lastRoomIndexUpdated = -1
     _modData.lastRoomSquareIndex = -1
     _modData.buildingSquareUpdateBudgetMaximum = -1
+    _modData.roomData = {}
     
     if SWAB_Config.debug.logging then
         print("SWAB: SWAB_Building.InitializeBuilding ".._modDataId)
@@ -122,12 +123,12 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _skip)
 
     while 0 < buildingSquareBudgetRemaining do
         
-        local squareUpdateCount = 0
+        local iterationResult = nil
         
         if _modData.lastRoomIndexInitialized < roomDefArray:size() then
             -- We still have rooms to initialize
             _modData.lastRoomIndexInitialized = PZMath.max(0, _modData.lastRoomIndexInitialized)
-            squareUpdateCount = SWAB_Building.IterateRoomSquares(
+            iterationResult = SWAB_Building.IterateRoomSquares(
                 _modData,
                 roomDefArray:get(_modData.lastRoomIndexInitialized):getIsoRoom(),
                 SWAB_Building.InitializeRoomSquare,
@@ -142,7 +143,7 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _skip)
                 _modData.lastRoomIndexUpdated = 0
             end
     
-            squareUpdateCount = SWAB_Building.IterateRoomSquares(
+            iterationResult = SWAB_Building.IterateRoomSquares(
                 _modData,
                 roomDefArray:get(_modData.lastRoomIndexUpdated):getIsoRoom(),
                 SWAB_Building.UpdateRoomSquare,
@@ -151,7 +152,7 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _skip)
         end
 
         -- For the rare circumstance that we run into a building with zero tiles, we make sure to decrement this by at least 1.
-        buildingSquareBudgetRemaining = buildingSquareBudgetRemaining - PZMath.max(squareUpdateCount, 1)
+        buildingSquareBudgetRemaining = buildingSquareBudgetRemaining - PZMath.max(iterationResult.checkCount, 1)
     end
 end
 
@@ -160,11 +161,14 @@ function SWAB_Building.IterateRoomSquares(_modData, _room, _onIterate, _onDone)
     local squares = _room:getSquares()
     local squareBeginIndex = _modData.lastRoomSquareIndex
     local squareEndIndex = PZMath.min(squares:size() - 1, _modData.lastRoomSquareIndex + SWAB_Config.buildingSquareUpdateBudget)
+    local squareUpdateCount = 0
     for squareIndex = squareBeginIndex, squareEndIndex do
         _modData.lastRoomSquareIndex = _modData.lastRoomSquareIndex + 1
         local square = squares:get(squareIndex)
 
-        _onIterate(_modData, _room, square)
+        if _onIterate(_modData, _room, square) then
+            squareUpdateCount = squareUpdateCount + 1
+        end
     end
 
     if squares:size() <= _modData.lastRoomSquareIndex  then
@@ -173,7 +177,7 @@ function SWAB_Building.IterateRoomSquares(_modData, _room, _onIterate, _onDone)
         _onDone(_modData, _room, squares:size())
     end
 
-    return squareEndIndex - squareBeginIndex
+    return { checkCount = squareEndIndex - squareBeginIndex, updateCount = squareUpdateCount }
 end
 
 function SWAB_Building.InitializeRoomSquare(_modData, _room, _square)
@@ -191,12 +195,20 @@ function SWAB_Building.InitializeRoomSquare(_modData, _room, _square)
     -- TODO: Figure out how to see if this is a spawn building, and if so set the contamination to zero.
     _square:getModData()[SWAB_Config.squareExposureModDataId] = SWAB_Config.buildingContaminationBaseline
     _square:getModData()[SWAB_Config.squareCeilingHeightModDataId] = squareAboveZ - 1
+
+    -- Return true so this room doesn't get put to sleep.
+    return true
 end
 
 function SWAB_Building.InitializeRoomDone(_modData, _room, _squareCount)
+    _modData.roomData[_modData.lastRoomIndexInitialized] = {
+        staleUpdatesCount       = 0,
+        skipUpdatesRemaining    = 0,
+    }
     -- Increment the room initialization index, so we know we can move onto the next one.
     _modData.lastRoomIndexInitialized = _modData.lastRoomIndexInitialized + 1
     _modData.buildingSquareUpdateBudgetMaximum = PZMath.max(0, _modData.buildingSquareUpdateBudgetMaximum) + _squareCount
+
 end
 
 function SWAB_Building.UpdateRoomSquare(_modData, _room, _square)
@@ -237,13 +249,15 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square)
         if highlightedFloor then
             _square:getFloor():setHighlighted(true, false)
             local squareAlpha = (neighbor.exposure - 4)/3
-            if squareExposurePrevious ~= _square:getModData()[SWAB_Config.squareExposureModDataId] then
+            if not PZMath.equal(squareExposurePrevious,_square:getModData()[SWAB_Config.squareExposureModDataId]) then
                 _square:getFloor():setHighlightColor(1.0, 1.0, 0.0, squareAlpha)
             else
                 _square:getFloor():setHighlightColor(1.0, 0.0, 0.0, squareAlpha)
             end
         end
     end
+
+    return not PZMath.equal(squareExposurePrevious,_square:getModData()[SWAB_Config.squareExposureModDataId])
 end
 
 function SWAB_Building.UpdateRoomDone(_modData, _room, _squareCount)
