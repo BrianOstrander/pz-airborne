@@ -211,12 +211,24 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square)
     -- a contamination value specified. If so we don't bother decreasing its contamination.
     local isContaminationFinite = neighbor.square:getModData()[SWAB_Config.squareExposureModDataId] ~= nil
 
-    if not squareExposurePrevious or squareExposurePrevious < (neighbor.exposure - SWAB_Config.squareContaminationTargetDelta) then
+    if not squareExposurePrevious then
+        -- No exposure, lets set ours to zero.
+        squareExposurePrevious = 0
+    end
+
+    
+    if squareExposurePrevious < neighbor.exposure and SWAB_Config.squareContaminationTargetDelta < (neighbor.exposure - squareExposurePrevious) then
         -- We don't currently have any contamination, or we have a neighbor that can contaminate us.
-        _square:getModData()[SWAB_Config.squareExposureModDataId] = PZMath.max(0, neighbor.exposure - SWAB_Config.squareContaminationTargetDelta)
+        -- The contamination difference is also larger than the minimum allowed.
+
         if isContaminationFinite then
-            -- Our neighbor is not an outdoor source, so we decrement it accordingly.
-            neighbor.square:getModData()[SWAB_Config.squareExposureModDataId] = PZMath.max(0, neighbor.exposure - SWAB_Config.squareContaminationSourceDelta)
+            -- Our neighbor is not an outdoor source, so we spread exposure instead of simply pumping it up.
+            local squareExposureDelta = PZMath.max(0, (neighbor.exposure - SWAB_Config.squareContaminationSourceDelta) - squareExposurePrevious) * 0.5
+            _square:getModData()[SWAB_Config.squareExposureModDataId] = squareExposurePrevious + squareExposureDelta
+            neighbor.square:getModData()[SWAB_Config.squareExposureModDataId] = neighbor.exposure - squareExposureDelta
+        else
+            -- Our neighbor is an outdoor source, so we just pump it in.
+            _square:getModData()[SWAB_Config.squareExposureModDataId] = neighbor.exposure - SWAB_Config.squareContaminationSourceDelta
         end
     end
 
