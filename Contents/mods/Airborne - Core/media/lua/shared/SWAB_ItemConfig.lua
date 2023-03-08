@@ -1,6 +1,6 @@
 SWAB_ItemConfig = SWAB_ItemConfig or {}
 
-SWAB_ItemConfig["swab_default"] = {
+SWAB_ItemConfig["swab_base_modifications"] = {
     {
         ids = { "Base.Hat_BandanaMask", "Base.Hat_BandanaMaskTINT" },
         parameters = {
