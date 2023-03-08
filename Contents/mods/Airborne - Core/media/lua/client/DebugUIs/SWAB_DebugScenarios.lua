@@ -10,7 +10,9 @@ SWAB_DebugScenarios.items = {
     "Hat_BandanaMask",
     "Hat_SurgicalMask_Green",
     "Hat_DustMask",
-    "Generator",
+    -- "Generator",
+    "SWAB.ValuTechHomeAirFilter",
+    "SWAB.MassGenFacIndustrialAirFilter",
 }
 
 SWAB_DebugScenarios.scenarios = {
@@ -102,6 +104,7 @@ function SWAB_DebugScenarios.OnStart()
     for i = 1, 10 do
         getPlayer():LevelPerk(Perks.Woodwork)
         getPlayer():LevelPerk(Perks.Mechanics)
+        getPlayer():LevelPerk(Perks.Electricity)
     end
 
     getPlayer():getKnownRecipes():add("Generator")
