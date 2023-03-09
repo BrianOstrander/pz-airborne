@@ -13,14 +13,12 @@ function SWAB_SpriteUtility.Initialize()
                     valueArray = ArrayList.new()
                     valueMap[parameterName] = valueArray
                 end
-                print("SWABTest: adding "..parameterName.." val of "..parameterValue)
                 valueArray:add(tostring(parameterValue))
             end
         end
     end
 
     for property, values in pairs(valueMap) do
-        print("SWABTest: adding "..property)
         IsoWorld.PropertyValueMap:put(property, values)
     end
 end
@@ -32,8 +30,6 @@ function SWAB_SpriteUtility.OnLoadedTileDefinitions(_spriteManager)
                 local sprite = _spriteManager:getSprite(spriteConfig.textureSheet.."_"..spriteIndex)
                 if sprite then
                     for parameterName, parameterValue in pairs(spriteConfig.parameters) do
-                        print("SWABTest: setting now on "..spriteConfig.textureSheet.."_"..spriteIndex)
-                        print("SWABTest: "..parameterName.." : "..parameterValue)
                         sprite:getProperties():Set(parameterName, tostring(parameterValue), false)
                     end
                 else
