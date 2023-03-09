@@ -44,15 +44,25 @@ function SWAB_DebugContaminationPanel:initialise()
     self.decontaminateRoomButton.borderColor = {r=1, g=1, b=1, a=0.1}
     self:addChild(self.decontaminateRoomButton)
 
-    -- Decontaminate Player Button
-    self.decontaminatePlayerButton = ISButton:new(10 + btnWid + 10, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt, "Decon. Player", self, SWAB_DebugContaminationPanel.onClickDecontaminatePlayerButton)
-    self.decontaminatePlayerButton.internal = "DECON_PLAYER"
-    self.decontaminatePlayerButton.anchorTop = false
-    self.decontaminatePlayerButton.anchorBottom = true
-    self.decontaminatePlayerButton:initialise()
-    self.decontaminatePlayerButton:instantiate()
-    self.decontaminatePlayerButton.borderColor = {r=1, g=1, b=1, a=0.1}
-    self:addChild(self.decontaminatePlayerButton)
+    -- Contaminate Room Button
+    self.contaminateRoomButton = ISButton:new(10 + btnWid + 10, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt, "Con. Room", self, SWAB_DebugContaminationPanel.onClickContaminateRoomButton)
+    self.contaminateRoomButton.internal = "CON_ROOM"
+    self.contaminateRoomButton.anchorTop = false
+    self.contaminateRoomButton.anchorBottom = true
+    self.contaminateRoomButton:initialise()
+    self.contaminateRoomButton:instantiate()
+    self.contaminateRoomButton.borderColor = {r=1, g=1, b=1, a=0.1}
+    self:addChild(self.contaminateRoomButton)
+
+    -- -- Decontaminate Player Button
+    -- self.decontaminatePlayerButton = ISButton:new(10 + btnWid + 10, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt, "Decon. Player", self, SWAB_DebugContaminationPanel.onClickDecontaminatePlayerButton)
+    -- self.decontaminatePlayerButton.internal = "DECON_PLAYER"
+    -- self.decontaminatePlayerButton.anchorTop = false
+    -- self.decontaminatePlayerButton.anchorBottom = true
+    -- self.decontaminatePlayerButton:initialise()
+    -- self.decontaminatePlayerButton:instantiate()
+    -- self.decontaminatePlayerButton.borderColor = {r=1, g=1, b=1, a=0.1}
+    -- self:addChild(self.decontaminatePlayerButton)
 
     -- Close Button
     self.closeButton = ISButton:new(10, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt, "Close", self, SWAB_DebugContaminationPanel.onClickCloseButton)
@@ -130,6 +140,19 @@ function SWAB_DebugContaminationPanel:onClickDecontaminateRoomButton(_button)
             squareModData = square:getModData()
             if squareModData and squareModData[SWAB_Config.squareExposureModDataId] then
                 squareModData[SWAB_Config.squareExposureModDataId] = 0
+            end
+        end
+    end
+end
+
+function SWAB_DebugContaminationPanel:onClickContaminateRoomButton(_button)
+    if getPlayer():getSquare() and getPlayer():getSquare():getRoom() then
+        local squares = getPlayer():getSquare():getRoom():getSquares()
+        for squareIndex = 0, squares:size() - 1 do
+            local square = squares:get(squareIndex)
+            squareModData = square:getModData()
+            if squareModData and squareModData[SWAB_Config.squareExposureModDataId] then
+                squareModData[SWAB_Config.squareExposureModDataId] = 7
             end
         end
     end

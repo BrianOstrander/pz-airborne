@@ -1,25 +1,25 @@
 module SWAB
 {
-    item ValuTechHomeAirFilter
+    item ValuTechHomeAirPurifier
 	{
 	    DisplayCategory 		= Furniture,
 		Type					= Moveable,
-		Icon					= TZ_IndieStoneNPK,
+		Icon					= default,
         Weight          		= 10.0,
 
-		DisplayName				= ValuTech Home Air Purifier,
+		DisplayName				= Moveable,
         
 		WorldObjectSprite		= swab_filters_01_0,
 	}
 
-    item MassGenFacIndustrialAirFilter
+    item MassGenFacIndustrialAirPurifier
 	{
 	    DisplayCategory 		= Furniture,
 		Type					= Moveable,
-		Icon					= TZ_IndieStoneNPK,
+		Icon					= default,
         Weight          		= 10.0,
 
-		DisplayName				= MassGenFac Industrial Air Purifier,
+		DisplayName				= Moveable,
         
 		WorldObjectSprite		= swab_filters_01_8,
 	}

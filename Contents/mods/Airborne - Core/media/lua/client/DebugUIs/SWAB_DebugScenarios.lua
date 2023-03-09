@@ -11,8 +11,8 @@ SWAB_DebugScenarios.items = {
     "Hat_SurgicalMask_Green",
     "Hat_DustMask",
     -- "Generator",
-    "SWAB.ValuTechHomeAirFilter",
-    "SWAB.MassGenFacIndustrialAirFilter",
+    "SWAB.ValuTechHomeAirPurifier",
+    "SWAB.MassGenFacIndustrialAirPurifier",
 }
 
 SWAB_DebugScenarios.scenarios = {

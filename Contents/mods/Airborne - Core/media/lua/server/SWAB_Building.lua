@@ -21,6 +21,7 @@ SWAB_Building.porousWallsWest["constructedobjects_01_72"] = true
 
 SWAB_Building.lastTick = 0
 SWAB_Building.buildingUpdateTickDelay = 0
+SWAB_Building.ElectricGridEnabled = false
 
 
 function SWAB_Building.OnTick(_tick)
@@ -67,6 +68,8 @@ function SWAB_Building.OnTick(_tick)
     if buildingCount == 0 then
         return
     end
+
+    SWAB_Building.ElectricGridEnabled = SandboxVars.ElecShutModifier > -1 and GameTime:getInstance():getNightsSurvived() < SandboxVars.ElecShutModifier
 
     local buildingsSorted = {}
     for _, b in pairs(buildings) do
@@ -336,6 +339,21 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square)
                 _square:getFloor():setHighlightColor(1.0, 0.0, 0.0, squareAlpha)
             end
         end
+    end
+
+    if SWAB_Building.ElectricGridEnabled or _square:haveElectricity() then
+        local squareObjects = _square:getObjects()
+        for i = 0, squareObjects:size() - 1 do
+            local squareObject = squareObjects:get(i)
+            if instanceof(squareObject, "IsoThumpable") then
+                local filtration = squareObject:getProperties():Val("AirFiltration")
+                if filtration then
+                    -- We found a filter
+                    _square:getModData()[SWAB_Config.squareExposureModDataId] = PZMath.max(0, _square:getModData()[SWAB_Config.squareExposureModDataId] - filtration)
+                    -- TODO: decrease fuel in generator
+                end
+            end
+        end 
     end
 
     return not PZMath.equal(squareExposurePrevious,_square:getModData()[SWAB_Config.squareExposureModDataId])

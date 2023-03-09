@@ -150,6 +150,13 @@ function SWAB_Config.GetRespiratoryEffects(_respiratoryAbsorptionLevel)
     return SWAB_Config.respiratoryEffects[_respiratoryAbsorptionLevel + 1]
 end
 
+-- Given the number of hours, this gives back an approximate value that represents the air
+-- filtration value for fully cleaning a 3x3 space within that time. This doesn't take
+-- into account tick rate, possible todo. This mostly exists to make balancing easier.
+function SWAB_Config.GetAirFiltrationFromDuration(_hours)
+    return 0.1 / _hours
+end
+
 -------------------------------------------------------
 -- CONSTANTS --
 -- DO NOT MESS WITH EVER
