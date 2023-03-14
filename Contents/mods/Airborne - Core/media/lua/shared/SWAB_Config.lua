@@ -30,7 +30,7 @@ SWAB_Config.itemConsumptionDurationMultiplier = 1 --60
 --      endurance         : Endurance effects
 --          duration      : Hours to reach the limit
 --          limit         : Endurance maximum for this level
-SWAB_Config.respiratoryEffects = {
+SWAB_Config.respiratoryExposureEffects = {
     {
         -- Exposure  0
         -- Moodle    0
@@ -145,9 +145,9 @@ SWAB_Config.respiratoryEffects = {
 
 SWAB_Config.respiratoryAbsorptionLevelMaximum = 10
 
-function SWAB_Config.GetRespiratoryEffects(_respiratoryAbsorptionLevel)
+function SWAB_Config.GetRespiratoryExposureEffects(_respiratoryAbsorptionLevel)
     -- Just wrapping some confusion caused by Lua's table indexing.
-    return SWAB_Config.respiratoryEffects[_respiratoryAbsorptionLevel + 1]
+    return SWAB_Config.respiratoryExposureEffects[_respiratoryAbsorptionLevel + 1]
 end
 
 -- Given the number of hours, this gives back an approximate value that represents the air
@@ -162,7 +162,7 @@ end
 -- DO NOT MESS WITH EVER
 -------------------------------------------------------
 
-SWAB_Config.moodleId = "contamination_exposure"
+SWAB_Config.respiratoryExposureMoodleId = "swab_respiratory_exposure"
 SWAB_Config.playerModDataId = "swab_player"
 SWAB_Config.squareExposureModDataId = "swab_square_exposure"
 SWAB_Config.squareFloorClaimDeltaModDataId = "swab_square_floor_claim_delta"

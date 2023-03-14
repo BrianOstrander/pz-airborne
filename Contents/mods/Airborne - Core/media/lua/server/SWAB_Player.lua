@@ -51,7 +51,7 @@ function SWAB_Player.EveryOneMinute()
             modData.respiratoryExposureLevel = SWAB_Player.CalculateRespiratoryExposureLevel(player, modData.respiratoryExposure)
             modData.respiratoryAbsorptionLevel = SWAB_Player.CalculateRespiratoryAbsorptionLevel(player, modData.respiratoryExposureLevel)
             modData.respiratoryAbsorptionRate = SWAB_Player.CalculateRespiratoryAbsorptionRate(player, modData.respiratoryAbsorptionLevel)
-            SWAB_Player.ApplyEnduranceEffects(player, SWAB_Config.GetRespiratoryEffects(modData.respiratoryAbsorptionLevel).endurance)
+            SWAB_Player.ApplyEnduranceEffects(player, SWAB_Config.GetRespiratoryExposureEffects(modData.respiratoryAbsorptionLevel).endurance)
             
             -- Level rate is divided by minutes in day.
             modData.respiratoryAbsorption = PZMath.max(0, modData.respiratoryAbsorption + (modData.respiratoryAbsorptionRate / 1440))
@@ -230,7 +230,7 @@ end
 
 -- Various moodles are taken into account when calculating the absorption rate
 function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryAbsorptionLevel)
-    local levelRate = SWAB_Config.GetRespiratoryEffects(_respiratoryAbsorptionLevel).rate
+    local levelRate = SWAB_Config.GetRespiratoryExposureEffects(_respiratoryAbsorptionLevel).rate
 
     if levelRate < 0 then
         -- Player is recovering from exposure
