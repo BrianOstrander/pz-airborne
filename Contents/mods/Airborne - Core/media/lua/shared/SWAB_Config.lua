@@ -34,7 +34,7 @@ SWAB_Config.respiratoryExposureEffects = {
     {
         -- Exposure  0
         -- Moodle    None
-        rate                = -1,
+        rate                = -18,
         moodle              = 0.5,
         endurance = {
             duration        = 0,
@@ -219,6 +219,8 @@ function SWAB_Config.GetRespiratorySicknessEffects(_respiratorySicknessLevel)
     -- Just wrapping some confusion caused by Lua's table indexing.
     return SWAB_Config.respiratorySicknessEffects[_respiratorySicknessLevel + 1]
 end
+
+SWAB_Config.respiratoryAbsorptionMaximum = SWAB_Config.GetRespiratorySicknessEffects(SWAB_Config.respiratorySicknessLevelMaximum).absorptionMinimum * 1.5
 
 -- Given the number of hours, this gives back an approximate value that represents the air
 -- filtration value for fully cleaning a 3x3 space within that time. This doesn't take

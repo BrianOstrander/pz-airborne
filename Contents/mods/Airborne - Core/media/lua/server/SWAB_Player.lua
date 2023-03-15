@@ -54,7 +54,7 @@ function SWAB_Player.EveryOneMinute()
             modData.respiratoryAbsorptionLevel = SWAB_Player.CalculateRespiratoryAbsorptionLevel(player, modData.respiratoryExposureLevel)
             modData.respiratoryAbsorptionRate = SWAB_Player.CalculateRespiratoryAbsorptionRate(player, modData.respiratoryAbsorptionLevel)
             -- Level rate is divided by minutes in day.
-            modData.respiratoryAbsorption = PZMath.max(0, modData.respiratoryAbsorption + (modData.respiratoryAbsorptionRate / 1440))
+            modData.respiratoryAbsorption = PZMath.min(SWAB_Config.respiratoryAbsorptionMaximum, PZMath.max(0, modData.respiratoryAbsorption + (modData.respiratoryAbsorptionRate / 1440)))
             modData.respiratorySicknessLevel = SWAB_Player.CalculateRespiratorySicknessLevel(player, modData.respiratoryAbsorption)
 
             SWAB_Player.ApplyEffects(
@@ -289,9 +289,9 @@ function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryAbs
         end
 
         if _player:getTraits():contains("SlowHealer") then
-            levelRate = levelRate * 0.75
+            levelRateMultiplier = levelRateMultiplier * 0.75
         elseif _player:getTraits():contains("FastHealer") then
-            levelRate = levelRate * 2
+            levelRateMultiplier = levelRateMultiplier * 2
         end
 
         levelRate = levelRate * levelRateMultiplier
@@ -310,19 +310,20 @@ function SWAB_Player.ApplyEffects(_player, _sickness, _exposure)
 
     -- Endurance
     local endurance = stats:getEndurance()
+    local enduranceModified = false
 
-    if _sickness and _sickness.endurance then
+    if _sickness and _sickness.endurance and not PZMath.equal(_sickness.endurance.limit, 1) then
+        enduranceModified = true
         endurance = PZMath.min(endurance, _sickness.endurance.limit)
-    else
-        endurance = 1
     end
-
-    if _exposure.endurance and _exposure.endurance.limit ~= 1 then
+    
+    if _exposure.endurance and not PZMath.equal(_exposure.endurance.limit, 1) then
+        enduranceModified = true
         -- This stops the player from going briefly inside to reset their enduranceMaximum, 
         -- now it will never be higher than their current endurance. This means running around
         -- will push your enduranceMaximum down faster, not allowing you to recoup any endurance
         -- above the current effects limit.
-        endurance = PZMath.max(PZMath.min(endurance, modData.enduranceMaximum), _exposure.endurance.limit)
+        endurance = PZMath.max(PZMath.min(endurance, modData.enduranceMaximum), PZMath.min(endurance, _exposure.endurance.limit))
 
         if _exposure.endurance.limit < endurance then
             -- We haven't bottomed out on our enduranceMaximum yet...
@@ -337,7 +338,11 @@ function SWAB_Player.ApplyEffects(_player, _sickness, _exposure)
         end
     end
 
-    modData.enduranceMaximum = endurance
+    if enduranceModified then
+        modData.enduranceMaximum = endurance
+    else
+        modData.enduranceMaximum = 1
+    end
 
     -- We don't apply the enduranceMaximum here, we wait until OnTick.
 end
