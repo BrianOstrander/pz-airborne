@@ -169,16 +169,18 @@ function SWAB_Player.CalculateRespiratoryExposureWithProtection(_player, _respir
             if itemModData then
                 if itemModData["SwabRespiratoryItem"] then
                     -- We've established this is an item that provides respiratory protection.
-                    local itemConsumedDuration = itemModData["SwabRespiratoryExposure_ConsumedDuration"] * SWAB_Config.itemConsumptionDurationMultiplier
+                    local itemProtectionDurationInMinutes = itemModData["SwabRespiratoryExposure_ProtectionDuration"] * SWAB_Config.itemRespiratoryProtectionDurationMultiplier
                     local itemReduction = 0
                     local itemMinimum = 0
                     
-                    local itemConsumedElapsed = itemModData["SwabRespiratoryExposure_ConsumedElapsed"]
-                    local itemConsumedElapsedUpdated = PZMath.min(itemConsumedDuration, itemConsumedElapsed + 1)
-                    if itemConsumedElapsed ~= itemConsumedElapsedUpdated then
-                        itemConsumedElapsed = itemConsumedElapsedUpdated
+                    local itemProtectionRemaining = itemModData["SwabRespiratoryExposure_ProtectionRemaining"]
+                    local itemProtectionRemainingUpdated = PZMath.max(0, itemProtectionRemaining - (1 / itemProtectionDurationInMinutes))
+                    if not PZMath.equal(itemProtectionRemaining, itemProtectionRemainingUpdated) then
+                        -- Item still has some protection remaining
+                        itemProtectionRemaining = itemProtectionRemainingUpdated
+                        itemModData["SwabRespiratoryExposure_ProtectionRemaining"] = itemProtectionRemaining
 
-                        if itemConsumedDuration <= itemConsumedElapsed then
+                        if PZMath.equal(0, itemProtectionRemaining) then
                             -- Item has been contaminated
                             local itemNamePrefix = getText("ContextMenu_SWAB_ContaminatedPrefix")
                             local itemNameSuffix = getText("ContextMenu_SWAB_ContaminatedSuffix")
@@ -192,22 +194,18 @@ function SWAB_Player.CalculateRespiratoryExposureWithProtection(_player, _respir
                             end
 
                             item:setName(itemNamePrefix..getText(item:getDisplayName())..itemNameSuffix)
-                        end
-
-                        itemModData["SwabRespiratoryExposure_ConsumedElapsed"] = itemConsumedElapsed
-                    end
-
-                    
-                    if itemConsumedElapsed < itemConsumedDuration then
-                        -- Still not entirely contaminated.
-                        itemReduction = itemModData["SwabRespiratoryExposure_Reduction"]
-                        itemMinimum = itemModData["SwabRespiratoryExposure_Minimum"]
+                        else
+                            -- Still not entirely contaminated.
+                            itemReduction = itemModData["SwabRespiratoryExposure_Reduction"]
+                            itemMinimum = itemModData["SwabRespiratoryExposure_Minimum"]
+                        end 
                     end
 
                     -- We can never reduce our exposure below the item's rated minimum.
                     local itemExposure = PZMath.max(_respiratoryExposure + itemReduction, itemMinimum)
 
                     -- There's a chance that wearing this item is no better than going without it.
+                    -- We return here since only one respiratory item can be worn at a time.
                     return PZMath.min(itemExposure, _respiratoryExposure)
                 end
             end

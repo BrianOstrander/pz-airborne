@@ -81,7 +81,7 @@ function SWAB_ISToolTipInv:RenderConsumption(_tooltip, _modData)
     local y = _tooltip:getHeight() - 20
 
     _tooltip:DrawText(UIFont.Small, getText("ContextMenu_SWAB_Tooltip_Contamination")..":", x, y, 1, 1, 0.8, 1)
-    local value = _modData["SwabRespiratoryExposure_ConsumedElapsed"]/_modData["SwabRespiratoryExposure_ConsumedDuration"]
+    local value = 1 - (_modData["SwabRespiratoryExposure_ProtectionRemaining"]/_modData["SwabRespiratoryExposure_ProtectionDuration"])
     local color = ColorInfo.new(0, 0, 0, 1)
     getCore():getBadHighlitedColor():interp(getCore():getGoodHighlitedColor(), 1 - value, color)
     -- Getting the X value here is not ideal
