@@ -113,6 +113,7 @@ function SWAB_DebugScenarios.OnStart()
 
     getPlayer():getKnownRecipes():add("Generator")
 
+    -- Cleans up zombies every minute.
     Events.EveryOneMinute.Add(SWAB_DebugScenarios.EveryOneMinute)
 end
 

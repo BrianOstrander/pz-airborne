@@ -25,6 +25,8 @@ function SWAB_Player.OnCreatePlayer(_, _player)
         modData.respiratoryAbsorptionRate = 0
         -- A float, the total toxins absorbed.
         modData.respiratoryAbsorption = 0
+        -- An integer between 0-5, measures the current sickness level.
+        modData.respiratorySicknessLevel = 0
         -- Maximum the endurance modifier is allowed to be.
         modData.enduranceMaximum = 1
 
@@ -51,10 +53,15 @@ function SWAB_Player.EveryOneMinute()
             modData.respiratoryExposureLevel = SWAB_Player.CalculateRespiratoryExposureLevel(player, modData.respiratoryExposure)
             modData.respiratoryAbsorptionLevel = SWAB_Player.CalculateRespiratoryAbsorptionLevel(player, modData.respiratoryExposureLevel)
             modData.respiratoryAbsorptionRate = SWAB_Player.CalculateRespiratoryAbsorptionRate(player, modData.respiratoryAbsorptionLevel)
-            SWAB_Player.ApplyEnduranceEffects(player, SWAB_Config.GetRespiratoryExposureEffects(modData.respiratoryAbsorptionLevel).endurance)
-            
             -- Level rate is divided by minutes in day.
             modData.respiratoryAbsorption = PZMath.max(0, modData.respiratoryAbsorption + (modData.respiratoryAbsorptionRate / 1440))
+            modData.respiratorySicknessLevel = SWAB_Player.CalculateRespiratorySicknessLevel(player, modData.respiratoryAbsorption)
+
+            SWAB_Player.ApplyEffects(
+                player,
+                SWAB_Config.GetRespiratorySicknessEffects(modData.respiratorySicknessLevel),
+                SWAB_Config.GetRespiratoryExposureEffects(modData.respiratoryAbsorptionLevel)
+            )
         end
     end
 end
@@ -228,6 +235,20 @@ function SWAB_Player.CalculateRespiratoryAbsorptionLevel(_player, _respiratoryEx
     return PZMath.clamp(level, 0, SWAB_Config.respiratoryAbsorptionLevelMaximum)
 end
 
+function SWAB_Player.CalculateRespiratorySicknessLevel(_player, _respiratoryAbsorption)
+
+    for sicknessLevel = SWAB_Config.respiratorySicknessLevelMaximum, 0, -1 do
+        sickness = SWAB_Config.GetRespiratorySicknessEffects(sicknessLevel)
+        if sickness.absorptionHealMinimum <= _respiratoryAbsorption then
+            return sicknessLevel
+        end
+    end
+
+    -- This should never happen.
+    print("SWAB: Error, unable to find a sickness level for respiratory absorption: ".._respiratoryAbsorption)
+    return 0
+end
+
 -- Various moodles are taken into account when calculating the absorption rate
 function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryAbsorptionLevel)
     local levelRate = SWAB_Config.GetRespiratoryExposureEffects(_respiratoryAbsorptionLevel).rate
@@ -274,41 +295,49 @@ function SWAB_Player.CalculateRespiratoryAbsorptionRate(_player, _respiratoryAbs
         end
 
         levelRate = levelRate * levelRateMultiplier
+    else
+        -- TODO: This is where veteran and asthmatic should be taken into account... I think?
+        -- possibly in CalculateRespiratoryAbsorptionLevel though... or maybe only affect healing...
     end
 
     return levelRate
 end
 
 -- Each level of resperatory absorption affects various player stats
-function SWAB_Player.ApplyEnduranceEffects(_player, _enduranceEffects)
+function SWAB_Player.ApplyEffects(_player, _sickness, _exposure)
     local modData = _player:getModData()[SWAB_Config.playerModDataId]
-    
-    if not _enduranceEffects or _enduranceEffects.limit == 1 then
-        modData.enduranceMaximum = 1
-        -- No endurance effects or no debuff for this level.
-        return
-    end
-
     local stats = _player:getStats()
+
+    -- Endurance
     local endurance = stats:getEndurance()
 
-    -- This stops the player from going briefly inside to reset their enduranceMaximum, 
-    -- now it will never be higher than their current endurance. This means running around
-    -- will push your enduranceMaximum down faster, not allowing you to recoup any endurance
-    -- above the current effects limit.
-    modData.enduranceMaximum = PZMath.max(PZMath.min(endurance, modData.enduranceMaximum), _enduranceEffects.limit)
-
-    if _enduranceEffects.limit < modData.enduranceMaximum then
-        -- We haven't bottomed out on our enduranceMaximum yet...
-        local enduranceDepletionRemaining = modData.enduranceMaximum - _enduranceEffects.limit
-        -- Since duration is in hours, and we call this function every minute,
-        -- we need to calculate our own modifier to enduranceMaximum by the minute.
-        local enduranceDelta = (1 - _enduranceEffects.limit) / (_enduranceEffects.duration * 60)    
-        -- Ensure we don't overshoot the limit when the delta is added.
-        enduranceDelta = PZMath.min(enduranceDepletionRemaining, enduranceDelta)
-        modData.enduranceMaximum = modData.enduranceMaximum - enduranceDelta
-        -- enduranceMaximum is now the maximum the player's endurance should ever be.
+    if _sickness and _sickness.endurance then
+        endurance = PZMath.min(endurance, _sickness.endurance.limit)
+    else
+        endurance = 1
     end
+
+    if _exposure.endurance and _exposure.endurance.limit ~= 1 then
+        -- This stops the player from going briefly inside to reset their enduranceMaximum, 
+        -- now it will never be higher than their current endurance. This means running around
+        -- will push your enduranceMaximum down faster, not allowing you to recoup any endurance
+        -- above the current effects limit.
+        endurance = PZMath.max(PZMath.min(endurance, modData.enduranceMaximum), _exposure.endurance.limit)
+
+        if _exposure.endurance.limit < endurance then
+            -- We haven't bottomed out on our enduranceMaximum yet...
+            local enduranceDepletionRemaining = endurance - _exposure.endurance.limit
+            -- Since duration is in hours, and we call this function every minute,
+            -- we need to calculate our own modifier to enduranceMaximum by the minute.
+            local enduranceDelta = (1 - _exposure.endurance.limit) / (_exposure.endurance.duration * 60)    
+            -- Ensure we don't overshoot the limit when the delta is added.
+            enduranceDelta = PZMath.min(enduranceDepletionRemaining, enduranceDelta)
+            endurance = endurance - enduranceDelta
+            -- enduranceMaximum is now the maximum the player's endurance should ever be.
+        end
+    end
+
+    modData.enduranceMaximum = endurance
 
     -- We don't apply the enduranceMaximum here, we wait until OnTick.
 end

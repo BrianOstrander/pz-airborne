@@ -44,6 +44,16 @@ function SWAB_DebugContaminationPanel:initialise()
     self.decontaminateRoomButton.borderColor = {r=1, g=1, b=1, a=0.1}
     self:addChild(self.decontaminateRoomButton)
 
+    -- Set Sprite Button
+    self.increaseSicknessButton = ISButton:new(10, self:getHeight() - ((padBottom + btnHgt) * 2), btnWid, btnHgt, "Sickness +", self, SWAB_DebugContaminationPanel.onClickIncreaseSicknessButton)
+    self.increaseSicknessButton.internal = "INC_SICK"
+    self.increaseSicknessButton.anchorTop = false
+    self.increaseSicknessButton.anchorBottom = true
+    self.increaseSicknessButton:initialise()
+    self.increaseSicknessButton:instantiate()
+    self.increaseSicknessButton.borderColor = {r=1, g=1, b=1, a=0.1}
+    self:addChild(self.increaseSicknessButton)
+
     -- Contaminate Room Button
     self.contaminateRoomButton = ISButton:new(10 + btnWid + 10, self:getHeight() - ((padBottom + btnHgt) * 2), btnWid, btnHgt, "Con. Room", self, SWAB_DebugContaminationPanel.onClickContaminateRoomButton)
     self.contaminateRoomButton.internal = "CON_ROOM"
@@ -142,6 +152,17 @@ function SWAB_DebugContaminationPanel:onClickDecontaminateRoomButton(_button)
                 squareModData[SWAB_Config.squareExposureModDataId] = 0
             end
         end
+    end
+end
+
+function SWAB_DebugContaminationPanel:onClickIncreaseSicknessButton(_button)
+    local modData = getPlayer():getModData()[SWAB_Config.playerModDataId]
+    if modData.respiratorySicknessLevel + 1 <= SWAB_Config.respiratorySicknessLevelMaximum then
+        modData.respiratorySicknessLevel = modData.respiratorySicknessLevel + 1
+        modData.respiratoryAbsorption = SWAB_Config.GetRespiratorySicknessEffects(modData.respiratorySicknessLevel).absorptionMinimum
+    else
+        modData.respiratorySicknessLevel = 0
+        modData.respiratoryAbsorption = 0
     end
 end
 

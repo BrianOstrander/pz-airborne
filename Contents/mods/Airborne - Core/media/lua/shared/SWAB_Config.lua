@@ -33,7 +33,7 @@ SWAB_Config.itemConsumptionDurationMultiplier = 1 --60
 SWAB_Config.respiratoryExposureEffects = {
     {
         -- Exposure  0
-        -- Moodle    0
+        -- Moodle    None
         rate                = -1,
         moodle              = 0.5,
         endurance = {
@@ -143,11 +143,81 @@ SWAB_Config.respiratoryExposureEffects = {
     },
 }
 
-SWAB_Config.respiratoryAbsorptionLevelMaximum = 10
+SWAB_Config.respiratoryAbsorptionLevelMaximum = #SWAB_Config.respiratoryExposureEffects - 1
 
 function SWAB_Config.GetRespiratoryExposureEffects(_respiratoryAbsorptionLevel)
     -- Just wrapping some confusion caused by Lua's table indexing.
     return SWAB_Config.respiratoryExposureEffects[_respiratoryAbsorptionLevel + 1]
+end
+
+-- Floor respiratoryAbsorptionLevel to get your level
+--      absorptionMinimum     : Minimum respiratoryAbsorption required for this sickness to appear
+--      absorptionHealMinimum : When absorption dips below this amount, this sickness level is healed
+--      moodle                : Respiratory sickness moodle value
+--      endurance             : Endurance effects
+--          limit             : Endurance maximum for this level
+SWAB_Config.respiratorySicknessEffects = {
+    {
+        -- Sickness 0
+        -- Moodle   None
+        absorptionMinimum       = 0,
+        absorptionHealMinimum   = 0,
+        moodle                  = 0.5,
+        endurance = {
+            limit               = 1,
+        },
+    },
+    {
+        -- Sickness 1
+        -- Moodle   1
+        -- Setting this to be the equivelent to 1 day(s) of exposure level 4 
+        absorptionMinimum       = SWAB_Config.GetRespiratoryExposureEffects(4).rate,
+        absorptionHealMinimum   = SWAB_Config.GetRespiratoryExposureEffects(4).rate * 0.9,
+        moodle                  = 0.4,
+        endurance = {
+            limit               = 0.52,
+        },
+    },
+    {
+        -- Sickness 2
+        -- Moodle   2
+        -- Setting this to be the equivelent to 1 day(s) of exposure level 7
+        absorptionMinimum       = SWAB_Config.GetRespiratoryExposureEffects(7).rate,
+        absorptionHealMinimum   = SWAB_Config.GetRespiratoryExposureEffects(7).rate * 0.9,
+        moodle                  = 0.3,
+        endurance = {
+            limit               = 0.27,
+        },
+    },
+    {
+        -- Sickness 3
+        -- Moodle   3
+        -- Setting this to be the equivelent to 4 day(s) of exposure level 7
+        absorptionMinimum       = SWAB_Config.GetRespiratoryExposureEffects(7).rate * 4,
+        absorptionHealMinimum   = SWAB_Config.GetRespiratoryExposureEffects(7).rate * 3,
+        moodle                  = 0.2,
+        endurance = {
+            limit               = 0.12,
+        },
+    },
+    {
+        -- Sickness 4
+        -- Moodle   4
+        -- Setting this to be the equivelent to 5 day(s) of exposure level 7
+        absorptionMinimum       = SWAB_Config.GetRespiratoryExposureEffects(7).rate * 5,
+        absorptionHealMinimum   = SWAB_Config.GetRespiratoryExposureEffects(7).rate * 4.5,
+        moodle                  = 0.1,
+        endurance = {
+            limit               = 0,
+        },
+    },
+}
+
+SWAB_Config.respiratorySicknessLevelMaximum = #SWAB_Config.respiratorySicknessEffects - 1
+
+function SWAB_Config.GetRespiratorySicknessEffects(_respiratorySicknessLevel)
+    -- Just wrapping some confusion caused by Lua's table indexing.
+    return SWAB_Config.respiratorySicknessEffects[_respiratorySicknessLevel + 1]
 end
 
 -- Given the number of hours, this gives back an approximate value that represents the air
@@ -163,6 +233,7 @@ end
 -------------------------------------------------------
 
 SWAB_Config.respiratoryExposureMoodleId = "swab_respiratory_exposure"
+SWAB_Config.respiratorySicknessMoodleId = "swab_respiratory_sickness"
 SWAB_Config.playerModDataId = "swab_player"
 SWAB_Config.squareExposureModDataId = "swab_square_exposure"
 SWAB_Config.squareFloorClaimDeltaModDataId = "swab_square_floor_claim_delta"
