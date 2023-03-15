@@ -170,12 +170,12 @@ SWAB_Config.respiratorySicknessEffects = {
     {
         -- Sickness 1
         -- Moodle   1
-        -- Setting this to be the equivelent to 1 day(s) of exposure level 4 
-        absorptionMinimum       = SWAB_Config.GetRespiratoryExposureEffects(4).rate,
-        absorptionHealMinimum   = SWAB_Config.GetRespiratoryExposureEffects(4).rate * 0.9,
+        -- Shows that the player is getting very near to the first level of sickness that will cause problems
+        absorptionMinimum       = SWAB_Config.GetRespiratoryExposureEffects(7).rate * 0.75,
+        absorptionHealMinimum   = SWAB_Config.GetRespiratoryExposureEffects(7).rate * 0.75 * 0.9,
         moodle                  = 0.4,
         endurance = {
-            limit               = 0.52,
+            limit               = 1,
         },
     },
     {
@@ -186,7 +186,7 @@ SWAB_Config.respiratorySicknessEffects = {
         absorptionHealMinimum   = SWAB_Config.GetRespiratoryExposureEffects(7).rate * 0.9,
         moodle                  = 0.3,
         endurance = {
-            limit               = 0.27,
+            limit               = 0.52,
         },
     },
     {
@@ -197,7 +197,7 @@ SWAB_Config.respiratorySicknessEffects = {
         absorptionHealMinimum   = SWAB_Config.GetRespiratoryExposureEffects(7).rate * 3,
         moodle                  = 0.2,
         endurance = {
-            limit               = 0.12,
+            limit               = 0.27,
         },
     },
     {
@@ -208,7 +208,7 @@ SWAB_Config.respiratorySicknessEffects = {
         absorptionHealMinimum   = SWAB_Config.GetRespiratoryExposureEffects(7).rate * 4.5,
         moodle                  = 0.1,
         endurance = {
-            limit               = 0,
+            limit               = 0.12,
         },
     },
 }

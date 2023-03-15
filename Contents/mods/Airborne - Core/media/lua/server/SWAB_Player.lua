@@ -55,7 +55,11 @@ function SWAB_Player.EveryOneMinute()
             modData.respiratoryAbsorptionRate = SWAB_Player.CalculateRespiratoryAbsorptionRate(player, modData.respiratoryAbsorptionLevel)
             -- Level rate is divided by minutes in day.
             modData.respiratoryAbsorption = PZMath.min(SWAB_Config.respiratoryAbsorptionMaximum, PZMath.max(0, modData.respiratoryAbsorption + (modData.respiratoryAbsorptionRate / 1440)))
-            modData.respiratorySicknessLevel = SWAB_Player.CalculateRespiratorySicknessLevel(player, modData.respiratoryAbsorption)
+            modData.respiratorySicknessLevel = SWAB_Player.CalculateRespiratorySicknessLevel(
+                player,
+                modData.respiratorySicknessLevel,
+                modData.respiratoryAbsorption
+            )
 
             SWAB_Player.ApplyEffects(
                 player,
@@ -235,11 +239,19 @@ function SWAB_Player.CalculateRespiratoryAbsorptionLevel(_player, _respiratoryEx
     return PZMath.clamp(level, 0, SWAB_Config.respiratoryAbsorptionLevelMaximum)
 end
 
-function SWAB_Player.CalculateRespiratorySicknessLevel(_player, _respiratoryAbsorption)
+function SWAB_Player.CalculateRespiratorySicknessLevel(_player, _respiratorySicknessLevel, _respiratoryAbsorption)
 
     for sicknessLevel = SWAB_Config.respiratorySicknessLevelMaximum, 0, -1 do
-        sickness = SWAB_Config.GetRespiratorySicknessEffects(sicknessLevel)
-        if sickness.absorptionHealMinimum <= _respiratoryAbsorption then
+        local sickness = SWAB_Config.GetRespiratorySicknessEffects(sicknessLevel)
+        local absorptionMinimum = sickness.absorptionMinimum
+
+        if sicknessLevel == _respiratorySicknessLevel then
+            -- To prevent ping ponging of sickness values, we make sure the player has healed a healthy amount
+            -- below the sickness.absorptionMinimum before letting them heal a level of sickness.
+            absorptionMinimum = sickness.absorptionHealMinimum
+        end
+
+        if absorptionMinimum <= _respiratoryAbsorption then
             return sicknessLevel
         end
     end
