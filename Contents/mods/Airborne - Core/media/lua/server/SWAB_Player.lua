@@ -180,18 +180,7 @@ function SWAB_Player.CalculateRespiratoryExposureWithProtection(_player, _respir
 
                         if PZMath.equal(0, itemProtectionRemaining) then
                             -- Item has been contaminated
-                            local itemNamePrefix = getText("ContextMenu_SWAB_ContaminatedPrefix")
-                            local itemNameSuffix = getText("ContextMenu_SWAB_ContaminatedSuffix")
-
-                            if itemNamePrefix == "ContextMenu_SWAB_ContaminatedPrefix" then
-                                itemNamePrefix = ""
-                            end
-
-                            if itemNameSuffix == "ContextMenu_SWAB_ContaminatedSuffix" then
-                                itemNameSuffix = ""
-                            end
-
-                            item:setName(itemNamePrefix..getText(item:getDisplayName())..itemNameSuffix)
+                            item:setName(SWAB_ItemUtility.GetContaminatedName(item:getDisplayName(), itemModData["SwabRespiratoryExposure_RefreshAction"]))
                         else
                             -- Item is clean and still providing protection.
                             local itemExposure = PZMath.max(0, PZMath.floor(_respiratoryExposure) + itemModData["SwabRespiratoryExposure_Reduction"]) * itemModData["SwabRespiratoryExposure_Falloff"]

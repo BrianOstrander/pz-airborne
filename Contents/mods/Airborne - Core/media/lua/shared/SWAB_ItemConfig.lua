@@ -38,3 +38,18 @@ SWAB_ItemConfig["swab_base_washables"] = {
         },
     },
 }
+
+SWAB_ItemConfig["swab_base_filterables"] = {
+    {
+        ids = { "Base.Hat_GasMask" },
+        parameters = {
+            SwabRespiratoryItem                           = true,
+            SwabRespiratoryExposure_Reduction             = -7,
+            SwabRespiratoryExposure_Falloff               = 3,
+            SwabRespiratoryExposure_ProtectionDuration    = 4,
+            SwabRespiratoryExposure_ProtectionRemaining   = 1,
+            SwabRespiratoryExposure_RefreshAction         = "replace_filter",
+            SwabRespiratoryExposure_AutoHydrationAllowed  = false,
+        },
+    },
+}

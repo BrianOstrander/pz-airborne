@@ -10,6 +10,7 @@ SWAB_DebugScenarios.items = {
     "Hat_BandanaMask",
     "Hat_SurgicalMask_Green",
     "Hat_DustMask",
+    "Hat_GasMask",
     -- "Generator",
     "SWAB.ValuTechHomeAirPurifier",
     "SWAB.MassGenFacIndustrialAirPurifier",

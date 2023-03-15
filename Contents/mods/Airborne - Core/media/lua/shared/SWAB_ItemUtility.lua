@@ -42,6 +42,34 @@ function SWAB_ItemUtility.Initialize()
 end
 Events.OnGameBoot.Add(SWAB_ItemUtility.Initialize)
 
+function SWAB_ItemUtility.GetContaminatedName(_name, _refreshAction)
+    local prefixKey = nil
+    local suffixKey = nil
+
+    if _refreshAction == "wash" or _refreshAction == "none" then
+        prefixKey = "ContextMenu_SWAB_ContaminatedWashablePrefix"
+        suffixKey = "ContextMenu_SWAB_ContaminatedWashableSuffix"
+    elseif _refreshAction == "replace_filter" then
+        prefixKey = "ContextMenu_SWAB_ContaminatedFilterablePrefix"
+        suffixKey = "ContextMenu_SWAB_ContaminatedFilterableSuffix"
+    else
+        print("SWAB: Error, unrecognized refresh action: "..tostring(_refreshAction))
+    end
+
+    local itemNamePrefix = getText(prefixKey)
+    local itemNameSuffix = getText(suffixKey)
+
+    if itemNamePrefix == prefixKey then
+        itemNamePrefix = ""
+    end
+
+    if itemNameSuffix == suffixKey then
+        itemNameSuffix = ""
+    end
+
+    return itemNamePrefix..getText(_name)..itemNameSuffix
+end
+
 -- function SWAB_ItemUtility.InitializeItem(_item)
 --     local modData = _item:getModData()[SWAB_ItemUtility.itemConfigModDataId]
 
