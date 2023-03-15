@@ -3,11 +3,20 @@ require "SWAB_Config"
 SWAB_DebugContaminationPanel = ISPanel:derive("SWAB_DebugContaminationPanel")
 SWAB_DebugContaminationPanel.instance = nil
 
-local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
+SWAB_DebugContaminationPanel.buttonBeginY = 180
+SWAB_DebugContaminationPanel.buttonPaddingBottom = 4
+SWAB_DebugContaminationPanel.buttonWidth = 100
+SWAB_DebugContaminationPanel.buttonHeight = PZMath.max(25, getTextManager():getFontHeight(UIFont.Small) + 1 * 2)
 
 function SWAB_DebugContaminationPanel.OnOpenPanel()
     if SWAB_DebugContaminationPanel.instance == nil then
-        SWAB_DebugContaminationPanel.instance = SWAB_DebugContaminationPanel:new (50, 200, 250, 260, getPlayer())
+        SWAB_DebugContaminationPanel.instance = SWAB_DebugContaminationPanel:new(
+            50,
+            200,
+            250,
+            SWAB_DebugContaminationPanel.buttonBeginY + ((SWAB_DebugContaminationPanel.buttonHeight + SWAB_DebugContaminationPanel.buttonPaddingBottom) * 3),
+            getPlayer()
+        )
         SWAB_DebugContaminationPanel.instance:initialise()
     end
 
@@ -19,71 +28,88 @@ end
 
 function SWAB_DebugContaminationPanel:initialise()
     ISPanel.initialise(self)
-    -- Button initializations
-    local btnWid = 100
-    local btnHgt = math.max(25, FONT_HGT_SMALL + 1 * 2)
-    local padBottom = 4
 
-    -- ReInit Building Button
-    self.reInitBuildingButton = ISButton:new(10, self:getHeight() - ((padBottom + btnHgt) * 3), btnWid, btnHgt, "ReInit Building", self, SWAB_DebugContaminationPanel.onClickReInitBuildingButton)
-    self.reInitBuildingButton.internal = "REINIT_BUILDING"
-    self.reInitBuildingButton.anchorTop = false
-    self.reInitBuildingButton.anchorBottom = true
-    self.reInitBuildingButton:initialise()
-    self.reInitBuildingButton:instantiate()
-    self.reInitBuildingButton.borderColor = {r=1, g=1, b=1, a=0.1}
-    self:addChild(self.reInitBuildingButton)
+    -- Button Creation
+    self:createButton(
+        "Con. Room",
+        "CON_ROOM",
+        SWAB_DebugContaminationPanel.onClickContaminateRoomButton
+    )
+    
+    self:createButton(
+        "Decon. Room",
+        "DECON_ROOM",
+        SWAB_DebugContaminationPanel.onClickDecontaminateRoomButton
+    )
+    
+    self:createButton(
+        "Sickness +",
+        "INC_SICK",
+        SWAB_DebugContaminationPanel.onClickIncreaseSicknessButton
+    )
+    
+    self:createButton(
+        "Decon. Player",
+        "DECON_PLAYER",
+        SWAB_DebugContaminationPanel.onClickDecontaminatePlayerButton
+    )
 
-    -- Decontaminate Room Button
-    self.decontaminateRoomButton = ISButton:new(10 + btnWid + 10, self:getHeight() - ((padBottom + btnHgt) * 3), btnWid, btnHgt, "Decon. Room", self, SWAB_DebugContaminationPanel.onClickDecontaminateRoomButton)
-    self.decontaminateRoomButton.internal = "DECON_ROOM"
-    self.decontaminateRoomButton.anchorTop = false
-    self.decontaminateRoomButton.anchorBottom = true
-    self.decontaminateRoomButton:initialise()
-    self.decontaminateRoomButton:instantiate()
-    self.decontaminateRoomButton.borderColor = {r=1, g=1, b=1, a=0.1}
-    self:addChild(self.decontaminateRoomButton)
+    self:createButton(
+        "ReInit Building",
+        "REINIT_BUILDING",
+        SWAB_DebugContaminationPanel.onClickReInitBuildingButton
+    )
 
-    -- Set Sprite Button
-    self.increaseSicknessButton = ISButton:new(10, self:getHeight() - ((padBottom + btnHgt) * 2), btnWid, btnHgt, "Sickness +", self, SWAB_DebugContaminationPanel.onClickIncreaseSicknessButton)
-    self.increaseSicknessButton.internal = "INC_SICK"
-    self.increaseSicknessButton.anchorTop = false
-    self.increaseSicknessButton.anchorBottom = true
-    self.increaseSicknessButton:initialise()
-    self.increaseSicknessButton:instantiate()
-    self.increaseSicknessButton.borderColor = {r=1, g=1, b=1, a=0.1}
-    self:addChild(self.increaseSicknessButton)
+    self:createButton(
+        "Close",
+        "CLOSE",
+        SWAB_DebugContaminationPanel.onClickCloseButton
+    )
+end
 
-    -- Contaminate Room Button
-    self.contaminateRoomButton = ISButton:new(10 + btnWid + 10, self:getHeight() - ((padBottom + btnHgt) * 2), btnWid, btnHgt, "Con. Room", self, SWAB_DebugContaminationPanel.onClickContaminateRoomButton)
-    self.contaminateRoomButton.internal = "CON_ROOM"
-    self.contaminateRoomButton.anchorTop = false
-    self.contaminateRoomButton.anchorBottom = true
-    self.contaminateRoomButton:initialise()
-    self.contaminateRoomButton:instantiate()
-    self.contaminateRoomButton.borderColor = {r=1, g=1, b=1, a=0.1}
-    self:addChild(self.contaminateRoomButton)
+function SWAB_DebugContaminationPanel:createButton(_name, _id, _onClick)
+    local buttonX = 10
+    local buttonY = SWAB_DebugContaminationPanel.buttonBeginY
 
-    -- Decontaminate Player Button
-    self.decontaminatePlayerButton = ISButton:new(10 + btnWid + 10, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt, "Decon. Player", self, SWAB_DebugContaminationPanel.onClickDecontaminatePlayerButton)
-    self.decontaminatePlayerButton.internal = "DECON_PLAYER"
-    self.decontaminatePlayerButton.anchorTop = false
-    self.decontaminatePlayerButton.anchorBottom = true
-    self.decontaminatePlayerButton:initialise()
-    self.decontaminatePlayerButton:instantiate()
-    self.decontaminatePlayerButton.borderColor = {r=1, g=1, b=1, a=0.1}
-    self:addChild(self.decontaminatePlayerButton)
+    if not self.buttonListInitialized then
+        self.buttonListInitialized = true
+        self.buttonCount = 1
+    else
+        self.buttonCount = self.buttonCount + 1
+    end
 
-    -- Close Button
-    self.closeButton = ISButton:new(10, self:getHeight() - padBottom - btnHgt, btnWid, btnHgt, "Close", self, SWAB_DebugContaminationPanel.onClickCloseButton)
-    self.closeButton.internal = "CLOSE"
-    self.closeButton.anchorTop = false
-    self.closeButton.anchorBottom = true
-    self.closeButton:initialise()
-    self.closeButton:instantiate()
-    self.closeButton.borderColor = {r=1, g=1, b=1, a=0.1}
-    self:addChild(self.closeButton)
+    local row = nil
 
+    if self.buttonCount % 2 == 0 then
+        -- We're in the right column
+        buttonX = buttonX + SWAB_DebugContaminationPanel.buttonWidth + 10
+        row = self.buttonCount / 2
+    else
+        row = (self.buttonCount + 1) / 2
+    end
+
+    row = row - 1
+
+    buttonY = buttonY + (row * (SWAB_DebugContaminationPanel.buttonHeight + SWAB_DebugContaminationPanel.buttonPaddingBottom))
+
+    local button = ISButton:new(
+        buttonX,
+        buttonY,
+        SWAB_DebugContaminationPanel.buttonWidth,
+        SWAB_DebugContaminationPanel.buttonHeight,
+        _name,
+        self,
+        _onClick
+    )
+    button.internal = _id
+    button.anchorTop = false
+    button.anchorBottom = true
+    self[_id.."_ENTRY"] = button
+    
+    button:initialise()
+    button:instantiate()
+    button.borderColor = {r=1, g=1, b=1, a=0.1}
+    self:addChild(button)
 end
 
 function SWAB_DebugContaminationPanel:prerender()
