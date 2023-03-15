@@ -170,8 +170,6 @@ function SWAB_Player.CalculateRespiratoryExposureWithProtection(_player, _respir
                 if itemModData["SwabRespiratoryItem"] then
                     -- We've established this is an item that provides respiratory protection.
                     local itemProtectionDurationInMinutes = itemModData["SwabRespiratoryExposure_ProtectionDuration"] * SWAB_Config.itemRespiratoryProtectionDurationMultiplier
-                    local itemReduction = 0
-                    local itemMinimum = 0
                     
                     local itemProtectionRemaining = itemModData["SwabRespiratoryExposure_ProtectionRemaining"]
                     local itemProtectionRemainingUpdated = PZMath.max(0, itemProtectionRemaining - (1 / itemProtectionDurationInMinutes))
@@ -195,18 +193,18 @@ function SWAB_Player.CalculateRespiratoryExposureWithProtection(_player, _respir
 
                             item:setName(itemNamePrefix..getText(item:getDisplayName())..itemNameSuffix)
                         else
-                            -- Still not entirely contaminated.
-                            itemReduction = itemModData["SwabRespiratoryExposure_Reduction"]
-                            itemMinimum = itemModData["SwabRespiratoryExposure_Minimum"]
+                            -- Item is clean and still providing protection.
+                            local itemExposure = PZMath.max(0, PZMath.floor(_respiratoryExposure) + itemModData["SwabRespiratoryExposure_Reduction"]) * itemModData["SwabRespiratoryExposure_Falloff"]
+                            _respiratoryExposure = PZMath.min(_respiratoryExposure, itemExposure)
                         end 
                     end
 
                     -- We can never reduce our exposure below the item's rated minimum.
-                    local itemExposure = PZMath.max(_respiratoryExposure + itemReduction, itemMinimum)
+                    
 
                     -- There's a chance that wearing this item is no better than going without it.
                     -- We return here since only one respiratory item can be worn at a time.
-                    return PZMath.min(itemExposure, _respiratoryExposure)
+                    return _respiratoryExposure
                 end
             end
         end
