@@ -35,7 +35,7 @@ SWAB_ItemConfig["swab_base_washables"] = {
             SwabRespiratoryExposure_Falloff               = 3,
             SwabRespiratoryExposure_ProtectionDuration    = 1,
             SwabRespiratoryExposure_ProtectionRemaining   = 1,
-            SwabRespiratoryExposure_RefreshAction         = "wash",
+            SwabRespiratoryExposure_RefreshAction         = "none",
             SwabRespiratoryExposure_AutoHydrationAllowed  = false,
         },
     },
