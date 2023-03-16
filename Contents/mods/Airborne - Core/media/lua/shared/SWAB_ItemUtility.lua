@@ -3,6 +3,8 @@ require "SWAB_ItemConfig"
 SWAB_ItemUtility = {}
 SWAB_ItemUtility.isItemCacheInitialized = false
 
+SWAB_ItemUtility.itemsByRefreshAction = {}
+
 function SWAB_ItemUtility.Initialize()
     if SWAB_ItemUtility.isItemCacheInitialized then
         return
@@ -28,6 +30,19 @@ function SWAB_ItemUtility.Initialize()
                 if itemScript then
                     for parameterKey, parameterValue in pairs(itemConfig.parameters) do
                         itemScript:DoParam(parameterKey.." = "..tostring(parameterValue))
+
+                        if parameterKey == "SwabRespiratoryExposure_RefreshAction" then
+                            -- This is in place of logic that requires item tagging, which is probably possible
+                            -- but I haven't had a chance to check.
+                            if parameterValue then
+                                if not SWAB_ItemUtility.itemsByRefreshAction[parameterValue] then
+                                    SWAB_ItemUtility.itemsByRefreshAction[parameterValue] = {}
+                                end
+                                table.insert(SWAB_ItemUtility.itemsByRefreshAction[parameterValue], itemId)
+                            else
+                                print("SWAB: Error, parameter "..parameterKey.." should not be nil")
+                            end
+                        end
                     end
                 else
                     print("SWAB: Error, unable to find an item script for "..itemId)
@@ -41,6 +56,20 @@ function SWAB_ItemUtility.Initialize()
     end
 end
 Events.OnGameBoot.Add(SWAB_ItemUtility.Initialize)
+
+SWAB_ItemUtility.GetItemTypes = SWAB_ItemUtility.GetItemTypes or {}
+
+function SWAB_ItemUtility.GetItemTypes.ReplaceFilter(scriptItems)
+    for _, itemId in pairs(SWAB_ItemUtility.itemsByRefreshAction.replace_filter) do
+        local all = getScriptManager():getItemsByType(itemId)
+        for i = 0, all:size() - 1 do
+            local scriptItem = all:get(i)
+            if not scriptItems:contains(scriptItem) then
+                scriptItems:add(scriptItem)
+            end
+        end
+    end
+end
 
 function SWAB_ItemUtility.GetName(_name, _prefixKey, _suffixKey)
     local itemNamePrefix = getText(_prefixKey)

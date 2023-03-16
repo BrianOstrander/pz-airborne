@@ -59,14 +59,15 @@ function SWAB_Recipe.OnTest.InsertUsedFilterWhileWorn(_item)
     return SWAB_Recipe.OnTest.InsertFilterShared(_item, true, true)
 end
 
-function SWAB_Recipe.OnCreate.InsertFilterShared(_items, _result, _player, _isWorn)
+function SWAB_Recipe.OnCreate.InsertFilterShared(_items, _throwawayResult, _player, _isWorn)
     local oldItem = nil
+    local filterUsedDelta = 0
     for i = 0, _items:size() - 1 do
         local item = _items:get(i)
         local modData = item:getModData()
         if modData["SwabRespiratoryItemFilter"] then
             -- This is the filter item.
-            _result:getModData()["SwabRespiratoryExposure_ProtectionRemaining"] = item:getUsedDelta()
+            filterUsedDelta = item:getUsedDelta()
         elseif modData["SwabRespiratoryItem"] then
             -- This is the old item we're destroying.
             oldItem = item
@@ -76,7 +77,11 @@ function SWAB_Recipe.OnCreate.InsertFilterShared(_items, _result, _player, _isWo
     end
 
     if oldItem then
-        SWAB_Recipe.CopyItemProperties(oldItem, _result, _player, _isWorn)
+        local newItem = SWAB_Recipe.CopyItemProperties(oldItem, _player:getInventory():AddItem(oldItem:getType()), _player, _isWorn)
+        newItem:getModData()["SwabRespiratoryExposure_ProtectionRemaining"] = filterUsedDelta
+        -- Recipes are probably easier than I'm making them out to be, but for now I'm doing this:
+        _throwawayResult:setUsedDelta(0)
+        _player:getModData()[SWAB_Config.playerModDataId].cleanupUsedFilters = true
     else
         print("SWAB: Error, expecting an old item, but none was found")
     end

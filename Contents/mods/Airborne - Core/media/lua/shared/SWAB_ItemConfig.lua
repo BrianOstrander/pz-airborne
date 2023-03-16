@@ -54,4 +54,28 @@ SWAB_ItemConfig["swab_base_filterables"] = {
             SwabRespiratoryExposure_AutoHydrationAllowed  = false,
         },
     },
+    {
+        ids = { "Base.Hat_NBCmask" },
+        parameters = {
+            SwabRespiratoryItem                           = true,
+            SwabRespiratoryExposure_Reduction             = -10,
+            SwabRespiratoryExposure_Falloff               = 0,
+            SwabRespiratoryExposure_ProtectionDuration    = 5,
+            SwabRespiratoryExposure_ProtectionRemaining   = 1,
+            SwabRespiratoryExposure_RefreshAction         = "replace_filter",
+            SwabRespiratoryExposure_AutoHydrationAllowed  = true,
+        },
+    },
+    {
+        ids = { "Base.HazmatSuit" },
+        parameters = {
+            SwabRespiratoryItem                           = true,
+            SwabRespiratoryExposure_Reduction             = -8,
+            SwabRespiratoryExposure_Falloff               = 4,
+            SwabRespiratoryExposure_ProtectionDuration    = 6,
+            SwabRespiratoryExposure_ProtectionRemaining   = 1,
+            SwabRespiratoryExposure_RefreshAction         = "replace_filter",
+            SwabRespiratoryExposure_AutoHydrationAllowed  = true,
+        },
+    },
 }

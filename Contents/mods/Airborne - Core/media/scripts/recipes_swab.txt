@@ -4,9 +4,9 @@ module SWAB
     recipe Insert Filter
     {
         destroy StandardFilter,
-        destroy Hat_GasMask,
+        destroy [SWAB_ItemUtility.GetItemTypes.ReplaceFilter],
 
-        Result:Hat_GasMask,
+        Result:StandardFilter,
         Time:30,
         OnTest:SWAB_Recipe.OnTest.InsertFilter,
         OnCreate:SWAB_Recipe.OnCreate.InsertFilter,
@@ -17,9 +17,9 @@ module SWAB
     recipe Insert Filter
     {
         destroy StandardFilter,
-        destroy Hat_GasMask,
+        destroy [SWAB_ItemUtility.GetItemTypes.ReplaceFilter],
 
-        Result:Hat_GasMask,
+        Result:StandardFilter,
         Time:30,
         OnTest:SWAB_Recipe.OnTest.InsertFilterWhileWorn,
         OnCreate:SWAB_Recipe.OnCreate.InsertFilterWhileWorn,
@@ -30,9 +30,9 @@ module SWAB
     recipe Insert Used Filter
     {
         destroy StandardFilter,
-        destroy Hat_GasMask,
+        destroy [SWAB_ItemUtility.GetItemTypes.ReplaceFilter],
 
-        Result:Hat_GasMask,
+        Result:StandardFilter,
         Time:30,
         OnTest:SWAB_Recipe.OnTest.InsertUsedFilter,
         OnCreate:SWAB_Recipe.OnCreate.InsertFilter,
@@ -43,9 +43,9 @@ module SWAB
     recipe Insert Used Filter
     {
         destroy StandardFilter,
-        destroy Hat_GasMask,
+        destroy [SWAB_ItemUtility.GetItemTypes.ReplaceFilter],
 
-        Result:Hat_GasMask,
+        Result:StandardFilter,
         Time:30,
         OnTest:SWAB_Recipe.OnTest.InsertUsedFilterWhileWorn,
         OnCreate:SWAB_Recipe.OnCreate.InsertFilterWhileWorn,
@@ -55,7 +55,7 @@ module SWAB
     /* Nonworn version of recipe */
     recipe Remove Filter
     {
-        destroy Hat_GasMask,
+        destroy [SWAB_ItemUtility.GetItemTypes.ReplaceFilter],
 
         Result:StandardFilter,
         Time:30,
@@ -67,7 +67,7 @@ module SWAB
     /* Worn version of recipe */
     recipe Remove Filter
     {
-        destroy Hat_GasMask,
+        destroy [SWAB_ItemUtility.GetItemTypes.ReplaceFilter],
 
         Result:StandardFilter,
         Time:30,

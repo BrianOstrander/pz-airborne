@@ -29,6 +29,9 @@ function SWAB_Player.OnCreatePlayer(_, _player)
         modData.respiratorySicknessLevel = 0
         -- Maximum the endurance modifier is allowed to be.
         modData.enduranceMaximum = 1
+        -- Due to some weird recipe hacks, we need to remove empty filters if this
+        -- is true.
+        modData.cleanupUsedFilters = false
 
         _player:getModData()[SWAB_Config.playerModDataId] = modData
         _player:transmitModData()
@@ -74,11 +77,30 @@ Events.EveryOneMinute.Add(SWAB_Player.EveryOneMinute)
 function SWAB_Player.OnTick(_ticks)
     for _, player in ipairs(SWAB_Utilities.GetPlayers()) do
         local modData = player:getModData()[SWAB_Config.playerModDataId]
-        if modData and modData.enduranceMaximum then
-            local stats = player:getStats()
-            if modData.enduranceMaximum < stats:getEndurance() then
-                -- Apply the enduranceMaximum we calculated on the last minute, doing it on tick to minimize ping-ponging.
-                player:getStats():setEndurance(modData.enduranceMaximum)
+
+        if modData then
+            if modData.cleanupUsedFilters then
+                -- Recipe hacks spawn depleted filters that need to be cleaned up.
+                modData.cleanupUsedFilters = false
+                local items = player:getInventory():getItems()
+                local itemsRemoved = {}
+                for itemIndex = 0, items:size() - 1 do
+                    local item = items:get(itemIndex);
+                    if item:getType() == "StandardFilter" and PZMath.equal(0, item:getUsedDelta()) then
+                        table.insert(itemsRemoved, item)
+                    end
+                end
+                for _, item in pairs(itemsRemoved) do
+                    player:getInventory():Remove(item)
+                end
+            end
+
+            if modData.enduranceMaximum then
+                local stats = player:getStats()
+                if modData.enduranceMaximum < stats:getEndurance() then
+                    -- Apply the enduranceMaximum we calculated on the last minute, doing it on tick to minimize ping-ponging.
+                    player:getStats():setEndurance(modData.enduranceMaximum)
+                end
             end
         end
     end
