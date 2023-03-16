@@ -22,7 +22,7 @@ SWAB_Config.squareContaminationDeltaMinimum = 0.01
 -- of contamination.
 SWAB_Config.buildingContaminationBaseline = 4
 -- Multiplier for how long consumables like masks, filters, and air tanks last.
-SWAB_Config.itemRespiratoryProtectionDurationMultiplier = 60--1440
+SWAB_Config.itemRespiratoryProtectionDurationMultiplier = 10--60--1440
 
 -- Floor respiratoryAbsorptionLevel to get your level
 --      rate              : Per day increase in absorption

@@ -1,0 +1,9 @@
+module SWAB
+{
+    model StandardFilter_Ground
+    {
+        mesh = WorldItems/TinnedTuna,
+        texture = WorldItems/SWAB_StandardFilter,
+        scale = 0.4,
+    }
+}

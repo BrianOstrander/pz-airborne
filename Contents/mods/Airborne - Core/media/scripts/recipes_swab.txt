@@ -1,0 +1,28 @@
+module SWAB
+{
+    /* Nonworn version of recipe */
+    recipe Insert Filter
+    {
+        destroy StandardFilter,
+        destroy Hat_GasMask,
+
+        Result:Hat_GasMask,
+        Time:30,
+        OnTest:SWAB_Recipe.OnTest.InsertFilter,
+        OnCreate:SWAB_Recipe.OnCreate.InsertFilter,
+        StopOnWalk:false,
+    }
+
+    /* Worn version of recipe */
+    recipe Insert Filter
+    {
+        destroy StandardFilter,
+        destroy Hat_GasMask,
+
+        Result:Hat_GasMask,
+        Time:30,
+        OnTest:SWAB_Recipe.OnTest.InsertFilterWhileWorn,
+        OnCreate:SWAB_Recipe.OnCreate.InsertFilterWhileWorn,
+        StopOnWalk:false,
+    }
+}

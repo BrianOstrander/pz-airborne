@@ -23,4 +23,19 @@ module SWAB
         
 		WorldObjectSprite		= swab_filters_01_8,
 	}
+
+	item StandardFilter
+	{
+		DisplayName 			= Standard Filter,
+		DisplayCategory 		= Accessory,
+		Type					= Drainable,
+		UseWhileEquipped		= FALSE,
+		UseDelta				= 1,
+		Weight 					= 0.3,
+		Icon 					= SWAB_StandardFilter,
+		StaticModel 			= CanClosed,
+		WorldStaticModel 		= StandardFilter_Ground,
+		Tags 					= HasMetal,
+		SwabRespiratoryItemFilter = TRUE,
+	}
 }

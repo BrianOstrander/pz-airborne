@@ -1,5 +1,7 @@
 SWAB_ItemConfig = SWAB_ItemConfig or {}
 
+-- Remember to update scripts/recipes_swab.txt when adding new entries.
+
 SWAB_ItemConfig["swab_base_washables"] = {
     {
         ids = { "Base.Hat_BandanaMask", "Base.Hat_BandanaMaskTINT" },

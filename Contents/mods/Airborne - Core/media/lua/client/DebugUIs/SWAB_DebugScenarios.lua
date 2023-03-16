@@ -12,6 +12,10 @@ SWAB_DebugScenarios.items = {
     "Hat_DustMask",
     "Hat_GasMask",
     -- "Generator",
+    "SWAB.StandardFilter",
+    "SWAB.StandardFilter",
+    "SWAB.StandardFilter",
+    "SWAB.StandardFilter",
     "SWAB.ValuTechHomeAirPurifier",
     "SWAB.MassGenFacIndustrialAirPurifier",
 }
