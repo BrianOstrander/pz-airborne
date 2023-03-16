@@ -57,18 +57,26 @@ function SWAB_ItemUtility.Initialize()
 end
 Events.OnGameBoot.Add(SWAB_ItemUtility.Initialize)
 
-SWAB_ItemUtility.GetItemTypes = SWAB_ItemUtility.GetItemTypes or {}
+SWAB_ItemUtility.ItemsByRefreshAction = SWAB_ItemUtility.ItemsByRefreshAction or {}
 
-function SWAB_ItemUtility.GetItemTypes.ReplaceFilter(scriptItems)
-    for _, itemId in pairs(SWAB_ItemUtility.itemsByRefreshAction.replace_filter) do
+function SWAB_ItemUtility.ItemsByRefreshAction.Get(_scriptItems, _refreshAction)
+    for _, itemId in pairs(SWAB_ItemUtility.itemsByRefreshAction[_refreshAction]) do
         local all = getScriptManager():getItemsByType(itemId)
         for i = 0, all:size() - 1 do
             local scriptItem = all:get(i)
-            if not scriptItems:contains(scriptItem) then
-                scriptItems:add(scriptItem)
+            if not _scriptItems:contains(scriptItem) then
+                _scriptItems:add(scriptItem)
             end
         end
     end
+end
+
+function SWAB_ItemUtility.ItemsByRefreshAction.Wash(_scriptItems)
+    SWAB_ItemUtility.ItemsByRefreshAction.Get(_scriptItems, "wash")
+end
+
+function SWAB_ItemUtility.ItemsByRefreshAction.ReplaceFilter(_scriptItems)
+    SWAB_ItemUtility.ItemsByRefreshAction.Get(_scriptItems, "replace_filter")
 end
 
 function SWAB_ItemUtility.GetName(_name, _prefixKey, _suffixKey)

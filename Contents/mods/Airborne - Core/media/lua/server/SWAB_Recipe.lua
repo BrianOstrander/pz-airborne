@@ -2,6 +2,10 @@ SWAB_Recipe = SWAB_Recipe or {}
 SWAB_Recipe.OnTest = SWAB_Recipe.OnTest or {}
 SWAB_Recipe.OnCreate = SWAB_Recipe.OnCreate or {}
 
+------------------------------------------------------------------------
+------------------------------UTILITY-----------------------------------
+------------------------------------------------------------------------
+
 function SWAB_Recipe.CopyItemProperties(_oldItem, _newItem, _player, _isWorn)
     if _isWorn then
         _player:setWornItem(_newItem:getBodyLocation(), _newItem);
@@ -14,6 +18,10 @@ function SWAB_Recipe.CopyItemProperties(_oldItem, _newItem, _player, _isWorn)
 
     return _newItem
 end
+
+------------------------------------------------------------------------
+------------------------FILTERED PROTECTION-----------------------------
+------------------------------------------------------------------------
 
 function SWAB_Recipe.OnTest.InsertFilterShared(_item, _requireWorn, _requireUsed)
     local modData = _item:getModData()
