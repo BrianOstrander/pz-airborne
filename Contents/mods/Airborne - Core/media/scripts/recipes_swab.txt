@@ -10,7 +10,7 @@ module SWAB
         Time:30,
         OnTest:SWAB_Recipe.OnTest.InsertFilter,
         OnCreate:SWAB_Recipe.OnCreate.InsertFilter,
-        StopOnWalk:false,
+        StopOnWalk:true,
     }
 
     /* Worn version of recipe */
@@ -23,6 +23,56 @@ module SWAB
         Time:30,
         OnTest:SWAB_Recipe.OnTest.InsertFilterWhileWorn,
         OnCreate:SWAB_Recipe.OnCreate.InsertFilterWhileWorn,
-        StopOnWalk:false,
+        StopOnWalk:true,
+    }
+
+    /* Nonworn version of recipe */
+    recipe Insert Used Filter
+    {
+        destroy StandardFilter,
+        destroy Hat_GasMask,
+
+        Result:Hat_GasMask,
+        Time:30,
+        OnTest:SWAB_Recipe.OnTest.InsertUsedFilter,
+        OnCreate:SWAB_Recipe.OnCreate.InsertFilter,
+        StopOnWalk:true,
+    }
+
+    /* Worn version of recipe */
+    recipe Insert Used Filter
+    {
+        destroy StandardFilter,
+        destroy Hat_GasMask,
+
+        Result:Hat_GasMask,
+        Time:30,
+        OnTest:SWAB_Recipe.OnTest.InsertUsedFilterWhileWorn,
+        OnCreate:SWAB_Recipe.OnCreate.InsertFilterWhileWorn,
+        StopOnWalk:true,
+    }
+
+    /* Nonworn version of recipe */
+    recipe Remove Filter
+    {
+        destroy Hat_GasMask,
+
+        Result:StandardFilter,
+        Time:30,
+        OnTest:SWAB_Recipe.OnTest.RemoveFilter,
+        OnCreate:SWAB_Recipe.OnCreate.RemoveFilter,
+        StopOnWalk:true,
+    }
+
+    /* Worn version of recipe */
+    recipe Remove Filter
+    {
+        destroy Hat_GasMask,
+
+        Result:StandardFilter,
+        Time:30,
+        OnTest:SWAB_Recipe.OnTest.RemoveFilterWhileWorn,
+        OnCreate:SWAB_Recipe.OnCreate.RemoveFilterWhileWorn,
+        StopOnWalk:true,
     }
 }

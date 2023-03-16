@@ -2,30 +2,64 @@ SWAB_Recipe = SWAB_Recipe or {}
 SWAB_Recipe.OnTest = SWAB_Recipe.OnTest or {}
 SWAB_Recipe.OnCreate = SWAB_Recipe.OnCreate or {}
 
-function SWAB_Recipe.OnTest.InsertFilterShared(_item, _requireWorn)
+function SWAB_Recipe.CopyItemProperties(_oldItem, _newItem, _player, _isWorn)
+    if _isWorn then
+        _player:setWornItem(_newItem:getBodyLocation(), _newItem);
+    end
+    _newItem:setFavorite(_oldItem:isFavorite())
+    _newItem:setCondition(_oldItem:getCondition())
+    _newItem:setBloodLevel(_oldItem:getBloodLevel())
+    _newItem:setDirtyness(_oldItem:getDirtyness())
+    _newItem:setWetness(_oldItem:getWetness())
+
+    return _newItem
+end
+
+function SWAB_Recipe.OnTest.InsertFilterShared(_item, _requireWorn, _requireUsed)
     local modData = _item:getModData()
     if modData and modData["SwabRespiratoryItem"] then
         if _item:isWorn() ~= _requireWorn then
             return false
         end
         if modData["SwabRespiratoryExposure_RefreshAction"] == "replace_filter" then
+            -- We can insert a new filter only when we have zero protection remaining.
            return PZMath.equal(0, modData["SwabRespiratoryExposure_ProtectionRemaining"])
         end
     end
     
-    return 0 < _item:getUsedDelta() -- We must be the filter...
+    -- If we get this far we must be the filter...
+
+    if PZMath.equal(0, _item:getUsedDelta()) then
+        -- Can't insert fully used filters.
+        return false
+    end
+
+    if _requireUsed then
+        -- If this is a used filter insert, check to make sure the filter is actually used.
+        return not PZMath.equal(1, _item:getUsedDelta())
+    end
+
+    -- Must be a new filter insert.
+    return true
 end
 
 function SWAB_Recipe.OnTest.InsertFilter(_item)
-    return SWAB_Recipe.OnTest.InsertFilterShared(_item, false)
+    return SWAB_Recipe.OnTest.InsertFilterShared(_item, false, false)
 end
 
 function SWAB_Recipe.OnTest.InsertFilterWhileWorn(_item)
-    return SWAB_Recipe.OnTest.InsertFilterShared(_item, true)
+    return SWAB_Recipe.OnTest.InsertFilterShared(_item, true, false)
+end
+
+function SWAB_Recipe.OnTest.InsertUsedFilter(_item)
+    return SWAB_Recipe.OnTest.InsertFilterShared(_item, false, true)
+end
+
+function SWAB_Recipe.OnTest.InsertUsedFilterWhileWorn(_item)
+    return SWAB_Recipe.OnTest.InsertFilterShared(_item, true, true)
 end
 
 function SWAB_Recipe.OnCreate.InsertFilterShared(_items, _result, _player, _isWorn)
-    print("running is worn "..tostring(_isWorn))
     local oldItem = nil
     for i = 0, _items:size() - 1 do
         local item = _items:get(i)
@@ -42,13 +76,7 @@ function SWAB_Recipe.OnCreate.InsertFilterShared(_items, _result, _player, _isWo
     end
 
     if oldItem then
-        if _isWorn then
-            _player:setWornItem(_result:getBodyLocation(), _result);
-        end
-        _result:setCondition(oldItem:getCondition())
-        _result:setBloodLevel(oldItem:getBloodLevel())
-        _result:setDirtyness(oldItem:getDirtyness())
-        _result:setWetness(oldItem:getWetness())
+        SWAB_Recipe.CopyItemProperties(oldItem, _result, _player, _isWorn)
     else
         print("SWAB: Error, expecting an old item, but none was found")
     end
@@ -62,35 +90,57 @@ function SWAB_Recipe.OnCreate.InsertFilterWhileWorn(_items, _result, _player)
     SWAB_Recipe.OnCreate.InsertFilterShared(_items, _result, _player, true)
 end
 
--- function SWAB_Recipe.OnTest.InsertFilter(_item)
---     local modData = _item:getModData()
---     if modData and modData["SwabRespiratoryItem"] then
---         if modData["SwabRespiratoryExposure_RefreshAction"] == "replace_filter" then
---            return PZMath.equal(0, modData["SwabRespiratoryExposure_ProtectionRemaining"])
---         end
---     end
-    
---     return 0 < _item:getUsedDelta() -- We must be the filter...
--- end
+function SWAB_Recipe.OnTest.RemoveFilterShared(_item, _requireWorn)
+    local modData = _item:getModData()
+    if modData and modData["SwabRespiratoryItem"] then
+        if _item:isWorn() ~= _requireWorn then
+            return false
+        end
+        if modData["SwabRespiratoryExposure_RefreshAction"] == "replace_filter" then
+            -- Can't remove a fully used filter.
+           return not PZMath.equal(0, modData["SwabRespiratoryExposure_ProtectionRemaining"])
+        end
+    end
+end
 
--- -- When creating item in result box of crafting panel.
--- function SWAB_Recipe.OnCreate.InsertFilter(_items, _result, _player)
---     local container = nil
---     local filter = nil
---     for i = 0, _items:size() - 1 do
---         local item = _items:get(i)
---         local modData = item:getModData()
---         if modData["SwabRespiratoryItem"] then
---             container = item
---         elseif modData["SwabRespiratoryItemFilter"] then
---             filter = item
---         else
---             print("SWAB: Error, unrecognized item: "..tostring(item:getType()))
---         end
---     end
---     if container and filter then
---         container:getModData()["SwabRespiratoryExposure_ProtectionRemaining"] = filter:getUsedDelta()
---         -- We don't actually want the contaminated filter junking up the player's inventory.
---         _player:getInventory():Remove(_result)
---     end
--- end
+function SWAB_Recipe.OnCreate.RemoveFilterShared(_items, _usedFilterResult, _player, _isWorn)
+    local oldItem = nil
+    for i = 0, _items:size() - 1 do
+        local item = _items:get(i)
+        local modData = item:getModData()
+        if modData["SwabRespiratoryItem"] then
+            -- This is the item the filter is being removed from.
+            oldItem = item
+            _usedFilterResult:setUsedDelta(modData["SwabRespiratoryExposure_ProtectionRemaining"])
+            if not PZMath.equal(1, _usedFilterResult:getUsedDelta()) then
+                _usedFilterResult:setName(SWAB_ItemUtility.GetUsedFilterName(_usedFilterResult:getDisplayName()))
+            end
+        else
+            print("SWAB: Error, unrecognized item: "..tostring(item:getType()))
+        end
+    end
+
+    if oldItem then
+        local newItem = SWAB_Recipe.CopyItemProperties(oldItem, _player:getInventory():AddItem(oldItem:getType()), _player, _isWorn)
+        newItem:getModData()["SwabRespiratoryExposure_ProtectionRemaining"] = 0
+        newItem:setName(SWAB_ItemUtility.GetMissingFilterName(newItem:getDisplayName()))
+    else
+        print("SWAB: Error, expecting an old item, but none was found")
+    end
+end
+
+function SWAB_Recipe.OnTest.RemoveFilter(_item)
+    return SWAB_Recipe.OnTest.RemoveFilterShared(_item, false)
+end
+
+function SWAB_Recipe.OnTest.RemoveFilterWhileWorn(_item)
+    return SWAB_Recipe.OnTest.RemoveFilterShared(_item, true)
+end
+
+function SWAB_Recipe.OnCreate.RemoveFilter(_items, _usedFilterResult, _player)
+    SWAB_Recipe.OnCreate.RemoveFilterShared(_items, _usedFilterResult, _player, false)
+end
+
+function SWAB_Recipe.OnCreate.RemoveFilterWhileWorn(_items, _usedFilterResult, _player)
+    SWAB_Recipe.OnCreate.RemoveFilterShared(_items, _usedFilterResult, _player, true)
+end

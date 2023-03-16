@@ -7,4 +7,10 @@ ContextMenu_EN = {
 
     ContextMenu_SWAB_ContaminatedFilterablePrefix = "",
     ContextMenu_SWAB_ContaminatedFilterableSuffix = " - Contaminated Filter",
+
+    ContextMenu_SWAB_MissingFilterablePrefix = "",
+    ContextMenu_SWAB_MissingFilterableSuffix = " - Missing Filter",
+
+    ContextMenu_SWAB_UsedFilterPrefix = "",
+    ContextMenu_SWAB_UsedFilterSuffix = " - Used",
 }

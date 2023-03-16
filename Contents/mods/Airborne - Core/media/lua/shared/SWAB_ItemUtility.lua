@@ -42,6 +42,22 @@ function SWAB_ItemUtility.Initialize()
 end
 Events.OnGameBoot.Add(SWAB_ItemUtility.Initialize)
 
+function SWAB_ItemUtility.GetName(_name, _prefixKey, _suffixKey)
+    local itemNamePrefix = getText(_prefixKey)
+    local itemNameSuffix = getText(_suffixKey)
+
+    if itemNamePrefix == _prefixKey then
+        itemNamePrefix = ""
+    end
+
+    if itemNameSuffix == _suffixKey then
+        itemNameSuffix = ""
+    end
+
+    return itemNamePrefix..getText(_name)..itemNameSuffix
+end
+
+
 function SWAB_ItemUtility.GetContaminatedName(_name, _refreshAction)
     local prefixKey = nil
     local suffixKey = nil
@@ -56,27 +72,13 @@ function SWAB_ItemUtility.GetContaminatedName(_name, _refreshAction)
         print("SWAB: Error, unrecognized refresh action: "..tostring(_refreshAction))
     end
 
-    local itemNamePrefix = getText(prefixKey)
-    local itemNameSuffix = getText(suffixKey)
-
-    if itemNamePrefix == prefixKey then
-        itemNamePrefix = ""
-    end
-
-    if itemNameSuffix == suffixKey then
-        itemNameSuffix = ""
-    end
-
-    return itemNamePrefix..getText(_name)..itemNameSuffix
+    return SWAB_ItemUtility.GetName(_name, prefixKey, suffixKey)
 end
 
--- function SWAB_ItemUtility.InitializeItem(_item)
---     local modData = _item:getModData()[SWAB_ItemUtility.itemConfigModDataId]
+function SWAB_ItemUtility.GetMissingFilterName(_name)
+    return SWAB_ItemUtility.GetName(_name, "ContextMenu_SWAB_MissingFilterablePrefix", "ContextMenu_SWAB_MissingFilterableSuffix")
+end
 
---     if modData then
---         return modData
---     end
-
---     modData = {}
---     -- modData.consumedDurationRemaining = 
--- end
+function SWAB_ItemUtility.GetUsedFilterName(_name)
+    return SWAB_ItemUtility.GetName(_name, "ContextMenu_SWAB_UsedFilterPrefix", "ContextMenu_SWAB_UsedFilterSuffix")
+end
