@@ -31,7 +31,7 @@ function SWAB_Player.OnCreatePlayer(_, _player)
         modData.enduranceMaximum = 1
         -- Due to some weird recipe hacks, we need to remove empty filters if this
         -- is true.
-        modData.cleanupUsedFilters = false
+        modData.cleanupThrowawayItems = false
 
         _player:getModData()[SWAB_Config.playerModDataId] = modData
         _player:transmitModData()
@@ -79,20 +79,21 @@ function SWAB_Player.OnTick(_ticks)
         local modData = player:getModData()[SWAB_Config.playerModDataId]
 
         if modData then
-            if modData.cleanupUsedFilters then
-                -- Recipe hacks spawn depleted filters that need to be cleaned up.
-                modData.cleanupUsedFilters = false
-                local items = player:getInventory():getItems()
-                local itemsRemoved = {}
-                for itemIndex = 0, items:size() - 1 do
-                    local item = items:get(itemIndex);
-                    if item:getType() == "StandardFilter" and PZMath.equal(0, item:getUsedDelta()) then
-                        table.insert(itemsRemoved, item)
-                    end
-                end
-                for _, item in pairs(itemsRemoved) do
-                    player:getInventory():Remove(item)
-                end
+            if modData.cleanupThrowawayItems then
+                -- Recipe hacks spawn throwaway items that need to be cleaned up.
+                modData.cleanupThrowawayItems = false
+                player:getInventory():RemoveAll("ThrowawayItem")
+                -- local items = player:getInventory():getItems()
+                -- local itemsRemoved = {}
+                -- for itemIndex = 0, items:size() - 1 do
+                --     local item = items:get(itemIndex);
+                --     if item:getType() == "ThrowawayItem" then
+                --         table.insert(itemsRemoved, item)
+                --     end
+                -- end
+                -- for _, item in pairs(itemsRemoved) do
+                --     player:getInventory():Remove(item)
+                -- end
             end
 
             if modData.enduranceMaximum then
@@ -189,23 +190,23 @@ function SWAB_Player.CalculateRespiratoryExposureWithProtection(_player, _respir
         if item:IsClothing() and item:isEquipped() then
             local itemModData = item:getModData()
             if itemModData then
-                if itemModData["SwabRespiratoryItem"] then
+                if itemModData.SwabRespiratoryItem then
                     -- We've established this is an item that provides respiratory protection.
-                    local itemProtectionDurationInMinutes = itemModData["SwabRespiratoryExposure_ProtectionDuration"] * SWAB_Config.itemRespiratoryProtectionDurationMultiplier
+                    local itemProtectionDurationInMinutes = itemModData.SwabRespiratoryExposure_ProtectionDuration * SWAB_Config.itemRespiratoryProtectionDurationMultiplier
                     
-                    local itemProtectionRemaining = itemModData["SwabRespiratoryExposure_ProtectionRemaining"]
+                    local itemProtectionRemaining = itemModData.SwabRespiratoryExposure_ProtectionRemaining
                     local itemProtectionRemainingUpdated = PZMath.max(0, itemProtectionRemaining - (1 / itemProtectionDurationInMinutes))
                     if not PZMath.equal(itemProtectionRemaining, itemProtectionRemainingUpdated) then
                         -- Item still has some protection remaining
                         itemProtectionRemaining = itemProtectionRemainingUpdated
-                        itemModData["SwabRespiratoryExposure_ProtectionRemaining"] = itemProtectionRemaining
+                        itemModData.SwabRespiratoryExposure_ProtectionRemaining = itemProtectionRemaining
 
                         if PZMath.equal(0, itemProtectionRemaining) then
                             -- Item has been contaminated
-                            item:setName(SWAB_ItemUtility.GetContaminatedName(item:getDisplayName(), itemModData["SwabRespiratoryExposure_RefreshAction"]))
+                            item:setName(SWAB_ItemUtility.GetContaminatedName(item:getDisplayName(), itemModData.SwabRespiratoryExposure_RefreshAction))
                         else
                             -- Item is clean and still providing protection.
-                            local itemExposure = PZMath.max(0, PZMath.floor(_respiratoryExposure) + itemModData["SwabRespiratoryExposure_Reduction"]) * itemModData["SwabRespiratoryExposure_Falloff"]
+                            local itemExposure = PZMath.max(0, PZMath.floor(_respiratoryExposure) + itemModData.SwabRespiratoryExposure_Reduction) * itemModData.SwabRespiratoryExposure_Falloff
                             _respiratoryExposure = PZMath.min(_respiratoryExposure, itemExposure)
                         end 
                     end

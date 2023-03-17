@@ -25,7 +25,7 @@ function SWAB_ItemContextMenu.OnFillInventoryObjectContextMenu(_playerIndex, _co
 
     if itemModData.SwabRespiratoryItem then
         if itemModData.SwabRespiratoryExposure_RefreshAction == "wash" then
-            SWAB_ItemContextMenu.AddWashMaskOption(_context, item)
+            SWAB_ItemContextMenu.AddDecontaminateMaskOption(_context, item)
         elseif itemModData.SwabRespiratoryExposure_RefreshAction == "replace_filter" then
             SWAB_ItemContextMenu.AddRemoveFilterOption(_context, item)
             SWAB_ItemContextMenu.AddInsertFilterOption(_context, item)
@@ -37,12 +37,31 @@ function SWAB_ItemContextMenu.OnFillInventoryObjectContextMenu(_playerIndex, _co
 end
 Events.OnFillInventoryObjectContextMenu.Add(SWAB_ItemContextMenu.OnFillInventoryObjectContextMenu)
 
-function SWAB_ItemContextMenu.AddWashMaskOption(_context, _item)
+function SWAB_ItemContextMenu.AddDecontaminateMaskOption(_context, _item)
     if PZMath.equal(1, _item:getModData().SwabRespiratoryExposure_ProtectionRemaining) then
-        -- This is clean, no need to add an option.
+        -- This is not contaminated, no need to decontaminate it.
         return
     end
-    _context:addOption("Wash Mask", _item, SWAB_ItemContextMenu.OnWashMask)
+
+    print("------------- SWAB got this far!")
+
+    local waterResult = SWAB_ItemContextMenu.GetBestWaterSource(SWAB_DecontaminateMask.GetRequiredWater())
+
+    if not waterResult.source then
+        return
+    end
+
+    print("------------- SWAB got this far! 2")
+
+    -- TODO: Localize
+    _context:addOption(
+        "Decontaminate",
+        {
+            item = _item,
+            water = waterResult,
+        },
+        SWAB_ItemContextMenu.OnDecontaminateMask
+    )
 end
 
 function SWAB_ItemContextMenu.AddRemoveFilterOption(_context, _item)
@@ -50,6 +69,7 @@ function SWAB_ItemContextMenu.AddRemoveFilterOption(_context, _item)
         -- This is contaminated, no filter to remove.
         return
     end
+    -- TODO: Localize
     _context:addOption("Remove Filter", _item, SWAB_ItemContextMenu.OnRemoveFilter)
 end
 
@@ -66,6 +86,7 @@ function SWAB_ItemContextMenu.AddInsertFilterOption(_context, _item)
         return
     end
 
+    -- TODO: Localize
     _context:addOption(
         "Insert Filter",
         {
@@ -89,6 +110,8 @@ function SWAB_ItemContextMenu.AddInsertSpecificFilterOption(_context, _item)
         -- No filter target available for insertion.
         return
     end
+
+    -- TODO: Localize
 
     if 0 < filterTarget:getModData().SwabRespiratoryExposure_ProtectionRemaining then
         -- We found a filter target that needs replacement.
@@ -127,6 +150,7 @@ function SWAB_ItemContextMenu.AddReplaceFilterOption(_context, _item)
         return
     end
 
+    -- TODO: Localize
     _context:addOption(
         "Replace Filter",
         {
@@ -141,11 +165,26 @@ end
 -------------------------------QUEUES-----------------------------------
 ------------------------------------------------------------------------
 
-function SWAB_ItemContextMenu.OnWashMask(_item)
-    print("want to clean "..tostring(_item))
+function SWAB_ItemContextMenu.OnDecontaminateMask(_payload)
+    ISInventoryPaneContextMenu.transferIfNeeded(getPlayer(), _payload.item)
+    ISTimedActionQueue.add(
+        SWAB_DecontaminateMask:new(
+            getPlayer(),
+            _payload.water.source, -- sink
+            {}, -- soaps
+            _payload.item,
+            _payload.item:getModData().SwabRespiratoryExposure_ProtectionRemaining,
+            0, -- blood
+            0, -- dirt,
+            true
+        )
+    )
 end
 
 function SWAB_ItemContextMenu.OnRemoveFilter(_item)
+
+    print("------------- SWAB got this far! 3")
+
     ISInventoryPaneContextMenu.transferIfNeeded(getPlayer(), _item)
     ISTimedActionQueue.add(SWAB_RemoveFilter:new(getPlayer(), _item, 30))
 end
@@ -165,6 +204,21 @@ end
 ------------------------------------------------------------------------
 -------------------------------UTILITY----------------------------------
 ------------------------------------------------------------------------
+
+function SWAB_ItemContextMenu.GetBestWaterSource(_waterAmount)
+    local result = {
+        source = nil,
+    --    isInventoryItem = nil,
+    }
+
+    local inventory = getPlayer():getInventory()
+    result.source = inventory:getFirstEvalArgRecurse(SWAB_DecontaminateMask.HasRequiredWater, _waterAmount)
+
+    return result
+end
+
+-- function SWAB_ItemContextMenu.GetBestSoapSource()
+-- end
 
 function SWAB_ItemContextMenu.GetBestFilter(_usedDeltaMinimum)
     local inventory = getPlayer():getInventory()
