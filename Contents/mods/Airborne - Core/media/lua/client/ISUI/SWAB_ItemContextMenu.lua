@@ -16,44 +16,6 @@ function SWAB_ItemContextMenu.OnFillInventoryObjectContextMenu(_playerIndex, _co
         if item then
             break
         end
-
-        -- if type(itemStackData) == "userdata" then
-        --     _context:addOption("item is userdata: "..tostring(itemStackData), nil, nil)
-        --     if itemStackData.size then
-        --         -- This is a java array.
-        --         for i = 0, itemStackData:size() - 1 do
-        --             _context:addOption(tostring(itemStackData:get(i)), nil, nil)
-        --         end
-        --     end
-        -- else
-        --     _context:addOption("item is...: "..tostring(itemStackData), nil, nil)
-        -- end
-
-        -- _context:addOption(tostring(type(item)), nil, nil)
-
-        -- _context:addOption(tostring(itemStack), nil, nil)
-
-        -- for _, item in pairs(itemStack.items) do
-        --     _context:addOption(tostring(item), nil, nil)
-        --     -- for itemK, itemV in pairs(item) do
-        --     --     _context:addOption(itemK..": "..tostring(itemV), nil, nil)
-        --     -- end
-        --     -- _context:addOption("-----", nil, nil)
-        --     -- for itemK, itemV in pairs(item) do
-        --     --     local mainOption = _context:addOption(itemK..": "..tostring(itemV), nil, nil)
-        --     -- end
-        -- end
-
-        --print("uh: "..tostring(_context)..", "..tostring(ISContextMenu)..", "..tostring(_context.addOption)..", "..tostring(item.getName))
-        -- for _, item in pairs(itemStack.items) do
-        --     _context:addOption(tostring(item), nil, nil)
-        --     -- _context:addOption("-----", nil, nil)
-        --     -- for itemK, itemV in pairs(item) do
-        --     --     local mainOption = _context:addOption(itemK..": "..tostring(itemV), nil, nil)
-        --     -- end
-        -- end
-        -- local mainSubMenu = ISContextMenu:getNew(_context)
-        -- _context:addSubMenu(mainOption, mainSubMenu)
     end
 
     if not item then
@@ -70,71 +32,9 @@ function SWAB_ItemContextMenu.OnFillInventoryObjectContextMenu(_playerIndex, _co
             SWAB_ItemContextMenu.AddInsertFilterOption(_context, item)
             SWAB_ItemContextMenu.AddReplaceFilterOption(_context, item)
         end
+    elseif itemModData.SwabRespiratoryItemFilter then
+        SWAB_ItemContextMenu.AddInsertSpecificFilterOption(_context, item)
     end
-
-    -- local playerInventory = getPlayer():getInventory()
-
-    -- local filters = {}
-    -- local itemsForFilterInsert = {}
-    -- local itemsForFilterReplace = {}
-
-    -- local clothingInventory = playerInventory:getItemsFromCategory("Container")
-    -- for itemIndex = 0, clothingInventory:size() - 1 do
-    --     local item = clothingInventory:get(itemIndex)
-    --     if not item:isHidden() then
-    --         local itemModData = item:getModData()
-    --         if itemModData.SwabRespiratoryItem then
-    --             if itemModData.SwabRespiratoryExposure_RefreshAction == "replace_filter" then
-    --                 if PZMath.equal(0, itemModData.SwabRespiratoryExposure_ProtectionRemaining) then
-    --                     -- This item needs a filter inserted.
-    --                     table.insert(itemsForFilterInsert, item)
-    --                 elseif not PZMath.equal(1, itemModData.SwabRespiratoryExposure_ProtectionRemaining) then
-    --                     -- This item has a filter, but it's used.
-    --                     table.insert(itemsForFilterReplace, item)
-    --                 end
-    --             end
-    --         end
-	-- 	end
-	-- end
-
-    -- if itemsForFilterReplace then
-    --     -- TODO LOCALIZE
-    --     local mainOption = _context:addOption("Replace Filter", nil, nil);
-    --     local mainSubMenu = ISContextMenu:getNew(context)
-    --     context:addSubMenu(mainOption, mainSubMenu)    
-    -- end
-
-    -- local mainOption = context:addOption(getText("ContextMenu_Wash"), nil, nil);
-    -- local mainSubMenu = ISContextMenu:getNew(context)
-    -- context:addSubMenu(mainOption, mainSubMenu)
-
-    ------------------
-
-	-- local container = nil
-    -- local resItems = {}
-    -- for i,v in ipairs(items) do
-    --     if not instanceof(v, "InventoryItem") then
-    --         for _, it in ipairs(v.items) do
-    --             resItems[it] = true
-    --         end
-    --         container = v.items[1]:getContainer()
-    --     else
-    --         resItems[v] = true
-    --         container = v:getContainer()
-    --     end
-    -- end
-
-    -- local listItems = {}
-    -- for v, _ in pairs(resItems) do
-    --     table.insert(listItems, v)
-    -- end
-
-    -- local removeOption = context:addDebugOption("Delete:")
-    -- local subMenuRemove = ISContextMenu:getNew(context)
-    -- context:addSubMenu(removeOption, subMenuRemove)
-
-    -- subMenuRemove:addOption("1 item", listItems[1], ISRemoveItemTool.removeItem, player)
-    -- subMenuRemove:addOption("selected", listItems, ISRemoveItemTool.removeItems, player)
 end
 Events.OnFillInventoryObjectContextMenu.Add(SWAB_ItemContextMenu.OnFillInventoryObjectContextMenu)
 
@@ -175,6 +75,43 @@ function SWAB_ItemContextMenu.AddInsertFilterOption(_context, _item)
         },
         SWAB_ItemContextMenu.OnInsertFilter
     )
+end
+
+-- Item being passed in is a filter that we want to find a mask to insert it into.
+function SWAB_ItemContextMenu.AddInsertSpecificFilterOption(_context, _item)
+    if PZMath.equal(0, _item:getUsedDelta()) then
+        -- This shouldn't happen, but just incase we don't want to waste time inserting dead filters.
+        return
+    end
+
+    local filterTarget = SWAB_ItemContextMenu.GetBestFilterTarget(0)
+
+    if not filterTarget then
+        -- No filter target available for insertion.
+        return
+    end
+
+    if 0 < filterTarget:getModData().SwabRespiratoryExposure_ProtectionRemaining then
+        -- We found a filter target that needs replacement.
+        _context:addOption(
+            "Replace Filter",
+            {
+                target = filterTarget,
+                filter = _item,
+            },
+            SWAB_ItemContextMenu.OnReplaceFilter
+        )
+    else
+        -- Must have found a filter target with no filter at all.
+        _context:addOption(
+            "Insert Filter",
+            {
+                target = filterTarget,
+                filter = _item,
+            },
+            SWAB_ItemContextMenu.OnInsertFilter
+        )
+    end
 end
 
 function SWAB_ItemContextMenu.AddReplaceFilterOption(_context, _item)
@@ -251,6 +188,31 @@ function SWAB_ItemContextMenu.GetBestFilter(_usedDeltaMinimum)
             if not result or result:getUsedDelta() < subInventoryResult:getUsedDelta() then
                 -- Either the first result was nil, or we are a better filter.
                 result = subInventoryResult
+            end
+        end
+    end
+
+    return result
+end
+
+function SWAB_ItemContextMenu.GetBestFilterTarget()
+    local result = nil
+    local items = getPlayer():getInventory():getItems()
+    for itemIndex = 0, items:size() - 1 do
+        local item = items:get(itemIndex)
+        local itemModData = item:getModData()
+        if itemModData.SwabRespiratoryItem then
+            if item:isWorn() then
+                -- Always assume we're replacing filters on worn protection.
+                return item
+            end
+
+            if not result then
+                -- No result yet? Set one.
+                result = item
+            elseif itemModData.SwabRespiratoryExposure_ProtectionRemaining < result:getModData().SwabRespiratoryExposure_ProtectionRemaining then
+                -- We assume we want to get the lowest protection.
+                result = item
             end
         end
     end
