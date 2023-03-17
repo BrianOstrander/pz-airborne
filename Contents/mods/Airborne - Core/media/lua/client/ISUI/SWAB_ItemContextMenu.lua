@@ -1,6 +1,5 @@
 SWAB_ItemContextMenu = {}
 
--- TODO: change name of this to be more generic
 function SWAB_ItemContextMenu.OnFillInventoryObjectContextMenu(_playerIndex, _context, _itemStack)
 
     local item = nil
