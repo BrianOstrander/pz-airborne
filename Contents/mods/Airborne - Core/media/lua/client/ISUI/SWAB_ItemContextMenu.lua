@@ -43,22 +43,18 @@ function SWAB_ItemContextMenu.AddDecontaminateMaskOption(_context, _item)
         return
     end
 
-    print("------------- SWAB got this far!")
+    local water = SWAB_ItemContextMenu.GetBestWaterSource(SWAB_DecontaminateMask.GetRequiredWater())
 
-    local waterResult = SWAB_ItemContextMenu.GetBestWaterSource(SWAB_DecontaminateMask.GetRequiredWater())
-
-    if not waterResult.source then
+    if not water then
         return
     end
-
-    print("------------- SWAB got this far! 2")
 
     -- TODO: Localize
     _context:addOption(
         "Decontaminate",
         {
             item = _item,
-            water = waterResult,
+            water = water,
         },
         SWAB_ItemContextMenu.OnDecontaminateMask
     )
@@ -170,7 +166,7 @@ function SWAB_ItemContextMenu.OnDecontaminateMask(_payload)
     ISTimedActionQueue.add(
         SWAB_DecontaminateMask:new(
             getPlayer(),
-            _payload.water.source, -- sink
+            _payload.water, -- sink or bottle
             {}, -- soaps
             _payload.item,
             _payload.item:getModData().SwabRespiratoryExposure_ProtectionRemaining,
@@ -182,9 +178,6 @@ function SWAB_ItemContextMenu.OnDecontaminateMask(_payload)
 end
 
 function SWAB_ItemContextMenu.OnRemoveFilter(_item)
-
-    print("------------- SWAB got this far! 3")
-
     ISInventoryPaneContextMenu.transferIfNeeded(getPlayer(), _item)
     ISTimedActionQueue.add(SWAB_RemoveFilter:new(getPlayer(), _item, 30))
 end
@@ -206,13 +199,27 @@ end
 ------------------------------------------------------------------------
 
 function SWAB_ItemContextMenu.GetBestWaterSource(_waterAmount)
-    local result = {
-        source = nil,
-    --    isInventoryItem = nil,
-    }
+    local result = nil
 
-    local inventory = getPlayer():getInventory()
-    result.source = inventory:getFirstEvalArgRecurse(SWAB_DecontaminateMask.HasRequiredWater, _waterAmount)
+    -- Check for nearby water sources first
+    for x = getPlayer():getX() - 1, getPlayer():getX() + 1 do
+        for y = getPlayer():getY() - 1, getPlayer():getY() + 1 do
+            local squareObjects = getCell():getGridSquare(x, y, getPlayer():getZ()):getObjects()
+            for i = 0, squareObjects:size() - 1 do
+                local squareObject = squareObjects:get(i)
+                if SWAB_DecontaminateMask.HasRequiredWater(squareObject, SWAB_DecontaminateMask.GetRequiredWater()) then
+                    if not result or IsoUtils.DistanceTo(getPlayer():getX(), getPlayer():getY(), x, y) < IsoUtils.DistanceTo(getPlayer():getX(), getPlayer():getY(), result:getX(), result:getY()) then
+                        result = squareObject
+                    end
+                end
+            end
+        end
+    end
+    
+    if not result then
+        local inventory = getPlayer():getInventory()
+        result = inventory:getFirstEvalArgRecurse(SWAB_DecontaminateMask.HasRequiredWater, _waterAmount)
+    end
 
     return result
 end

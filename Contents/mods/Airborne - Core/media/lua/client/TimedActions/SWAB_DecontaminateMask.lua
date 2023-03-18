@@ -71,16 +71,15 @@ function SWAB_DecontaminateMask.GetRequiredWater()
 end
 
 function SWAB_DecontaminateMask.HasRequiredWater(_item, _amount)
-    if _item:isWaterSource() and not _item:isTaintedWater() then
-        if _item.getWaterAmount then
-            -- Must be a sink or maybe a barrel?
-            return _amount <= _item:getWaterAmount()
-        elseif _item.getDrainableUsesInt then
-            -- Liquid container item, like a water bottle
-            return _amount <= _item:getDrainableUsesInt()
-        else
-            print("SWAB: Error, unrecognized water source "..tostring(_item))
+    if _item.getWaterAmount then
+        -- Must be a sink or maybe a barrel?
+        if _item:isTaintedWater() then
+            return false
         end
+        return _amount <= _item:getWaterAmount()
+    elseif _item.getDrainableUsesInt then
+        -- Liquid container item, like a water bottle
+        return _amount <= _item:getDrainableUsesInt()
     end
     return false
 end
@@ -140,12 +139,7 @@ function SWAB_DecontaminateMask:perform()
     triggerEvent("OnClothingUpdated", self.character)
     
     if self:isSink() then
-        -- Must be a sink or maybe a barrel?
-        -- return _amount <= _item:getWaterAmount()
-
-        -- TODO
-        -- ISTakeWaterAction.SendTakeWaterCommand(self.character, self.sink, water)
-        print("SWAB: TODO this!")
+        ISTakeWaterAction.SendTakeWaterCommand(self.character, self.sink, water)
     else
         -- Liquid container item, like a water bottle
         self.sink:setUsedDelta(PZMath.max(0, self.sink:getDrainableUsesInt() - SWAB_DecontaminateMask.GetRequiredWater()) / (1 / self.sink:getUseDelta()))
