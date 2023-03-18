@@ -107,34 +107,37 @@ end
 function SWAB_DecontaminateMask:perform()
     self:stopSound()
     self.item:setJobDelta(0.0)
-    local item = self.item
+
+    self.item:setName(ScriptManager.instance:getItem(self.item:getType()):getDisplayName())
+    self.item:setCustomName(false)
+
     local water = SWAB_DecontaminateMask.GetRequiredWater()
-    if instanceof(item, "Clothing") then
-        local coveredParts = BloodClothingType.getCoveredParts(item:getBloodClothingType())
+    if instanceof(self.item, "Clothing") then
+        local coveredParts = BloodClothingType.getCoveredParts(self.item:getBloodClothingType())
         if coveredParts then
             for j=0,coveredParts:size()-1 do
                 if self.noSoap == false then
-                    self:useSoap(item, coveredParts:get(j))
+                    self:useSoap(self.item, coveredParts:get(j))
                 end
-                item:setBlood(coveredParts:get(j), 0)
-                item:setDirt(coveredParts:get(j), 0)
+                self.item:setBlood(coveredParts:get(j), 0)
+                self.item:setDirt(coveredParts:get(j), 0)
             end
         end
-        item:setWetness(100)
-        item:setDirtyness(0)
+        self.item:setWetness(100)
+        self.item:setDirtyness(0)
     else
-        self:useSoap(item, nil)
+        self:useSoap(self.item, nil)
     end
-    item:setBloodLevel(0)
-    item:getModData().SwabRespiratoryExposure_ProtectionRemaining = 1
+    self.item:setBloodLevel(0)
+    self.item:getModData().SwabRespiratoryExposure_ProtectionRemaining = 1
     
     self.character:resetModel()
     sendClothing(self.character)
-    if self.character:isPrimaryHandItem(item) then
-        self.character:setPrimaryHandItem(item)
+    if self.character:isPrimaryHandItem(self.item) then
+        self.character:setPrimaryHandItem(self.item)
     end
-    if self.character:isSecondaryHandItem(item) then
-        self.character:setSecondaryHandItem(item)
+    if self.character:isSecondaryHandItem(self.item) then
+        self.character:setSecondaryHandItem(self.item)
     end
     triggerEvent("OnClothingUpdated", self.character)
     
