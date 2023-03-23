@@ -13,6 +13,8 @@ SWAB_ItemConfig["swab_base_washables"] = {
             SwabRespiratoryExposure_ProtectionRemaining   = 1,
             SwabRespiratoryExposure_RefreshAction         = "wash",
             SwabRespiratoryExposure_AutoHydrationAllowed  = false,
+            -- Bandanas can bea worn as a hat, so we need to specify this only works if worn as a mask.
+            SwabRespiratoryExposure_RequiredBodyLocation  = "Mask",
         },
     },
     {

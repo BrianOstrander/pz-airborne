@@ -190,8 +190,9 @@ function SWAB_Player.CalculateRespiratoryExposureWithProtection(_player, _respir
         if item:IsClothing() and item:isEquipped() then
             local itemModData = item:getModData()
             if itemModData then
-                if itemModData.SwabRespiratoryItem then
-                    -- We've established this is an item that provides respiratory protection.
+                if itemModData.SwabRespiratoryItem and not itemModData.SwabRespiratoryExposure_RequiredBodyLocation or item:getBodyLocation() == itemModData.SwabRespiratoryExposure_RequiredBodyLocation then
+                    -- We've established this is an item that provides respiratory protection, and that there is no required location for equiping it,
+                    -- or it's equiped in the correct location.
                     local itemProtectionDurationInMinutes = itemModData.SwabRespiratoryExposure_ProtectionDuration * SWAB_Config.itemRespiratoryProtectionDurationMultiplier
                     
                     local itemProtectionRemaining = itemModData.SwabRespiratoryExposure_ProtectionRemaining
