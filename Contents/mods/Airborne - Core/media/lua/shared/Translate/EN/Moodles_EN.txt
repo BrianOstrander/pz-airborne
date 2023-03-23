@@ -1,4 +1,4 @@
-Moodles_EN {
+Moodles_EN = {
     Moodles_contamination_Bad_lvl1 = "Mild Contamination",
     Moodles_contamination_Bad_desc_lvl1 = "text_desc_1",
     Moodles_contamination_Bad_lvl2 = "Medium Contamination",

@@ -1,0 +1,4 @@
+Recipes_EN = {
+    Recipe_SWAB_OpenStandardFilterBoxLarge = "Open Crate of Standard Filters",
+    Recipe_SWAB_PutStandardFiltersInBoxLarge = "Put Standard Filters in Crate",
+}

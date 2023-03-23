@@ -2,43 +2,53 @@ module SWAB
 {
     item ValuTechHomeAirPurifier
 	{
+		/* TODO: Localize */
+		DisplayName				= ValuTech Home Air Purifier,
 	    DisplayCategory 		= Furniture,
 		Type					= Moveable,
 		Icon					= default,
         Weight          		= 10.0,
-
-		DisplayName				= Moveable,
-        
 		WorldObjectSprite		= swab_filters_01_0,
 	}
 
     item MassGenFacIndustrialAirPurifier
 	{
+		/* TODO: Localize */
+		DisplayName				= Mass-GenFac Industrial Air Purifier,
 	    DisplayCategory 		= Furniture,
 		Type					= Moveable,
 		Icon					= default,
         Weight          		= 10.0,
-
-		DisplayName				= Moveable,
-        
 		WorldObjectSprite		= swab_filters_01_8,
 	}
 
 	item StandardFilter
 	{
+		/* TODO: Localize */
 		DisplayName 				= Standard Filter,
 		DisplayCategory 			= Accessory,
 		Type						= Drainable,
 		UseWhileEquipped			= FALSE,
 		UseDelta					= 1,
 		Weight 						= 0.3,
-		Icon 						= SWAB_StandardFilter,
+		Icon 						= SWAB_StandardFilter_icon,
 		StaticModel 				= CanClosed,
 		WorldStaticModel 			= StandardFilter_Ground,
 		Tags 						= HasMetal,
 		SwabRespiratoryItemFilter 	= TRUE,
 		cantBeConsolided 			= TRUE,
 	}
+
+	item StandardFilterBoxLarge
+    {
+		/* TODO: Localize */
+        DisplayName					= Standard Filter Crate,
+        DisplayCategory 			= Accessory,
+        Weight						= 1.8,
+        Type						= Normal,
+        Icon						= SWAB_StandardFilterBoxLarge_icon,
+        WorldStaticModel 			= StandardFilterBoxLarge_Ground,
+    }
 
 	/* This item is used for some recipe hacks */
 	item ThrowawayItem

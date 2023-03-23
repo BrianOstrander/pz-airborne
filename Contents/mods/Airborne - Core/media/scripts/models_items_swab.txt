@@ -4,6 +4,13 @@ module SWAB
     {
         mesh = WorldItems/TinnedTuna,
         texture = WorldItems/SWAB_StandardFilter,
-        scale = 0.4,
+        scale = 0.3,
+    }
+
+    model StandardFilterBoxLarge_Ground
+    {
+        mesh = WorldItems/BoxOfJars,
+        texture = WorldItems/SWAB_StandardFilterBoxLarge,
+        scale = 0.275,
     }
 }

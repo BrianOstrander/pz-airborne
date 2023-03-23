@@ -27,4 +27,23 @@ module SWAB
         StopOnWalk:true,
     }
     */
+    
+    recipe SWAB OpenStandardFilterBoxLarge
+    {
+        StandardFilterBoxLarge,
+
+        Result:StandardFilter=6,
+        Sound:PutItemInBag,
+        Time:15.0,
+    }
+
+    recipe SWAB PutStandardFiltersInBoxLarge
+    {
+        StandardFilter=6,
+
+        Result:StandardFilterBoxLarge,
+        OnTest:SWAB_Recipe.OnTest.PutStandardFiltersInBoxLarge,
+        Sound:PutItemInBag,
+        Time:15.0,
+    }
 }
