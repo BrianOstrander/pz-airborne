@@ -1,6 +1,6 @@
-SWAB_ItemContextMenu = {}
+SWAB_InventoryContextMenu = {}
 
-function SWAB_ItemContextMenu.OnFillInventoryObjectContextMenu(_playerIndex, _context, _itemStack)
+function SWAB_InventoryContextMenu.OnFillInventoryObjectContextMenu(_playerIndex, _context, _itemStack)
 
     local item = nil
 
@@ -25,25 +25,25 @@ function SWAB_ItemContextMenu.OnFillInventoryObjectContextMenu(_playerIndex, _co
 
     if itemModData.SwabRespiratoryItem then
         if itemModData.SwabRespiratoryExposure_RefreshAction == "wash" then
-            SWAB_ItemContextMenu.AddDecontaminateMaskOption(_context, item)
+            SWAB_InventoryContextMenu.AddDecontaminateMaskOption(_context, item)
         elseif itemModData.SwabRespiratoryExposure_RefreshAction == "replace_filter" then
-            SWAB_ItemContextMenu.AddRemoveFilterOption(_context, item)
-            SWAB_ItemContextMenu.AddInsertFilterOption(_context, item)
-            SWAB_ItemContextMenu.AddReplaceFilterOption(_context, item)
+            SWAB_InventoryContextMenu.AddRemoveFilterOption(_context, item)
+            SWAB_InventoryContextMenu.AddInsertFilterOption(_context, item)
+            SWAB_InventoryContextMenu.AddReplaceFilterOption(_context, item)
         end
     elseif itemModData.SwabRespiratoryItemFilter then
-        SWAB_ItemContextMenu.AddInsertSpecificFilterOption(_context, item)
+        SWAB_InventoryContextMenu.AddInsertSpecificFilterOption(_context, item)
     end
 end
-Events.OnFillInventoryObjectContextMenu.Add(SWAB_ItemContextMenu.OnFillInventoryObjectContextMenu)
+Events.OnFillInventoryObjectContextMenu.Add(SWAB_InventoryContextMenu.OnFillInventoryObjectContextMenu)
 
-function SWAB_ItemContextMenu.AddDecontaminateMaskOption(_context, _item)
+function SWAB_InventoryContextMenu.AddDecontaminateMaskOption(_context, _item)
     if PZMath.equal(1, _item:getModData().SwabRespiratoryExposure_ProtectionRemaining) then
         -- This is not contaminated, no need to decontaminate it.
         return
     end
 
-    local water = SWAB_ItemContextMenu.GetBestWaterSource(SWAB_DecontaminateMask.GetRequiredWater())
+    local water = SWAB_InventoryContextMenu.GetBestWaterSource(SWAB_DecontaminateMask.GetRequiredWater())
 
     if not water then
         return
@@ -56,26 +56,26 @@ function SWAB_ItemContextMenu.AddDecontaminateMaskOption(_context, _item)
             item = _item,
             water = water,
         },
-        SWAB_ItemContextMenu.OnDecontaminateMask
+        SWAB_InventoryContextMenu.OnDecontaminateMask
     )
 end
 
-function SWAB_ItemContextMenu.AddRemoveFilterOption(_context, _item)
+function SWAB_InventoryContextMenu.AddRemoveFilterOption(_context, _item)
     if PZMath.equal(0, _item:getModData().SwabRespiratoryExposure_ProtectionRemaining) then
         -- This is contaminated, no filter to remove.
         return
     end
     -- TODO: Localize
-    _context:addOption("Remove Filter", _item, SWAB_ItemContextMenu.OnRemoveFilter)
+    _context:addOption("Remove Filter", _item, SWAB_InventoryContextMenu.OnRemoveFilter)
 end
 
-function SWAB_ItemContextMenu.AddInsertFilterOption(_context, _item)
+function SWAB_InventoryContextMenu.AddInsertFilterOption(_context, _item)
     if not PZMath.equal(0, _item:getModData().SwabRespiratoryExposure_ProtectionRemaining) then
         -- This is not completely contaminated, need to remove or replace filter instead.
         return
     end
 
-    local filter = SWAB_ItemContextMenu.GetBestFilter(0)
+    local filter = SWAB_InventoryContextMenu.GetBestFilter(0)
 
     if not filter then
         -- No filter available for insertion.
@@ -89,18 +89,18 @@ function SWAB_ItemContextMenu.AddInsertFilterOption(_context, _item)
             target = _item,
             filter = filter,
         },
-        SWAB_ItemContextMenu.OnInsertFilter
+        SWAB_InventoryContextMenu.OnInsertFilter
     )
 end
 
 -- Item being passed in is a filter that we want to find a mask to insert it into.
-function SWAB_ItemContextMenu.AddInsertSpecificFilterOption(_context, _item)
+function SWAB_InventoryContextMenu.AddInsertSpecificFilterOption(_context, _item)
     if PZMath.equal(0, _item:getUsedDelta()) then
         -- This shouldn't happen, but just incase we don't want to waste time inserting dead filters.
         return
     end
 
-    local filterTarget = SWAB_ItemContextMenu.GetBestFilterTarget(0)
+    local filterTarget = SWAB_InventoryContextMenu.GetBestFilterTarget(0)
 
     if not filterTarget then
         -- No filter target available for insertion.
@@ -117,7 +117,7 @@ function SWAB_ItemContextMenu.AddInsertSpecificFilterOption(_context, _item)
                 target = filterTarget,
                 filter = _item,
             },
-            SWAB_ItemContextMenu.OnReplaceFilter
+            SWAB_InventoryContextMenu.OnReplaceFilter
         )
     else
         -- Must have found a filter target with no filter at all.
@@ -127,19 +127,19 @@ function SWAB_ItemContextMenu.AddInsertSpecificFilterOption(_context, _item)
                 target = filterTarget,
                 filter = _item,
             },
-            SWAB_ItemContextMenu.OnInsertFilter
+            SWAB_InventoryContextMenu.OnInsertFilter
         )
     end
 end
 
-function SWAB_ItemContextMenu.AddReplaceFilterOption(_context, _item)
+function SWAB_InventoryContextMenu.AddReplaceFilterOption(_context, _item)
     local protectionRemaining = _item:getModData().SwabRespiratoryExposure_ProtectionRemaining
     if PZMath.equal(0, protectionRemaining) or PZMath.equal(1, protectionRemaining) then
         -- This is not contaminated, no need to replace a filter.
         return
     end
 
-    local filter = SWAB_ItemContextMenu.GetBestFilter(protectionRemaining)
+    local filter = SWAB_InventoryContextMenu.GetBestFilter(protectionRemaining)
 
     if not filter then
         -- No better filter available for replacement.
@@ -153,7 +153,7 @@ function SWAB_ItemContextMenu.AddReplaceFilterOption(_context, _item)
             target = _item,
             filter = filter,
         },
-        SWAB_ItemContextMenu.OnReplaceFilter
+        SWAB_InventoryContextMenu.OnReplaceFilter
     )
 end
 
@@ -161,7 +161,7 @@ end
 -------------------------------QUEUES-----------------------------------
 ------------------------------------------------------------------------
 
-function SWAB_ItemContextMenu.OnDecontaminateMask(_payload)
+function SWAB_InventoryContextMenu.OnDecontaminateMask(_payload)
     ISInventoryPaneContextMenu.transferIfNeeded(getPlayer(), _payload.item)
     ISTimedActionQueue.add(
         SWAB_DecontaminateMask:new(
@@ -177,18 +177,18 @@ function SWAB_ItemContextMenu.OnDecontaminateMask(_payload)
     )
 end
 
-function SWAB_ItemContextMenu.OnRemoveFilter(_item)
+function SWAB_InventoryContextMenu.OnRemoveFilter(_item)
     ISInventoryPaneContextMenu.transferIfNeeded(getPlayer(), _item)
     ISTimedActionQueue.add(SWAB_RemoveFilter:new(getPlayer(), _item, 30))
 end
 
-function SWAB_ItemContextMenu.OnInsertFilter(_payload)
+function SWAB_InventoryContextMenu.OnInsertFilter(_payload)
     ISInventoryPaneContextMenu.transferIfNeeded(getPlayer(), _payload.target)
     ISInventoryPaneContextMenu.transferIfNeeded(getPlayer(), _payload.filter)
     ISTimedActionQueue.add(SWAB_InsertFilter:new(getPlayer(), _payload.target, _payload.filter , 30))
 end
 
-function SWAB_ItemContextMenu.OnReplaceFilter(_payload)
+function SWAB_InventoryContextMenu.OnReplaceFilter(_payload)
     ISInventoryPaneContextMenu.transferIfNeeded(getPlayer(), _payload.target)
     ISInventoryPaneContextMenu.transferIfNeeded(getPlayer(), _payload.filter)
     ISTimedActionQueue.add(SWAB_ReplaceFilter:new(getPlayer(), _payload.target, _payload.filter , 30))
@@ -198,7 +198,7 @@ end
 -------------------------------UTILITY----------------------------------
 ------------------------------------------------------------------------
 
-function SWAB_ItemContextMenu.GetBestWaterSource(_waterAmount)
+function SWAB_InventoryContextMenu.GetBestWaterSource(_waterAmount)
     local result = nil
 
     -- Check for nearby water sources first
@@ -224,12 +224,12 @@ function SWAB_ItemContextMenu.GetBestWaterSource(_waterAmount)
     return result
 end
 
--- function SWAB_ItemContextMenu.GetBestSoapSource()
+-- function SWAB_InventoryContextMenu.GetBestSoapSource()
 -- end
 
-function SWAB_ItemContextMenu.GetBestFilter(_usedDeltaMinimum)
+function SWAB_InventoryContextMenu.GetBestFilter(_usedDeltaMinimum)
     local inventory = getPlayer():getInventory()
-    local result = inventory:getBestTypeEval("SWAB.StandardFilter", SWAB_ItemContextMenu.EvaluateFilter)
+    local result = inventory:getBestTypeEval("SWAB.StandardFilter", SWAB_InventoryContextMenu.EvaluateFilter)
 
     if result then
         if PZMath.equal(1, result:getUsedDelta()) then
@@ -241,7 +241,7 @@ function SWAB_ItemContextMenu.GetBestFilter(_usedDeltaMinimum)
         end
     end
 
-    subInventoryResult = inventory:getBestTypeEvalRecurse("SWAB.StandardFilter", SWAB_ItemContextMenu.EvaluateFilter)
+    subInventoryResult = inventory:getBestTypeEvalRecurse("SWAB.StandardFilter", SWAB_InventoryContextMenu.EvaluateFilter)
 
     if subInventoryResult then
         if _usedDeltaMinimum < subInventoryResult:getUsedDelta() then
@@ -255,7 +255,7 @@ function SWAB_ItemContextMenu.GetBestFilter(_usedDeltaMinimum)
     return result
 end
 
-function SWAB_ItemContextMenu.GetBestFilterTarget()
+function SWAB_InventoryContextMenu.GetBestFilterTarget()
     local result = nil
     local items = getPlayer():getInventory():getItems()
     for itemIndex = 0, items:size() - 1 do
@@ -284,6 +284,6 @@ end
 ------------------------------PREDICATES--------------------------------
 ------------------------------------------------------------------------
 
-function SWAB_ItemContextMenu.EvaluateFilter(_filter1, _filter2)
+function SWAB_InventoryContextMenu.EvaluateFilter(_filter1, _filter2)
     return _filter1:getUsedDelta() - _filter2:getUsedDelta()
 end
