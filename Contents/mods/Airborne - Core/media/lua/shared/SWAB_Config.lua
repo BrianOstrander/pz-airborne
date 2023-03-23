@@ -23,6 +23,10 @@ SWAB_Config.squareContaminationDeltaMinimum = 0.01
 SWAB_Config.buildingContaminationBaseline = 4
 -- Multiplier for how long consumables like masks, filters, and air tanks last.
 SWAB_Config.itemRespiratoryProtectionDurationMultiplier = 60--1440
+-- The maximum amount of soap a fully contaminated mask will require to clean.
+SWAB_Config.itemRespiratorySoapMaximum = 4
+-- The duration required to clean a fully contaminated mask.
+SWAB_Config.itemRespiratoryWashDurationMaximum = 60
 
 -- Floor respiratoryAbsorptionLevel to get your level
 --      rate              : Per day increase in absorption
