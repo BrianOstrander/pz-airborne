@@ -115,6 +115,22 @@ function SWAB_DebugScenarios.OnStart()
     ISFastTeleportMove.cheat = true
     --ISWorldMap.setHideUnvisitedAreas(false)
 
+    -- Not sure why, but debug scenarios have a bunch of clothing in their inventory.
+    local items = getPlayer():getInventory():getItems()
+    local itemsForRemoval = {}
+
+    for itemIndex = 0, items:size() - 1 do
+        local item = items:get(itemIndex)
+        if instanceof(item, "Clothing") and not getPlayer():isEquipped(item) then
+            table.insert(itemsForRemoval, item)
+        end
+    end
+
+    for _, item in ipairs(itemsForRemoval) do
+        getPlayer():getInventory():Remove(item)
+    end
+
+
     for _, itemId in ipairs(SWAB_DebugScenarios.items) do
         getPlayer():getInventory():AddItem(itemId)
     end
