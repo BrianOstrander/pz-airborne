@@ -1,4 +1,3 @@
-require "SWAB_ItemUtility"
 require "TimedActions/ISBaseTimedAction"
 
 SWAB_InsertFilter = ISBaseTimedAction:derive("SWAB_InsertFilter")

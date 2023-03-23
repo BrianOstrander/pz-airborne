@@ -2,15 +2,11 @@ ContextMenu_EN = {
     -- Needs ContextMenu before them, not sure why
     ContextMenu_SWAB_Tooltip_Contamination = "Contamination",
     
-    ContextMenu_SWAB_ContaminatedWashablePrefix = "",
-    ContextMenu_SWAB_ContaminatedWashableSuffix = " - Contaminated",
+    ContextMenu_SWAB_ContaminatedWashable = "%1 - Contaminated",
 
-    ContextMenu_SWAB_ContaminatedFilterablePrefix = "",
-    ContextMenu_SWAB_ContaminatedFilterableSuffix = " - Contaminated Filter",
+    ContextMenu_SWAB_ContaminatedFilterable = "%1 - Contaminated Filter",
 
-    ContextMenu_SWAB_MissingFilterablePrefix = "",
-    ContextMenu_SWAB_MissingFilterableSuffix = " - Missing Filter",
+    ContextMenu_SWAB_MissingFilterable = "%1 - Missing Filter",
 
-    ContextMenu_SWAB_UsedFilterPrefix = "",
-    ContextMenu_SWAB_UsedFilterSuffix = " - Used",
+    ContextMenu_SWAB_UsedFilter = "%1 - Used",
 }

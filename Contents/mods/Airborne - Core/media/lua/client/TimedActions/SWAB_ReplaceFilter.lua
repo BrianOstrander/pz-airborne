@@ -1,4 +1,3 @@
-require "SWAB_ItemUtility"
 require "TimedActions/ISBaseTimedAction"
 
 SWAB_ReplaceFilter = ISBaseTimedAction:derive("SWAB_ReplaceFilter")
@@ -32,7 +31,7 @@ function SWAB_ReplaceFilter:perform()
 
     local filter = self.character:getInventory():AddItem("SWAB.StandardFilter")
     filter:setUsedDelta(self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining)
-    filter:setName(SWAB_ItemUtility.GetUsedFilterName(filter:getDisplayName()))
+    filter:setName(getText("ContextMenu_SWAB_UsedFilter", filter:getDisplayName()))
     filter:setCustomName(true)
 
     self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining = self.filter:getUsedDelta()

@@ -79,43 +79,13 @@ function SWAB_ItemUtility.ItemsByRefreshAction.ReplaceFilter(_scriptItems)
     SWAB_ItemUtility.ItemsByRefreshAction.Get(_scriptItems, "replace_filter")
 end
 
-function SWAB_ItemUtility.GetName(_name, _prefixKey, _suffixKey)
-    local itemNamePrefix = getText(_prefixKey)
-    local itemNameSuffix = getText(_suffixKey)
-
-    if itemNamePrefix == _prefixKey then
-        itemNamePrefix = ""
-    end
-
-    if itemNameSuffix == _suffixKey then
-        itemNameSuffix = ""
-    end
-
-    return itemNamePrefix..getText(_name)..itemNameSuffix
-end
-
-
 function SWAB_ItemUtility.GetContaminatedName(_name, _refreshAction)
-    local prefixKey = nil
-    local suffixKey = nil
-
     if _refreshAction == "wash" or _refreshAction == "none" then
-        prefixKey = "ContextMenu_SWAB_ContaminatedWashablePrefix"
-        suffixKey = "ContextMenu_SWAB_ContaminatedWashableSuffix"
+        return getText("ContextMenu_SWAB_ContaminatedWashable", _name)
     elseif _refreshAction == "replace_filter" then
-        prefixKey = "ContextMenu_SWAB_ContaminatedFilterablePrefix"
-        suffixKey = "ContextMenu_SWAB_ContaminatedFilterableSuffix"
-    else
-        print("SWAB: Error, unrecognized refresh action: "..tostring(_refreshAction))
+        return getText("ContextMenu_SWAB_ContaminatedFilterable", _name)
     end
 
-    return SWAB_ItemUtility.GetName(_name, prefixKey, suffixKey)
-end
-
-function SWAB_ItemUtility.GetMissingFilterName(_name)
-    return SWAB_ItemUtility.GetName(_name, "ContextMenu_SWAB_MissingFilterablePrefix", "ContextMenu_SWAB_MissingFilterableSuffix")
-end
-
-function SWAB_ItemUtility.GetUsedFilterName(_name)
-    return SWAB_ItemUtility.GetName(_name, "ContextMenu_SWAB_UsedFilterPrefix", "ContextMenu_SWAB_UsedFilterSuffix")
+    print("SWAB: Error, unrecognized refresh action: "..tostring(_refreshAction))
+    return _name
 end

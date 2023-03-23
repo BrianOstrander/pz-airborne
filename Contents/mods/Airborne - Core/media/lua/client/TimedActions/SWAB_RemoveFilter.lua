@@ -1,4 +1,3 @@
-require "SWAB_ItemUtility"
 require "TimedActions/ISBaseTimedAction"
 
 SWAB_RemoveFilter = ISBaseTimedAction:derive("SWAB_RemoveFilter")
@@ -33,12 +32,12 @@ function SWAB_RemoveFilter:perform()
     filter:setUsedDelta(self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining)
 
     if not PZMath.equal(1, filter:getUsedDelta()) then
-        filter:setName(SWAB_ItemUtility.GetUsedFilterName(filter:getDisplayName()))
+        filter:setName(getText("ContextMenu_SWAB_UsedFilter", filter:getDisplayName()))
 		filter:setCustomName(true)
 	end
     
     self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining = 0
-    self.target:setName(SWAB_ItemUtility.GetMissingFilterName(self.target:getDisplayName()))
+    self.target:setName(getText("ContextMenu_SWAB_MissingFilterable", self.target:getDisplayName()))
 	self.target:setCustomName(true)
 
     -- needed to remove from queue / start next.
