@@ -75,4 +75,15 @@ module SWAB
         Sound:PutItemInBag,
         Time:5.0,
     }
+
+    recipe SWAB MakeshiftBandana
+    {
+        [Recipe.GetItemTypes.RipClothing_Cotton],
+
+        Result:Hat_BandanaMaskTINT,
+        Sound:ClothesRipping,
+        Time:50.0,
+        AnimNode:RipSheets,
+        OnCreate:SWAB_Recipe.OnCreate.MakeshiftBandana,
+    }
 }

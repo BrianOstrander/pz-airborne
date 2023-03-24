@@ -10,4 +10,6 @@ Recipes_EN = {
 
     Recipe_SWAB_OpenMedicalMaskGreenBox = "Open Box of Medical Masks",
     Recipe_SWAB_PutMedicalMasksGreenInBox = "Put Medical Masks in Box",
+
+    Recipe_SWAB_MakeshiftBandana = "Craft Bandana",
 }

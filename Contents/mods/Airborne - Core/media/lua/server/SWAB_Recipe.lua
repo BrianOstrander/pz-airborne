@@ -22,3 +22,30 @@ function SWAB_Recipe.OnTest.PutMasksInBox(_item)
     -- This must be a used mask.
     return false
 end
+
+function SWAB_Recipe.OnCreate.MakeshiftBandana(_items, _result, _player, _selectedItem)
+    local iconColor = nil
+    local visualColor = nil
+    for itemIndex = 0, _items:size() - 1 do
+        local item = _items:get(itemIndex)
+        if item.getColor then
+            -- Not sure every clothing item has a iconColor option or not...
+            iconColor = item:getColor()
+            visualColor = item:getVisual():getTint()
+            break
+        end
+    end
+
+    if not iconColor then
+        iconColor = Color.new(0.5, 0.5, 0.5, 1.0)
+    end
+
+    if not visualColor then
+        visualColor = ImmutableColor.new(0.5, 0.5, 0.5, 1.0)
+    end
+
+    _result:setColor(iconColor)
+    _result:getVisual():setTint(visualColor)
+    
+    _result:setCustomColor(true)
+end
