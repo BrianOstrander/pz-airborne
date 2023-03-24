@@ -11,3 +11,14 @@ function SWAB_Recipe.OnTest.PutStandardFiltersInBoxLarge(_item)
     -- This must be a used filter.
     return false
 end
+
+function SWAB_Recipe.OnTest.PutDustMasksInBox(_item)
+    local itemModData = _item:getModData()
+    if itemModData.SwabRespiratoryExposure_ProtectionRemaining and PZMath.equal(1, itemModData.SwabRespiratoryExposure_ProtectionRemaining) then
+        -- This is an unused dust mask.
+        return true
+    end
+    
+    -- This must be a used dust mask.
+    return false
+end

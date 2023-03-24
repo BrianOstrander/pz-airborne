@@ -42,12 +42,23 @@ module SWAB
 	item StandardFilterBoxLarge
     {
 		/* TODO: Localize */
-        DisplayName					= Standard Filter Crate,
+        DisplayName					= Crate of Standard Filters,
         DisplayCategory 			= Accessory,
         Weight						= 1.8,
         Type						= Normal,
         Icon						= SWAB_StandardFilterBoxLarge_icon,
         WorldStaticModel 			= StandardFilterBoxLarge_Ground,
+    }
+
+	item DustMaskBox
+    {
+		/* TODO: Localize */
+        DisplayName					= Box of Dust Masks,
+        DisplayCategory 			= Accessory,
+        Weight						= 1,
+        Type						= Normal,
+        Icon						= SWAB_DustMaskBox_icon,
+        WorldStaticModel 			= DustMaskBox_Ground,
     }
 
 	/* This item is used for some recipe hacks */

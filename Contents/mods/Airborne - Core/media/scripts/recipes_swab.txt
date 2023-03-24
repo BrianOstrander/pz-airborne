@@ -18,4 +18,23 @@ module SWAB
         Sound:PutItemInBag,
         Time:15.0,
     }
+
+    recipe SWAB OpenDustMaskBox
+    {
+        DustMaskBox,
+
+        Result:Hat_DustMask=5,
+        Sound:PutItemInBag,
+        Time:5.0,
+    }
+
+    recipe SWAB PutDustMasksInBox
+    {
+        Hat_DustMask=5,
+
+        Result:DustMaskBox,
+        OnTest:SWAB_Recipe.OnTest.PutDustMasksInBox,
+        Sound:PutItemInBag,
+        Time:5.0,
+    }
 }

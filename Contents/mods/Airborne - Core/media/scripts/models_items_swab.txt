@@ -13,4 +13,11 @@ module SWAB
         texture = WorldItems/SWAB_StandardFilterBoxLarge,
         scale = 0.275,
     }
+
+    model DustMaskBox_Ground
+    {
+        mesh = WorldItems/PaperclipBox,
+		texture = WorldItems/SWAB_DustMaskBox,
+		scale = 1,
+    }
 }

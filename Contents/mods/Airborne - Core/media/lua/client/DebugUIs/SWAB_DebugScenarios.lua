@@ -28,6 +28,12 @@ SWAB_DebugScenarios.items = {
     -- "SWAB.ValuTechHomeAirPurifier",
     -- "SWAB.MassGenFacIndustrialAirPurifier",
     "SWAB.StandardFilterBoxLarge",
+    "SWAB.DustMaskBox",
+    "SWAB.DustMaskBox",
+    "SWAB.DustMaskBox",
+    "SWAB.DustMaskBox",
+    "SWAB.DustMaskBox",
+    "SWAB.DustMaskBox",
 }
 
 SWAB_DebugScenarios.scenarios = {
