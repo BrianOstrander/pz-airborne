@@ -29,9 +29,6 @@ function SWAB_Player.OnCreatePlayer(_, _player)
         modData.respiratorySicknessLevel = 0
         -- Maximum the endurance modifier is allowed to be.
         modData.enduranceMaximum = 1
-        -- Due to some weird recipe hacks, we need to remove empty filters if this
-        -- is true.
-        modData.cleanupThrowawayItems = false
 
         _player:getModData()[SWAB_Config.playerModDataId] = modData
         _player:transmitModData()
@@ -79,23 +76,6 @@ function SWAB_Player.OnTick(_ticks)
         local modData = player:getModData()[SWAB_Config.playerModDataId]
 
         if modData then
-            if modData.cleanupThrowawayItems then
-                -- Recipe hacks spawn throwaway items that need to be cleaned up.
-                modData.cleanupThrowawayItems = false
-                player:getInventory():RemoveAll("ThrowawayItem")
-                -- local items = player:getInventory():getItems()
-                -- local itemsRemoved = {}
-                -- for itemIndex = 0, items:size() - 1 do
-                --     local item = items:get(itemIndex);
-                --     if item:getType() == "ThrowawayItem" then
-                --         table.insert(itemsRemoved, item)
-                --     end
-                -- end
-                -- for _, item in pairs(itemsRemoved) do
-                --     player:getInventory():Remove(item)
-                -- end
-            end
-
             if modData.enduranceMaximum then
                 local stats = player:getStats()
                 if modData.enduranceMaximum < stats:getEndurance() then

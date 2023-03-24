@@ -82,13 +82,4 @@ module SWAB
         Icon						= SWAB_MedicalMaskGreenBox_icon,
         WorldStaticModel 			= MedicalMaskGreenBox_Ground,
     }
-
-	/* This item is used for some recipe hacks */
-	item ThrowawayItem
-	{
-		DisplayName 				= Decontaminated Item,
-		DisplayCategory 			= Accessory,
-		Weight 						= 0,
-		Icon 						= default,
-	}
 }
