@@ -30,7 +30,7 @@ function SWAB_InsertFilter:perform()
     self.target:setJobDelta(0)
 
     self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining = self.filter:getUsedDelta()
-    self.target:setName(ScriptManager.instance:getItem(self.target:getType()):getDisplayName())
+    self.target:setName(getItemNameFromFullType(self.target:getFullType()))
     self.target:setCustomName(false)
     
     self.character:getInventory():Remove(self.filter)

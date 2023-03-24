@@ -39,7 +39,7 @@ function ISWashClothing:perform()
 -- SWAB MOD BEGIN
     local itemModData = item:getModData()
     if itemModData.SwabRespiratoryItem and itemModData.SwabRespiratoryExposure_RefreshAction == "wash" then
-        item:setName(ScriptManager.instance:getItem(self.item:getType()):getDisplayName())
+        item:setName(getItemNameFromFullType(self.item:getFullType()))
         item:setCustomName(false)
         itemModData.SwabRespiratoryExposure_ProtectionRemaining = 1
     end

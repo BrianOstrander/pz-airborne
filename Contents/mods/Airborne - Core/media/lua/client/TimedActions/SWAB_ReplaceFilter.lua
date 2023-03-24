@@ -31,11 +31,11 @@ function SWAB_ReplaceFilter:perform()
 
     local filter = self.character:getInventory():AddItem("SWAB.StandardFilter")
     filter:setUsedDelta(self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining)
-    filter:setName(getText("ContextMenu_SWAB_UsedFilter", filter:getDisplayName()))
+    filter:setName(getText("ContextMenu_SWAB_UsedFilter", getItemNameFromFullType(filter:getFullType())))
     filter:setCustomName(true)
 
     self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining = self.filter:getUsedDelta()
-    self.target:setName(ScriptManager.instance:getItem(self.target:getType()):getDisplayName())
+    self.target:setName(getItemNameFromFullType(self.target:getFullType()))
     self.target:setCustomName(false)
     
     self.character:getInventory():Remove(self.filter)

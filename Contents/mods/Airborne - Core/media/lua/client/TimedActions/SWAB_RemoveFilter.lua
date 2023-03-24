@@ -32,12 +32,12 @@ function SWAB_RemoveFilter:perform()
     filter:setUsedDelta(self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining)
 
     if not PZMath.equal(1, filter:getUsedDelta()) then
-        filter:setName(getText("ContextMenu_SWAB_UsedFilter", filter:getDisplayName()))
+        filter:setName(getText("ContextMenu_SWAB_UsedFilter", getItemNameFromFullType(filter:getFullType())))
 		filter:setCustomName(true)
 	end
     
     self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining = 0
-    self.target:setName(getText("ContextMenu_SWAB_MissingFilterable", self.target:getDisplayName()))
+    self.target:setName(getText("ContextMenu_SWAB_MissingFilterable", getItemNameFromFullType(filter:getFullType())))
 	self.target:setCustomName(true)
 
     -- needed to remove from queue / start next.

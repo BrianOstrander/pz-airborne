@@ -9,4 +9,6 @@ ContextMenu_EN = {
     ContextMenu_SWAB_MissingFilterable = "%1 - Missing Filter",
 
     ContextMenu_SWAB_UsedFilter = "%1 - Used",
+
+    ContextMenu_SWAB_UsedWashable = "%1 - Used",
 }

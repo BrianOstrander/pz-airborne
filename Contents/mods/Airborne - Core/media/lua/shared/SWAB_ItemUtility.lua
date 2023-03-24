@@ -89,3 +89,14 @@ function SWAB_ItemUtility.GetContaminatedName(_name, _refreshAction)
     print("SWAB: Error, unrecognized refresh action: "..tostring(_refreshAction))
     return _name
 end
+
+function SWAB_ItemUtility.GetUsedName(_name, _refreshAction)
+    if _refreshAction == "wash" or _refreshAction == "none" then
+        return getText("ContextMenu_SWAB_UsedWashable", _name)
+    elseif _refreshAction == "replace_filter" then
+        return _name
+    end
+
+    print("SWAB: Error, unrecognized refresh action: "..tostring(_refreshAction))
+    return _name
+end

@@ -199,16 +199,23 @@ function SWAB_Player.CalculateRespiratoryExposureWithProtection(_player, _respir
                     local itemProtectionRemainingUpdated = PZMath.max(0, itemProtectionRemaining - (1 / itemProtectionDurationInMinutes))
                     if not PZMath.equal(itemProtectionRemaining, itemProtectionRemainingUpdated) then
                         -- Item still has some protection remaining
+                        local wasFresh = PZMath.equal(1, itemProtectionRemaining)
                         itemProtectionRemaining = itemProtectionRemainingUpdated
                         itemModData.SwabRespiratoryExposure_ProtectionRemaining = itemProtectionRemaining
-
                         if PZMath.equal(0, itemProtectionRemaining) then
                             -- Item has been contaminated
-                            item:setName(SWAB_ItemUtility.GetContaminatedName(item:getDisplayName(), itemModData.SwabRespiratoryExposure_RefreshAction))
+                            item:setName(SWAB_ItemUtility.GetContaminatedName(getItemNameFromFullType(item:getFullType()), itemModData.SwabRespiratoryExposure_RefreshAction))
+                            item:setCustomName(true)
                         else
                             -- Item is clean and still providing protection.
                             local itemExposure = PZMath.max(0, PZMath.floor(_respiratoryExposure) + itemModData.SwabRespiratoryExposure_Reduction) * itemModData.SwabRespiratoryExposure_Falloff
                             _respiratoryExposure = PZMath.min(_respiratoryExposure, itemExposure)
+
+                            if wasFresh then
+                                -- This item went from fresh to used.
+                                item:setName(SWAB_ItemUtility.GetUsedName(getItemNameFromFullType(item:getFullType()), itemModData.SwabRespiratoryExposure_RefreshAction))
+                                item:setCustomName(true)
+                            end
                         end 
                     end
 
