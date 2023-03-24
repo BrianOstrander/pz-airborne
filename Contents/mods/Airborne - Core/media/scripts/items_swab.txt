@@ -64,8 +64,8 @@ module SWAB
 	item MedicalMaskBlueBox
     {
 		/* TODO: Localize */
-        DisplayName					= Box of Medical Masks - Blue,
-        DisplayCategory 			= First Aid,
+        DisplayName					= Box of Medical Masks Blue,
+        DisplayCategory 			= FirstAid,
         Weight						= 1,
         Type						= Normal,
         Icon						= SWAB_MedicalMaskBlueBox_icon,
@@ -75,8 +75,8 @@ module SWAB
 	item MedicalMaskGreenBox
     {
 		/* TODO: Localize */
-        DisplayName					= Box of Medical Masks - Green,
-        DisplayCategory 			= First Aid,
+        DisplayName					= Box of Medical Masks Green,
+        DisplayCategory 			= FirstAid,
         Weight						= 1,
         Type						= Normal,
         Icon						= SWAB_MedicalMaskGreenBox_icon,
