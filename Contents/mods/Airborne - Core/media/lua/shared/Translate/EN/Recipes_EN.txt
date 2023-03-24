@@ -4,4 +4,10 @@ Recipes_EN = {
 
     Recipe_SWAB_OpenDustMaskBox = "Open Box of Dust Masks",
     Recipe_SWAB_PutDustMasksInBox = "Put Dust Masks in Box",
+
+    Recipe_SWAB_OpenMedicalMaskBlueBox = "Open Box of Medical Masks",
+    Recipe_SWAB_PutMedicalMasksBlueInBox = "Put Medical Masks in Box",
+
+    Recipe_SWAB_OpenMedicalMaskGreenBox = "Open Box of Medical Masks",
+    Recipe_SWAB_PutMedicalMasksGreenInBox = "Put Medical Masks in Box",
 }

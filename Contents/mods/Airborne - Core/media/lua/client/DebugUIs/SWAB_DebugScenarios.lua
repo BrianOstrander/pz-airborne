@@ -34,6 +34,16 @@ SWAB_DebugScenarios.items = {
     "SWAB.DustMaskBox",
     "SWAB.DustMaskBox",
     "SWAB.DustMaskBox",
+    "SWAB.MedicalMaskBlueBox",
+    "SWAB.MedicalMaskBlueBox",
+    "SWAB.MedicalMaskBlueBox",
+    "SWAB.MedicalMaskBlueBox",
+    "SWAB.MedicalMaskBlueBox",
+    "SWAB.MedicalMaskGreenBox",
+    "SWAB.MedicalMaskGreenBox",
+    "SWAB.MedicalMaskGreenBox",
+    "SWAB.MedicalMaskGreenBox",
+    "SWAB.MedicalMaskGreenBox",
 }
 
 SWAB_DebugScenarios.scenarios = {

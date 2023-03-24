@@ -18,6 +18,20 @@ module SWAB
     {
         mesh = WorldItems/PaperclipBox,
 		texture = WorldItems/SWAB_DustMaskBox,
-		scale = 1,
+		scale = 0.8,
+    }
+
+    model MedicalMaskBlueBox_Ground
+    {
+        mesh = WorldItems/RifleAmmoBox,
+		texture = WorldItems/SWAB_MedicalMaskBlueBox,
+		scale = 0.75,
+    }
+
+    model MedicalMaskGreenBox_Ground
+    {
+        mesh = WorldItems/RifleAmmoBox,
+		texture = WorldItems/SWAB_MedicalMaskGreenBox,
+		scale = 0.75,
     }
 }

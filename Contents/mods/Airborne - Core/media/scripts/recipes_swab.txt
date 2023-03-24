@@ -37,4 +37,42 @@ module SWAB
         Sound:PutItemInBag,
         Time:5.0,
     }
+
+    recipe SWAB OpenMedicalMaskBlueBox
+    {
+        MedicalMaskBlueBox,
+
+        Result:Hat_SurgicalMask_Blue=10,
+        Sound:PutItemInBag,
+        Time:5.0,
+    }
+
+    recipe SWAB PutMedicalMasksBlueInBox
+    {
+        Hat_SurgicalMask_Blue=10,
+
+        Result:MedicalMaskBlueBox,
+        OnTest:SWAB_Recipe.OnTest.PutMasksInBox,
+        Sound:PutItemInBag,
+        Time:5.0,
+    }
+
+    recipe SWAB OpenMedicalMaskGreenBox
+    {
+        MedicalMaskGreenBox,
+
+        Result:Hat_SurgicalMask_Green=10,
+        Sound:PutItemInBag,
+        Time:5.0,
+    }
+
+    recipe SWAB PutMedicalMasksGreenInBox
+    {
+        Hat_SurgicalMask_Green=10,
+
+        Result:MedicalMaskGreenBox,
+        OnTest:SWAB_Recipe.OnTest.PutMasksInBox,
+        Sound:PutItemInBag,
+        Time:5.0,
+    }
 }

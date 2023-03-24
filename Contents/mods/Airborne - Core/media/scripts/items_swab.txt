@@ -61,6 +61,28 @@ module SWAB
         WorldStaticModel 			= DustMaskBox_Ground,
     }
 
+	item MedicalMaskBlueBox
+    {
+		/* TODO: Localize */
+        DisplayName					= Box of Medical Masks - Blue,
+        DisplayCategory 			= First Aid,
+        Weight						= 1,
+        Type						= Normal,
+        Icon						= SWAB_MedicalMaskBlueBox_icon,
+        WorldStaticModel 			= MedicalMaskBlueBox_Ground,
+    }
+
+	item MedicalMaskGreenBox
+    {
+		/* TODO: Localize */
+        DisplayName					= Box of Medical Masks - Green,
+        DisplayCategory 			= First Aid,
+        Weight						= 1,
+        Type						= Normal,
+        Icon						= SWAB_MedicalMaskGreenBox_icon,
+        WorldStaticModel 			= MedicalMaskGreenBox_Ground,
+    }
+
 	/* This item is used for some recipe hacks */
 	item ThrowawayItem
 	{
