@@ -25,9 +25,9 @@ function SWAB_InventoryContextMenu.OnFillInventoryObjectContextMenu(_playerIndex
 
     if itemModData.SwabRespiratoryItem then
         if itemModData.SwabRespiratoryExposure_RefreshAction == "replace_filter" then
-            SWAB_InventoryContextMenu.AddRemoveFilterOption(_context, item)
             SWAB_InventoryContextMenu.AddInsertFilterOption(_context, item)
             SWAB_InventoryContextMenu.AddReplaceFilterOption(_context, item)
+            SWAB_InventoryContextMenu.AddRemoveFilterOption(_context, item)
         end
     elseif itemModData.SwabRespiratoryItemFilter then
         SWAB_InventoryContextMenu.AddInsertSpecificFilterOption(_context, item)
