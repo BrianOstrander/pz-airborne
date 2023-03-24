@@ -1,33 +1,5 @@
 module SWAB
-{
-    /*
-    /* Nonworn version of recipe */
-    recipe Decontaminate
-    {
-        keep [SWAB_ItemUtility.ItemsByRefreshAction.Wash],
-        Water=2,
-
-        Result:ThrowawayItem,
-        Time:100,
-        OnTest:SWAB_Recipe.OnTest.DecontaminateMask,
-        OnCreate:SWAB_Recipe.OnCreate.DecontaminateMask,
-        StopOnWalk:true,
-    }
-
-    /* Worn version of recipe */
-    recipe Decontaminate
-    {
-        keep [SWAB_ItemUtility.ItemsByRefreshAction.Wash],
-        Water=2,
-
-        Result:ThrowawayItem,
-        Time:100,
-        OnTest:SWAB_Recipe.OnTest.DecontaminateMaskWhileWorn,
-        OnCreate:SWAB_Recipe.OnCreate.DecontaminateMaskWhileWorn,
-        StopOnWalk:true,
-    }
-    */
-    
+{   
     recipe SWAB OpenStandardFilterBoxLarge
     {
         StandardFilterBoxLarge,
