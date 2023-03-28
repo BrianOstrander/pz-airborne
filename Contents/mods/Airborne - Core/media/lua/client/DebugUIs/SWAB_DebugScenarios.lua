@@ -42,6 +42,10 @@ SWAB_DebugScenarios.scenarios = {
         location = { x = 10612, y = 9324, z = 0 },
     },
     {
+        name = "Prison",
+        location = { x = 7708, y = 11893, z = 0 },
+    },
+    {
         name = "School",
         location = { x = 10609, y = 9975, z = 0 },
     },

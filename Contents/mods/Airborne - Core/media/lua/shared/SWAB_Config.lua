@@ -240,12 +240,16 @@ SWAB_Config.squareExposureModDataId = "swab_square_exposure"
 SWAB_Config.squareFloorClaimDeltaModDataId = "swab_square_floor_claim_delta"
 SWAB_Config.squareCeilingHeightModDataId = "swab_square_ceiling_height"
 
+function SWAB_Config.getBuildingLocationConcat(_buildingDef)
+    return _buildingDef:getX().."_".._buildingDef:getY()
+end
+
 function SWAB_Config.getBuildingModDataId(_buildingDef)
-    return "swab_building_".._buildingDef:getID()
+    return "swab_building_"..SWAB_Config.getBuildingLocationConcat(_buildingDef)
 end
 
 function SWAB_Config.getRoomModDataId(_roomDef)
-    return "swab_room_".._roomDef:getBuilding():getID()..".".._roomDef:getID()
+    return "swab_room_"..SWAB_Config.getBuildingLocationConcat(_roomDef:getBuilding())..".".._roomDef:getID()
 end
 
 -------------------------------------------------------

@@ -120,7 +120,7 @@ function SWAB_Building.InitializeBuilding(_def, _modDataId, _modData)
     -- TODO: check if this iteration causes lag in buildings with a high room count.
     for roomIndex = 0, rooms:size() - 1 do
         local room = rooms:get(roomIndex):getIsoRoom()
-        local ignore = SWAB_Config.squareUpdateMaximum < room:getSquares():size()
+        local ignore = SWAB_Config.squareUpdateMaximum < room:getRoomDef():getArea()
         _modData.roomDatas[roomIndex] = {
             ignore                  = ignore,
             squareUpdateCount       = 0,
@@ -227,6 +227,9 @@ function SWAB_Building.UpdateBuilding(_modData, _tick, _tickDelta, _squareBudget
                         end
                     end
                 end
+            else
+                -- Room is too big, we're ignoring it.
+                _modData.lastRoomIndexUpdated = _modData.lastRoomIndexUpdated + 1
             end
         end
 
@@ -257,7 +260,8 @@ function SWAB_Building.IterateRoomSquares(_modData, _room, _tick, _squareBudget,
         end
     end
 
-    local isDone = squares:size() <= _modData.lastRoomSquareIndex
+    -- Use room def's getArea function to ensure we are initializing all tiles, not just loaded ones.
+    local isDone = _room:getRoomDef():getArea() <= _modData.lastRoomSquareIndex
     if isDone then
         -- We completed iterating over an entire room
         _modData.lastRoomSquareIndex = -1
