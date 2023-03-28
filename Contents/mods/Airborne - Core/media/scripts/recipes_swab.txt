@@ -33,7 +33,7 @@ module SWAB
         Hat_DustMask=5,
 
         Result:DustMaskBox,
-        OnTest:SWAB_Recipe.OnTest.PutDustMasksInBox,
+        OnTest:SWAB_Recipe.OnTest.PutMasksInBox,
         Sound:PutItemInBag,
         Time:5.0,
     }
