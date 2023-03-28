@@ -1,5 +1,6 @@
 SWAB_Recipe = SWAB_Recipe or {}
 SWAB_Recipe.OnTest = SWAB_Recipe.OnTest or {}
+SWAB_Recipe.OnCanPerform = SWAB_Recipe.OnCanPerform or {}
 SWAB_Recipe.OnCreate = SWAB_Recipe.OnCreate or {}
 
 function SWAB_Recipe.OnTest.PutStandardFiltersInBoxLarge(_item)
@@ -48,4 +49,23 @@ function SWAB_Recipe.OnCreate.MakeshiftBandana(_items, _result, _player, _select
     _result:getVisual():setTint(visualColor)
     
     _result:setCustomColor(true)
+end
+
+function SWAB_Recipe.OnCanPerform.GetActivatedCharcoalFromPot(_recipe, _player, _item)
+    return _item and _item:isCooked()
+end
+
+function SWAB_Recipe.OnCanPerform.GetBurntActivatedCharcoalFromPot(_recipe, _player, _item)
+    return _item and _item:isBurnt()
+end
+
+function SWAB_Recipe.OnCreate.GetActivatedCharcoalFromPot(_items, _result, _player, _selectedItem)
+    -- The system seems aware that a pot is attatched to this item, and since a pot has a weight of 1,
+    -- we subtract it from the item to find out how much we have left... incase the player like, ate
+    -- it or something weird. The right side of the division operator is just the full weight of the
+    -- ActiveCharcoalPot (3) minus the weight of a pot (1). Update this if the item ever changes!
+    _result:setUsedDelta((_selectedItem:getUnequippedWeight() - 1) / 2)
+
+	_player:getInventory():AddItem("Base.Pot")
+    _player:getInventory():Remove(_selectedItem)
 end

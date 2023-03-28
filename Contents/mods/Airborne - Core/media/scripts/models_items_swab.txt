@@ -48,4 +48,11 @@ module SWAB
 		texture = WorldItems/SWAB_ActivatedCharcoalJar,
 		scale = 0.6,
 	}
+
+    model ActivatedCharcoalPot_Ground
+    {
+        mesh = WorldItems/CookingPotFull,
+        texture = WorldItems/CookingPotSoup,
+        scale = 0.4,
+    }
 }

@@ -10,18 +10,39 @@ SWAB_DebugScenarios.items = {
     -- "Hat_BandanaMask",
     -- "Hat_SurgicalMask_Green",
     -- "Hat_DustMask",
-    "Hat_GasMask",
+    -- "Hat_GasMask",
     -- "Generator",
     -- "SWAB.StandardFilter",
-    "SWAB.ValuTechHomeAirPurifier",
-    "SWAB.MassGenFacIndustrialAirPurifier",
-    "SWAB.ValuTechPersonalAirPurifier",
-    "SWAB.MakeshiftAirPurifier",
+
+    -- "SWAB.ValuTechHomeAirPurifier",
+    -- "SWAB.MassGenFacIndustrialAirPurifier",
+    -- "SWAB.ValuTechPersonalAirPurifier",
+    -- "SWAB.MakeshiftAirPurifier",
 
     -- "SWAB.StandardFilterBoxLarge",
     -- "SWAB.DustMaskBox",
     -- "SWAB.MedicalMaskBlueBox",
     -- "SWAB.MedicalMaskGreenBox",
+
+    "SWAB.ActivatedCharcoalPot",
+
+    "Pot",
+    "Bleach",
+    "Charcoal",
+    "Plank",
+    "TreeBranch",
+    "UnusableWood",
+
+    "Twigs",
+    "Twigs",
+    "Twigs",
+    "Twigs",
+    "Twigs",
+    "Twigs",
+    "Twigs",
+    "Twigs",
+    "Twigs",
+    "Twigs",
 }
 
 SWAB_DebugScenarios.scenarios = {

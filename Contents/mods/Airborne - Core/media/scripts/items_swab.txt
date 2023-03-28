@@ -100,7 +100,7 @@ module SWAB
     {
         DisplayName					= ActivatedCharcoal,
         DisplayCategory 			= Material,
-        Weight						= 0.5,
+        Weight						= 1,
         Type	            		= Drainable,
         Icon						= SWAB_ActivatedCharcoal_icon,
         UseWhileEquipped			= FALSE,
@@ -120,4 +120,27 @@ module SWAB
         WeightEmpty 				= 0.1,
         WorldStaticModel 			= ActivatedCharcoalJar_Ground,
     }
+
+    item ActivatedCharcoalPot
+	{
+		DisplayName                 = ActivatedCharcoalPot,
+		DisplayCategory             = Material,
+		Type                        = Food,
+		Weight                      = 3,
+		Icon                        = SWAB_ActivatedCharcoalPot_icon,
+		CookingSound                = BoilingFood,
+		IsCookable                  = TRUE,
+        EatType                     = Pot,
+		HungerChange                = -5,
+		ThirstChange                = 60,
+		UnhappyChange               = 40,
+		ReplaceOnUse                = Base.Pot,
+		MinutesToCook               = 1,
+		MinutesToBurn               = 30,
+		/*MinutesToCook               = 120,*/
+		/*MinutesToBurn               = 480,*/
+		Tags                        = HasMetal,
+		StaticModel                 = CookingPot,
+		WorldStaticModel            = ActivatedCharcoalPot_Ground,
+	}
 }

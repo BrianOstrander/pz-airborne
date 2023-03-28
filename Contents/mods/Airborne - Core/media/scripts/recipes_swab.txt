@@ -86,4 +86,62 @@ module SWAB
         AnimNode:RipSheets,
         OnCreate:SWAB_Recipe.OnCreate.MakeshiftBandana,
     }
+
+    recipe SWAB MakeActivatedCharcoalPot
+    {
+       Charcoal/Plank/TreeBranch/UnusableWood,
+       Water=5,
+       Bleach,
+       Pot,
+
+       Result:ActivatedCharcoalPot,
+       Time:130.0,
+       Category:Survivalist,
+    }
+
+    recipe SWAB MakeActivatedCharcoalPot
+    {
+       Twigs=10,
+       Water=5,
+       Bleach,
+       Pot,
+
+       Result:ActivatedCharcoalPot,
+       Time:130.0,
+       Category:Survivalist,
+    }
+
+    recipe SWAB GetActivatedCharcoalFromPot
+    {
+        destroy ActivatedCharcoalPot,
+
+        Result:ActivatedCharcoal,
+        Category:Survivalist,
+        OnCanPerform:SWAB_Recipe.OnCanPerform.GetActivatedCharcoalFromPot,
+        OnCreate:SWAB_Recipe.OnCreate.GetActivatedCharcoalFromPot,
+        Time:60,
+    }
+
+    recipe SWAB GetBurntActivatedCharcoalFromPot
+    {
+        destroy ActivatedCharcoalPot,
+
+        Result:Pot,
+        Category:Survivalist,
+        OnCanPerform:SWAB_Recipe.OnCanPerform.GetBurntActivatedCharcoalFromPot,
+        Time:60,
+    }
+
+    /*
+    recipe SWAB MakeshiftFilter
+    {
+        RippedSheets/AlcoholRippedSheets,
+
+        Result:Hat_BandanaMaskTINT,
+        Sound:ClothesRipping,
+        Time:50.0,
+        AnimNode:RipSheets,
+        OnCreate:SWAB_Recipe.OnCreate.MakeshiftBandana,
+    }
+    */
 }
