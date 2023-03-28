@@ -101,8 +101,6 @@ function ISWashClothing:new(character, sink, soapList, item, bloodAmount, dirtAm
 	o.item = item;
 	o.maxTime = ((bloodAmount + dirtAmount) * 15);
 -- SWAB MOD BEGIN
-	-- TODO: Remove print
-    print("bloodAmount: "..tostring(bloodAmount))
     local itemModData = item:getModData()
     if itemModData.SwabRespiratoryItem and itemModData.SwabRespiratoryExposure_RefreshAction == "wash" and itemModData.SwabRespiratoryExposure_ProtectionRemaining < 1 then
         o.maxTime = o.maxTime + PZMath.ceil((1 - itemModData.SwabRespiratoryExposure_ProtectionRemaining) * SWAB_Config.itemRespiratoryWashDurationMaximum)
