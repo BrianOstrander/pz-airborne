@@ -34,4 +34,18 @@ module SWAB
 		texture = WorldItems/SWAB_MedicalMaskGreenBox,
 		scale = 0.75,
     }
+
+    model ActivatedCharcoal_Ground
+	{
+		mesh = WorldItems/Yeast,
+		texture = WorldItems/SWAB_ActivatedCharcoal,
+		scale = 1.0,
+	}
+
+    model ActivatedCharcoalJar_Ground
+	{
+		mesh = WorldItems/GunpowderJar,
+		texture = WorldItems/SWAB_ActivatedCharcoalJar,
+		scale = 0.6,
+	}
 }

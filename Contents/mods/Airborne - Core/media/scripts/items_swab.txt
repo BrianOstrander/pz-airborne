@@ -95,4 +95,29 @@ module SWAB
         Icon						= SWAB_MedicalMaskGreenBox_icon,
         WorldStaticModel 			= MedicalMaskGreenBox_Ground,
     }
+
+	item ActivatedCharcoal
+    {
+        DisplayName					= ActivatedCharcoal,
+        DisplayCategory 			= Material,
+        Weight						= 0.5,
+        Type	            		= Drainable,
+        Icon						= SWAB_ActivatedCharcoal_icon,
+        UseWhileEquipped			= FALSE,
+        UseDelta	        		= 0.2,
+        WorldStaticModel			= ActivatedCharcoal_Ground,
+    }
+
+	item ActivatedCharcoalJar
+    {
+        DisplayName					= ActivatedCharcoalJar,
+        DisplayCategory 			= Material,
+        Weight						= 2,
+        Type						= Drainable,
+        Icon						= SWAB_ActivatedCharcoalJar_icon,
+        UseWhileEquipped 			= FALSE,
+        UseDelta 					= 0.04,
+        WeightEmpty 				= 0.1,
+        WorldStaticModel 			= ActivatedCharcoalJar_Ground,
+    }
 }

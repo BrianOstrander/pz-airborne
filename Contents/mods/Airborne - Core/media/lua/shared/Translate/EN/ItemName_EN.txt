@@ -10,4 +10,7 @@ ItemName_EN = {
     ItemName_SWAB.DustMaskBox                       = "Box of Dust Masks",
     ItemName_SWAB.MedicalMaskBlueBox                = "Box of Medical Masks Blue",
     ItemName_SWAB.MedicalMaskGreenBox               = "Box of Medical Masks Green",
+    
+    ItemName_SWAB.ActivatedCharcoal                 = "Activated Charcoal",
+    ItemName_SWAB.ActivatedCharcoalJar              = "Activated Charcoal Jar",
 }
