@@ -355,7 +355,7 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square, _tick)
             local filtration = squareObject:getProperties():Val("AirFiltration")
             if filtration then
                 -- We found a filter
-                filtration = SWAB_Config.AirFiltrationMultiplier * filtration * PZMath.max(1, _tick - _square:getModData().swab_last_tick)
+                filtration = filtration * SWAB_Config.AirFiltrationMultiplier * getGameTime():getMultiplier() * PZMath.max(1, _tick - _square:getModData().swab_last_tick)
                 _square:getModData().swab_square_exposure = PZMath.max(0, _square:getModData().swab_square_exposure - filtration)
                 -- TODO: decrease fuel in generator
                 -- TODO: decrease battery

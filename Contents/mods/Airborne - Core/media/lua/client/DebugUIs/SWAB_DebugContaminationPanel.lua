@@ -12,8 +12,8 @@ function SWAB_DebugContaminationPanel.OnOpenPanel()
     if SWAB_DebugContaminationPanel.instance == nil then
         SWAB_DebugContaminationPanel.instance = SWAB_DebugContaminationPanel:new(
             50,
-            200,
-            250,
+            300,
+            310,
             SWAB_DebugContaminationPanel.buttonBeginY + ((SWAB_DebugContaminationPanel.buttonHeight + SWAB_DebugContaminationPanel.buttonPaddingBottom) * 3),
             getPlayer()
         )
@@ -125,11 +125,25 @@ function SWAB_DebugContaminationPanel:prerender()
     local buildingModDataId = "< Outside >"
     local roomModDataId = "< Outside >"
     local lastTick = "None"
+    local squareExposure = nil
+    local isRoomAsleep = nil
 
     if getPlayer() and getPlayer():getSquare() and getPlayer():getSquare():getRoom() then
         buildingModDataId = SWAB_Config.getBuildingModDataId(getPlayer():getSquare():getBuilding():getDef())
         roomModDataId = SWAB_Config.getRoomModDataId(getPlayer():getSquare():getRoom():getRoomDef())
         lastTick = getPlayer():getSquare():getModData().swab_last_tick
+        squareExposure = getPlayer():getSquare():getModData().swab_square_exposure
+        if ModData.exists(buildingModDataId) then
+            local rooms = getPlayer():getSquare():getBuilding():getDef():getRooms()
+            for i = 0, rooms:size() - 1 do
+                if rooms:get(i) == getPlayer():getSquare():getRoom():getRoomDef() then
+                    local roomDatas = ModData.get(buildingModDataId).roomDatas
+                    if roomDatas and i <= #roomDatas then
+                        isRoomAsleep = 0 < roomDatas[i].skipUpdatesRemaining
+                    end
+                end
+            end
+        end
     end
 
     local playerModData = getPlayer():getModData().swab_player
@@ -139,12 +153,14 @@ function SWAB_DebugContaminationPanel:prerender()
     z = self:drawField("Room ModData ID", roomModDataId, x, z)
 
     z = self:drawField("Last Tick", lastTick, x, z)
+    z = self:drawField("Is Room Asleep", isRoomAsleep, x, z)
+    z = self:drawFloat("Squa. Exposure", squareExposure, x, z)
     z = self:drawFloat("Resp. Exposure", playerModData.respiratoryExposure, x, z)
-    z = self:drawField("Resp. Exposure Level", playerModData.respiratoryExposureLevel, x, z)
-    z = self:drawField("Resp. Absorption Level", playerModData.respiratoryAbsorptionLevel, x, z)
-    z = self:drawFloat("Resp. Absorption Rate", playerModData.respiratoryAbsorptionRate, x, z)
-    z = self:drawFloat("Resp. Absorption", playerModData.respiratoryAbsorption, x, z)
-    z = self:drawFloat("Endurance Maximum", playerModData.enduranceMaximum, x, z)
+    -- z = self:drawField("Resp. Exposure Level", playerModData.respiratoryExposureLevel, x, z)
+    -- z = self:drawField("Resp. Absorption Level", playerModData.respiratoryAbsorptionLevel, x, z)
+    -- z = self:drawFloat("Resp. Absorption Rate", playerModData.respiratoryAbsorptionRate, x, z)
+    -- z = self:drawFloat("Resp. Absorption", playerModData.respiratoryAbsorption, x, z)
+    -- z = self:drawFloat("Endurance Maximum", playerModData.enduranceMaximum, x, z)
 end
 
 function SWAB_DebugContaminationPanel:drawFloat(_name, _value, _x, _z)

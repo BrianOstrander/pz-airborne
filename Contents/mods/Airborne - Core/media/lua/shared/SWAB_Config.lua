@@ -5,7 +5,7 @@ SWAB_Config.isInitialized = false
 
 -- A single building will never be updated more often than this many ticks.
 -- However, multiple buildings may still get updated during this time.
-SWAB_Config.buildingUpdateTickDelay = 1
+SWAB_Config.buildingUpdateTickDelay = 0
 -- How many squares can be updated per a given tick.
 SWAB_Config.squareUpdatesPerTick = 100
 -- Above this number, rooms are treated as outdoors, and are not updated.
@@ -13,7 +13,7 @@ SWAB_Config.squareUpdateMaximum = 3000
 -- The number of room updates without changes that will trigger it to skip updates for awhile.
 SWAB_Config.roomStaleUpdateCountMaximum = 10
 -- The number of updates to skip after maxing the stale update maximum.
-SWAB_Config.roomSkipUpdateCount = 600
+SWAB_Config.roomSkipUpdateCount = 60
 -- Difference allowed between contaminated squares before we start spreading contamination.
 SWAB_Config.squareContaminationThreshold = 0.002
 -- Minimum difference allowed between two tiles.
