@@ -43,7 +43,7 @@ function SWAB_RespiratoryExposureMoodle.EveryOneMinute()
     if SWAB_RespiratoryExposureMoodle.Initialize() then
         local moodle = MF.getMoodle("swab_respiratory_exposure")
         if moodle then
-            local modData = getPlayer():getModData()["swab_player"]
+            local modData = getPlayer():getModData().swab_player
             if modData and modData.respiratoryExposureLevel then
                 -- We use respiratoryExposureLevel instead of respiratoryAbsorptionLevel so that there 
                 -- is no confusion between players with different traits and professions. The moodle

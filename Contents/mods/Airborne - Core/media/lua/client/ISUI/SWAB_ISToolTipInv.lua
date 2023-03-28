@@ -8,7 +8,7 @@ function ISToolTipInv:render()
     if not ISContextMenu.instance or not ISContextMenu.instance.visibleCheck then
 
         local itemModData = self.item:getModData() -- TODO: Do this check earlier
-        if not itemModData or not itemModData["SwabRespiratoryItem"] then
+        if not itemModData or not itemModData.SwabRespiratoryItem then
             -- Bail out early if it's not a respiratory item.
             SWAB_ISToolTipInv.BaseRender(self)
             return
@@ -64,12 +64,6 @@ function ISToolTipInv:render()
         self:drawRect(0, 0, self.width, self.height, self.backgroundColor.a, self.backgroundColor.r, self.backgroundColor.g, self.backgroundColor.b);
         self:drawRectBorder(0, 0, self.width, self.height, self.borderColor.a, self.borderColor.r, self.borderColor.g, self.borderColor.b);
 
-        -- local itemModData = self.item:getModData() -- TODO: Do this check earlier
-        
-        -- if itemModData["SwabRespiratoryItem"] then
-        --     self:drawText(self.item:getFullType(), 16, th-32, 1, 1, 1, 1, UIFont.Small)
-        -- end
-
         SWAB_ISToolTipInv.RenderConsumption(self, self.tooltip, itemModData)
 
         self.item:DoTooltip(self.tooltip);
@@ -81,7 +75,7 @@ function SWAB_ISToolTipInv:RenderConsumption(_tooltip, _modData)
     local y = _tooltip:getHeight() - 20
 
     _tooltip:DrawText(UIFont.Small, getText("ContextMenu_SWAB_Tooltip_Contamination")..":", x, y, 1, 1, 0.8, 1)
-    local value = 1 - _modData["SwabRespiratoryExposure_ProtectionRemaining"]
+    local value = 1 - _modData.SwabRespiratoryExposure_ProtectionRemaining
     local color = ColorInfo.new(0, 0, 0, 1)
     getCore():getBadHighlitedColor():interp(getCore():getGoodHighlitedColor(), 1 - value, color)
     -- Getting the X value here is not ideal

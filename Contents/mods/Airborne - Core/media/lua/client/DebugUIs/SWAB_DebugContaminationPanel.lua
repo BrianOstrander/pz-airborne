@@ -132,7 +132,7 @@ function SWAB_DebugContaminationPanel:prerender()
         lastTick = getPlayer():getSquare():getModData().swab_last_tick
     end
 
-    local playerModData = getPlayer():getModData()["swab_player"]
+    local playerModData = getPlayer():getModData().swab_player
     
     z = self:drawField("Position", string.format("%d, %d, %d", getPlayer():getX(), getPlayer():getY(), getPlayer():getZ()), x, z)
     z = self:drawField("Building ModData ID", buildingModDataId, x, z)
@@ -177,15 +177,15 @@ function SWAB_DebugContaminationPanel:onClickDecontaminateRoomButton(_button)
         for squareIndex = 0, squares:size() - 1 do
             local square = squares:get(squareIndex)
             squareModData = square:getModData()
-            if squareModData and squareModData["swab_square_exposure"] then
-                squareModData["swab_square_exposure"] = 0
+            if squareModData and squareModData.swab_square_exposure then
+                squareModData.swab_square_exposure = 0
             end
         end
     end
 end
 
 function SWAB_DebugContaminationPanel:onClickIncreaseSicknessButton(_button)
-    local modData = getPlayer():getModData()["swab_player"]
+    local modData = getPlayer():getModData().swab_player
     if modData.respiratorySicknessLevel + 1 <= SWAB_Config.respiratorySicknessLevelMaximum then
         modData.respiratorySicknessLevel = modData.respiratorySicknessLevel + 1
         modData.respiratoryAbsorption = SWAB_Config.GetRespiratorySicknessEffects(modData.respiratorySicknessLevel).absorptionMinimum
@@ -201,15 +201,15 @@ function SWAB_DebugContaminationPanel:onClickContaminateRoomButton(_button)
         for squareIndex = 0, squares:size() - 1 do
             local square = squares:get(squareIndex)
             squareModData = square:getModData()
-            if squareModData and squareModData["swab_square_exposure"] then
-                squareModData["swab_square_exposure"] = 7
+            if squareModData and squareModData.swab_square_exposure then
+                squareModData.swab_square_exposure = 7
             end
         end
     end
 end
 
 function SWAB_DebugContaminationPanel:onClickDecontaminatePlayerButton(_button)
-    local modData = getPlayer():getModData()["swab_player"]
+    local modData = getPlayer():getModData().swab_player
     modData.respiratoryAbsorption = 0
 end
 
