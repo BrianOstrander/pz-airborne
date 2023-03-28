@@ -87,6 +87,24 @@ module SWAB
         OnCreate:SWAB_Recipe.OnCreate.MakeshiftBandana,
     }
 
+    recipe SWAB PourActivatedCharcoalIntoJar
+    {
+        ActivatedCharcoal=40,
+
+        Result:ActivatedCharcoalJar,
+        Sound:PutItemInBag,
+        Time:30.0,
+    }
+
+    recipe SWAB PourActivatedCharcoalFromJar
+    {
+        ActivatedCharcoalJar=10,
+
+        Result:ActivatedCharcoal,
+        Sound:PutItemInBag,
+        Time:15.0,
+    }
+
     recipe SWAB MakeActivatedCharcoalPot
     {
        Charcoal/Plank/TreeBranch/UnusableWood,

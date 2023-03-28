@@ -12,4 +12,10 @@ Recipes_EN = {
     Recipe_SWAB_PutMedicalMasksGreenInBox = "Put Medical Masks in Box",
 
     Recipe_SWAB_MakeshiftBandana = "Craft Bandana",
+
+    Recipe_SWAB_PourActivatedCharcoalIntoJar = "Pour Activated Charcoal into Jar",
+    Recipe_SWAB_PourActivatedCharcoalFromJar = "Pour Activated Charcoal from Jar",
+    Recipe_SWAB_MakeActivatedCharcoalPot = "Prepare Activated Charcoal",
+    Recipe_SWAB_GetActivatedCharcoalFromPot = "Get Activated Charcoal"
+    Recipe_SWAB_GetBurntActivatedCharcoalFromPot = "Clean Pot"
 }

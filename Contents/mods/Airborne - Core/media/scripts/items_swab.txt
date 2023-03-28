@@ -104,7 +104,7 @@ module SWAB
         Type	            		= Drainable,
         Icon						= SWAB_ActivatedCharcoal_icon,
         UseWhileEquipped			= FALSE,
-        UseDelta	        		= 0.2,
+        UseDelta	        		= 0.1,
         WorldStaticModel			= ActivatedCharcoal_Ground,
     }
 
@@ -112,11 +112,11 @@ module SWAB
     {
         DisplayName					= ActivatedCharcoalJar,
         DisplayCategory 			= Material,
-        Weight						= 2,
+        Weight						= 3,
         Type						= Drainable,
         Icon						= SWAB_ActivatedCharcoalJar_icon,
         UseWhileEquipped 			= FALSE,
-        UseDelta 					= 0.04,
+        UseDelta 					= 0.025,
         WeightEmpty 				= 0.1,
         WorldStaticModel 			= ActivatedCharcoalJar_Ground,
     }
@@ -135,10 +135,8 @@ module SWAB
 		ThirstChange                = 60,
 		UnhappyChange               = 40,
 		ReplaceOnUse                = Base.Pot,
-		MinutesToCook               = 1,
-		MinutesToBurn               = 30,
-		/*MinutesToCook               = 120,*/
-		/*MinutesToBurn               = 480,*/
+		MinutesToCook               = 120,
+		MinutesToBurn               = 480,
 		Tags                        = HasMetal,
 		StaticModel                 = CookingPot,
 		WorldStaticModel            = ActivatedCharcoalPot_Ground,

@@ -13,4 +13,6 @@ ItemName_EN = {
     
     ItemName_SWAB.ActivatedCharcoal                 = "Activated Charcoal",
     ItemName_SWAB.ActivatedCharcoalJar              = "Activated Charcoal Jar",
+
+    ItemName_SWAB.ActivatedCharcoalPot              = "Pot of Activated Charcoal",
 }
