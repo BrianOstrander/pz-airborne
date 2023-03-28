@@ -11,8 +11,7 @@ function SWAB_RemoveFilter:isValid()
 end
 
 function SWAB_RemoveFilter:start()
-    -- TODO: Localize
-    self.target:setJobType("Remove")
+    self.target:setJobType(getText("ContextMenu_SWAB_Remove"))
     self.target:setJobDelta(0)
 end
 

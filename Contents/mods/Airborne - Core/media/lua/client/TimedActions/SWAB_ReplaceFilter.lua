@@ -12,8 +12,7 @@ function SWAB_ReplaceFilter:isValid()
 end
 
 function SWAB_ReplaceFilter:start()
-    -- TODO: Localize
-    self.target:setJobType("Replace")
+    self.target:setJobType(getText("ContextMenu_SWAB_Replace"))
     self.target:setJobDelta(0)
 end
 

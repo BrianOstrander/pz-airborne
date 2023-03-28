@@ -12,8 +12,7 @@ function SWAB_InsertFilter:isValid()
 end
 
 function SWAB_InsertFilter:start()
-    -- TODO: Localize
-    self.target:setJobType("Insert")
+    self.target:setJobType(getText("ContextMenu_SWAB_Insert"))
     self.target:setJobDelta(0)
 end
 

@@ -40,8 +40,8 @@ function SWAB_InventoryContextMenu.AddRemoveFilterOption(_context, _item)
         -- This is contaminated, no filter to remove.
         return
     end
-    -- TODO: Localize
-    _context:addOption("Remove Filter", _item, SWAB_InventoryContextMenu.OnRemoveFilter)
+    
+    _context:addOption(getText("ContextMenu_SWAB_RemoveFilter"), _item, SWAB_InventoryContextMenu.OnRemoveFilter)
 end
 
 function SWAB_InventoryContextMenu.AddInsertFilterOption(_context, _item)
@@ -57,9 +57,8 @@ function SWAB_InventoryContextMenu.AddInsertFilterOption(_context, _item)
         return
     end
 
-    -- TODO: Localize
     _context:addOption(
-        "Insert Filter",
+        getText("ContextMenu_SWAB_InsertFilter"),
         {
             target = _item,
             filter = filter,
@@ -81,13 +80,11 @@ function SWAB_InventoryContextMenu.AddInsertSpecificFilterOption(_context, _item
         -- No filter target available for insertion.
         return
     end
-
-    -- TODO: Localize
-
+    
     if 0 < filterTarget:getModData().SwabRespiratoryExposure_ProtectionRemaining then
         -- We found a filter target that needs replacement.
         _context:addOption(
-            "Replace Filter",
+            getText("ContextMenu_SWAB_ReplaceFilter"),
             {
                 target = filterTarget,
                 filter = _item,
@@ -97,7 +94,7 @@ function SWAB_InventoryContextMenu.AddInsertSpecificFilterOption(_context, _item
     else
         -- Must have found a filter target with no filter at all.
         _context:addOption(
-            "Insert Filter",
+            getText("ContextMenu_SWAB_InsertFilter"),
             {
                 target = filterTarget,
                 filter = _item,
@@ -120,10 +117,9 @@ function SWAB_InventoryContextMenu.AddReplaceFilterOption(_context, _item)
         -- No better filter available for replacement.
         return
     end
-
-    -- TODO: Localize
+    
     _context:addOption(
-        "Replace Filter",
+        getText("ContextMenu_SWAB_ReplaceFilter"),
         {
             target = _item,
             filter = filter,
