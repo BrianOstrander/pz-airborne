@@ -233,8 +233,6 @@ SWAB_Config.respiratoryAbsorptionMaximum = SWAB_Config.GetRespiratorySicknessEff
 -- DO NOT MESS WITH EVER
 -------------------------------------------------------
 
-SWAB_Config.respiratoryExposureMoodleId = "swab_respiratory_exposure"
-SWAB_Config.respiratorySicknessMoodleId = "swab_respiratory_sickness"
 SWAB_Config.playerModDataId = "swab_player"
 SWAB_Config.squareExposureModDataId = "swab_square_exposure"
 SWAB_Config.squareFloorClaimDeltaModDataId = "swab_square_floor_claim_delta"

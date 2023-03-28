@@ -19,8 +19,8 @@ SWAB_RespiratorySicknessMoodle.isInitialized = false
 
 function SWAB_RespiratorySicknessMoodle.Initialize()
     if not SWAB_RespiratorySicknessMoodle.isInitialized then
-        MF.createMoodle(SWAB_Config.respiratorySicknessMoodleId)
-        local moodle = MF.getMoodle(SWAB_Config.respiratorySicknessMoodleId)
+        MF.createMoodle("swab_respiratory_sickness")
+        local moodle = MF.getMoodle("swab_respiratory_sickness")
 
         if moodle then
             -- MF.getMoodle(*):setThresholds(bad4, bad3, bad2, bad1,   good1, good2, good3, good4)
@@ -41,7 +41,7 @@ Events.OnCreatePlayer.Add(SWAB_RespiratorySicknessMoodle.Initialize)
 
 function SWAB_RespiratorySicknessMoodle.EveryOneMinute()
     if SWAB_RespiratorySicknessMoodle.Initialize() then
-        local moodle = MF.getMoodle(SWAB_Config.respiratorySicknessMoodleId)
+        local moodle = MF.getMoodle("swab_respiratory_sickness")
         if moodle then
             local modData = getPlayer():getModData()[SWAB_Config.playerModDataId]
             if modData and modData.respiratorySicknessLevel then

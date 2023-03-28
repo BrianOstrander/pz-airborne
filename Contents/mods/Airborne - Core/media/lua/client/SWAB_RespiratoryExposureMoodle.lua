@@ -19,8 +19,8 @@ SWAB_RespiratoryExposureMoodle.isInitialized = false
 
 function SWAB_RespiratoryExposureMoodle.Initialize()
     if not SWAB_RespiratoryExposureMoodle.isInitialized then
-        MF.createMoodle(SWAB_Config.respiratoryExposureMoodleId)
-        local moodle = MF.getMoodle(SWAB_Config.respiratoryExposureMoodleId)
+        MF.createMoodle("swab_respiratory_exposure")
+        local moodle = MF.getMoodle("swab_respiratory_exposure")
 
         if moodle then
             -- MF.getMoodle(*):setThresholds(bad4, bad3, bad2, bad1,   good1, good2, good3, good4)
@@ -41,7 +41,7 @@ Events.OnCreatePlayer.Add(SWAB_RespiratoryExposureMoodle.Initialize)
 
 function SWAB_RespiratoryExposureMoodle.EveryOneMinute()
     if SWAB_RespiratoryExposureMoodle.Initialize() then
-        local moodle = MF.getMoodle(SWAB_Config.respiratoryExposureMoodleId)
+        local moodle = MF.getMoodle("swab_respiratory_exposure")
         if moodle then
             local modData = getPlayer():getModData()[SWAB_Config.playerModDataId]
             if modData and modData.respiratoryExposureLevel then
