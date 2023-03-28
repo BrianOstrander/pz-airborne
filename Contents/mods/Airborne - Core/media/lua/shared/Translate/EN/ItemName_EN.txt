@@ -1,0 +1,6 @@
+ItemName_EN = {
+    ItemName_SWAB.ValuTechHomeAirPurifier           = "ValuTech Home Air Purifier",
+    ItemName_SWAB.MassGenFacIndustrialAirPurifier   = "Mass-GenFac Industrial Air Purifier",
+    ItemName_SWAB.ValuTechPersonalAirPurifier       = "ValuTech Personal Air Purifier",
+    ItemName_SWAB.MakeshiftAirPurifier              = "Makeshift Air Purifier",
+}

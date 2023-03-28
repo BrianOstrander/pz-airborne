@@ -15,9 +15,9 @@ SWAB_Config.roomStaleUpdateCountMaximum = 10
 -- The number of updates to skip after maxing the stale update maximum.
 SWAB_Config.roomSkipUpdateCount = 600
 -- Difference allowed between contaminated squares before we start spreading contamination.
-SWAB_Config.squareContaminationThreshold = 0.02
+SWAB_Config.squareContaminationThreshold = 0.002
 -- Minimum difference allowed between two tiles.
-SWAB_Config.squareContaminationDeltaMinimum = 0.01
+SWAB_Config.squareContaminationDeltaMinimum = 0.001
 -- An entirely enclosed space with no filtration will decay to this level
 -- of contamination.
 SWAB_Config.buildingContaminationBaseline = 4
@@ -27,6 +27,8 @@ SWAB_Config.itemRespiratoryProtectionDurationMultiplier = 60--1440
 SWAB_Config.itemRespiratorySoapMaximum = 4
 -- The duration required to clean a fully contaminated mask.
 SWAB_Config.itemRespiratoryWashDurationMaximum = 60
+-- How effective air purifiers are.
+SWAB_Config.AirFiltrationMultiplier = 1
 
 -- Floor respiratoryAbsorptionLevel to get your level
 --      rate              : Per day increase in absorption
@@ -225,13 +227,6 @@ function SWAB_Config.GetRespiratorySicknessEffects(_respiratorySicknessLevel)
 end
 
 SWAB_Config.respiratoryAbsorptionMaximum = SWAB_Config.GetRespiratorySicknessEffects(SWAB_Config.respiratorySicknessLevelMaximum).absorptionMinimum * 1.5
-
--- Given the number of hours, this gives back an approximate value that represents the air
--- filtration value for fully cleaning a 3x3 space within that time. This doesn't take
--- into account tick rate, possible todo. This mostly exists to make balancing easier.
-function SWAB_Config.GetAirFiltrationFromDuration(_hours)
-    return 0.1 / _hours
-end
 
 -------------------------------------------------------
 -- CONSTANTS --

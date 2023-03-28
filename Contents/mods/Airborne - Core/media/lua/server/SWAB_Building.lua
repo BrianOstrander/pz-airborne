@@ -92,7 +92,7 @@ function SWAB_Building.OnTick(_tick)
     local buildingIndex = 1
 
     while 0 < squareUpdatesPerTickRemaining do
-        squareUpdatesPerTickRemaining = squareUpdatesPerTickRemaining - SWAB_Building.UpdateBuilding(buildingsSorted[buildingIndex], ticksSinceLastUpdate, squareUpdatesPerTickRemaining)
+        squareUpdatesPerTickRemaining = squareUpdatesPerTickRemaining - SWAB_Building.UpdateBuilding(buildingsSorted[buildingIndex], _tick, ticksSinceLastUpdate, squareUpdatesPerTickRemaining)
         buildingIndex = buildingIndex + 1
         if buildingCount < buildingIndex then
             buildingIndex = 1
@@ -137,7 +137,7 @@ function SWAB_Building.InitializeBuilding(_def, _modDataId, _modData)
     end
 end
 
-function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _squareBudget)
+function SWAB_Building.UpdateBuilding(_modData, _tick, _tickDelta, _squareBudget)
     if _squareBudget == 0 then
         _modData.ticksSinceUpdate = _modData.ticksSinceUpdate + _tickDelta
         -- We're skipping this building, returning that no squares were updated.
@@ -171,6 +171,7 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _squareBudget)
                 iterationResult = SWAB_Building.IterateRoomSquares(
                     _modData,
                     roomDefArray:get(_modData.lastRoomIndexInitialized):getIsoRoom(),
+                    _tick,
                     squareBudgetRemaining,
                     SWAB_Building.InitializeRoomSquare,
                     SWAB_Building.InitializeRoomDone
@@ -201,6 +202,7 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _squareBudget)
                     iterationResult = SWAB_Building.IterateRoomSquares(
                         _modData,
                         roomDefArray:get(_modData.lastRoomIndexUpdated):getIsoRoom(),
+                        _tick,
                         squareBudgetRemaining,
                         SWAB_Building.UpdateRoomSquare,
                         SWAB_Building.UpdateRoomDone
@@ -239,7 +241,7 @@ function SWAB_Building.UpdateBuilding(_modData, _tickDelta, _squareBudget)
     return _squareBudget - squareBudgetRemaining
 end
 
-function SWAB_Building.IterateRoomSquares(_modData, _room, _squareBudget, _onIterate, _onDone)
+function SWAB_Building.IterateRoomSquares(_modData, _room, _tick, _squareBudget, _onIterate, _onDone)
     _modData.lastRoomSquareIndex = PZMath.max(0, _modData.lastRoomSquareIndex)
     local squares = _room:getSquares()
     local squareBeginIndex = _modData.lastRoomSquareIndex
@@ -249,8 +251,9 @@ function SWAB_Building.IterateRoomSquares(_modData, _room, _squareBudget, _onIte
         _modData.lastRoomSquareIndex = _modData.lastRoomSquareIndex + 1
         local square = squares:get(squareIndex)
 
-        if _onIterate(_modData, _room, square) then
+        if _onIterate(_modData, _room, square, _tick) then
             squareUpdateCount = squareUpdateCount + 1
+            square:getModData().swab_last_tick = _tick
         end
     end
 
@@ -268,7 +271,7 @@ function SWAB_Building.IterateRoomSquares(_modData, _room, _squareBudget, _onIte
     }
 end
 
-function SWAB_Building.InitializeRoomSquare(_modData, _room, _square)
+function SWAB_Building.InitializeRoomSquare(_modData, _room, _square, _tick)
     local squareAbove = nil
     local squareAboveX = _square:getX()
     local squareAboveY = _square:getY()
@@ -295,7 +298,7 @@ function SWAB_Building.InitializeRoomDone(_modData, _room, _squareCount)
 
 end
 
-function SWAB_Building.UpdateRoomSquare(_modData, _room, _square)
+function SWAB_Building.UpdateRoomSquare(_modData, _room, _square, _tick)
     local squareExposurePrevious = _square:getModData()[SWAB_Config.squareExposureModDataId]
     local neighbor = SWAB_Building.CalculateSquareExposure(_square)
     
@@ -345,13 +348,13 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square)
         local squareObjects = _square:getObjects()
         for i = 0, squareObjects:size() - 1 do
             local squareObject = squareObjects:get(i)
-            if instanceof(squareObject, "IsoThumpable") then
-                local filtration = squareObject:getProperties():Val("AirFiltration")
-                if filtration then
-                    -- We found a filter
-                    _square:getModData()[SWAB_Config.squareExposureModDataId] = PZMath.max(0, _square:getModData()[SWAB_Config.squareExposureModDataId] - filtration)
-                    -- TODO: decrease fuel in generator
-                end
+            local filtration = squareObject:getProperties():Val("AirFiltration")
+            if filtration then
+                -- We found a filter
+                filtration = SWAB_Config.AirFiltrationMultiplier * filtration * PZMath.max(1, _tick - _square:getModData().swab_last_tick)
+                _square:getModData()[SWAB_Config.squareExposureModDataId] = PZMath.max(0, _square:getModData()[SWAB_Config.squareExposureModDataId] - filtration)
+                -- TODO: decrease fuel in generator
+                -- TODO: decrease battery
             end
         end 
     end

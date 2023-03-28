@@ -2,24 +2,42 @@ module SWAB
 {
     item ValuTechHomeAirPurifier
 	{
-		/* TODO: Localize */
-		DisplayName				= ValuTech Home Air Purifier,
-	    DisplayCategory 		= Furniture,
-		Type					= Moveable,
-		Icon					= default,
-        Weight          		= 10.0,
-		WorldObjectSprite		= swab_filters_01_0,
+		DisplayName 				= ValuTechHomeAirPurifier,
+		DisplayCategory 			= AirPurifier,
+		Type						= Moveable,
+		Icon						= default,
+        Weight          			= 10.0,
+		WorldObjectSprite			= swab_filters_01_0,
 	}
 
     item MassGenFacIndustrialAirPurifier
 	{
-		/* TODO: Localize */
-		DisplayName				= Mass-GenFac Industrial Air Purifier,
-	    DisplayCategory 		= Furniture,
-		Type					= Moveable,
-		Icon					= default,
-        Weight          		= 10.0,
-		WorldObjectSprite		= swab_filters_01_8,
+	    DisplayName					= MassGenFacIndustrialAirPurifier,
+		DisplayCategory 			= AirPurifier,
+		Type						= Moveable,
+		Icon						= default,
+        Weight          			= 10.0,
+		WorldObjectSprite			= swab_filters_01_8,
+	}
+	
+    item ValuTechPersonalAirPurifier
+	{
+	    DisplayName					= ValuTechPersonalAirPurifier,
+		DisplayCategory 			= AirPurifier,
+		Type						= Moveable,
+		Icon						= default,
+        Weight          			= 2.5,
+		WorldObjectSprite			= swab_filters_01_16,
+	}
+
+    item MakeshiftAirPurifier
+	{
+	    DisplayName					= MakeshiftAirPurifier,
+		DisplayCategory 			= AirPurifier,
+		Type						= Moveable,
+		Icon						= default,
+        Weight          			= 10.0,
+		WorldObjectSprite			= swab_filters_01_24,
 	}
 
 	item StandardFilter

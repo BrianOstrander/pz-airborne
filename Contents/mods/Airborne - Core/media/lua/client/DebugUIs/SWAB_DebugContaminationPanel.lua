@@ -124,10 +124,12 @@ function SWAB_DebugContaminationPanel:prerender()
 
     local buildingModDataId = "< Outside >"
     local roomModDataId = "< Outside >"
+    local lastTick = "None"
 
     if getPlayer() and getPlayer():getSquare() and getPlayer():getSquare():getRoom() then
         buildingModDataId = SWAB_Config.getBuildingModDataId(getPlayer():getSquare():getBuilding():getDef())
         roomModDataId = SWAB_Config.getRoomModDataId(getPlayer():getSquare():getRoom():getRoomDef())
+        lastTick = getPlayer():getSquare():getModData().swab_last_tick
     end
 
     local playerModData = getPlayer():getModData()[SWAB_Config.playerModDataId]
@@ -136,6 +138,7 @@ function SWAB_DebugContaminationPanel:prerender()
     z = self:drawField("Building ModData ID", buildingModDataId, x, z)
     z = self:drawField("Room ModData ID", roomModDataId, x, z)
 
+    z = self:drawField("Last Tick", lastTick, x, z)
     z = self:drawFloat("Resp. Exposure", playerModData.respiratoryExposure, x, z)
     z = self:drawField("Resp. Exposure Level", playerModData.respiratoryExposureLevel, x, z)
     z = self:drawField("Resp. Absorption Level", playerModData.respiratoryAbsorptionLevel, x, z)
