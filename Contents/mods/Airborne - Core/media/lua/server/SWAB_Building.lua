@@ -95,7 +95,7 @@ function SWAB_Building.OnTick(_tick)
         squareUpdatesPerTickRemaining = squareUpdatesPerTickRemaining - SWAB_Building.UpdateBuilding(buildingsSorted[buildingIndex], _tick, ticksSinceLastUpdate, squareUpdatesPerTickRemaining)
         buildingIndex = buildingIndex + 1
         if buildingCount < buildingIndex then
-            buildingIndex = 1
+            break
         end
     end
 end
