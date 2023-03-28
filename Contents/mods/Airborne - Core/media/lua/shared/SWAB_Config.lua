@@ -233,11 +233,6 @@ SWAB_Config.respiratoryAbsorptionMaximum = SWAB_Config.GetRespiratorySicknessEff
 -- DO NOT MESS WITH EVER
 -------------------------------------------------------
 
-SWAB_Config.playerModDataId = "swab_player"
-SWAB_Config.squareExposureModDataId = "swab_square_exposure"
-SWAB_Config.squareFloorClaimDeltaModDataId = "swab_square_floor_claim_delta"
-SWAB_Config.squareCeilingHeightModDataId = "swab_square_ceiling_height"
-
 function SWAB_Config.getBuildingLocationConcat(_buildingDef)
     return _buildingDef:getX().."_".._buildingDef:getY()
 end

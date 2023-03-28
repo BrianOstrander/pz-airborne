@@ -5,7 +5,7 @@ require "SWAB_Utilities"
 SWAB_Player = {}
 
 function SWAB_Player.OnCreatePlayer(_, _player)
-	local modData = _player:getModData()[SWAB_Config.playerModDataId]
+	local modData = _player:getModData()["swab_player"]
 
     if not modData then
         if SWAB_Config.debug.logging then
@@ -30,7 +30,7 @@ function SWAB_Player.OnCreatePlayer(_, _player)
         -- Maximum the endurance modifier is allowed to be.
         modData.enduranceMaximum = 1
 
-        _player:getModData()[SWAB_Config.playerModDataId] = modData
+        _player:getModData()["swab_player"] = modData
         _player:transmitModData()
     end
 end
@@ -38,7 +38,7 @@ Events.OnCreatePlayer.Add(SWAB_Player.OnCreatePlayer)
 
 function SWAB_Player.EveryOneMinute()
     for _, player in ipairs(SWAB_Utilities.GetPlayers()) do
-        local modData = player:getModData()[SWAB_Config.playerModDataId]
+        local modData = player:getModData()["swab_player"]
 
         if not modData or not modData.isInitialized then
             -- Must be before mod data is initialized by the game.
@@ -73,7 +73,7 @@ Events.EveryOneMinute.Add(SWAB_Player.EveryOneMinute)
 
 function SWAB_Player.OnTick(_ticks)
     for _, player in ipairs(SWAB_Utilities.GetPlayers()) do
-        local modData = player:getModData()[SWAB_Config.playerModDataId]
+        local modData = player:getModData()["swab_player"]
 
         if modData then
             if modData.enduranceMaximum then
@@ -151,7 +151,7 @@ function SWAB_Player.CalculateRespiratoryExposure(_player)
             -- Inside a room
 
             if _player:getSquare() then
-                return _player:getSquare():getModData()[SWAB_Config.squareExposureModDataId]
+                return _player:getSquare():getModData()["swab_square_exposure"]
             end
         end
     end
@@ -313,7 +313,7 @@ end
 
 -- Each level of resperatory absorption affects various player stats
 function SWAB_Player.ApplyEffects(_player, _sickness, _exposure)
-    local modData = _player:getModData()[SWAB_Config.playerModDataId]
+    local modData = _player:getModData()["swab_player"]
     local stats = _player:getStats()
 
     -- Endurance

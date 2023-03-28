@@ -283,13 +283,13 @@ function SWAB_Building.InitializeRoomSquare(_modData, _room, _square, _tick)
     repeat
         local squareAbove = getCell():getGridSquare(squareAboveX, squareAboveY, squareAboveZ)
         if squareAbove and not squareAbove:Is(IsoFlagType.attachedFloor) then
-            squareAbove:getModData()[SWAB_Config.squareFloorClaimDeltaModDataId] = _square:getZ() - squareAboveZ
+            squareAbove:getModData()["swab_square_floor_claim_delta"] = _square:getZ() - squareAboveZ
         end
         squareAboveZ = squareAboveZ + 1
     until not squareAbove or squareAbove:Is(IsoFlagType.attachedFloor)
     -- TODO: Figure out how to see if this is a spawn building, and if so set the contamination to zero.
-    _square:getModData()[SWAB_Config.squareExposureModDataId] = SWAB_Config.buildingContaminationBaseline
-    _square:getModData()[SWAB_Config.squareCeilingHeightModDataId] = squareAboveZ - 1
+    _square:getModData()["swab_square_exposure"] = SWAB_Config.buildingContaminationBaseline
+    _square:getModData()["swab_square_ceiling_height"] = squareAboveZ - 1
 
     -- Return true so this room doesn't get put to sleep.
     return true
@@ -303,7 +303,7 @@ function SWAB_Building.InitializeRoomDone(_modData, _room, _squareCount)
 end
 
 function SWAB_Building.UpdateRoomSquare(_modData, _room, _square, _tick)
-    local squareExposurePrevious = _square:getModData()[SWAB_Config.squareExposureModDataId]
+    local squareExposurePrevious = _square:getModData()["swab_square_exposure"]
     local neighbor = SWAB_Building.CalculateSquareExposure(_square)
     
     if not neighbor or not neighbor.exposure then
@@ -312,7 +312,7 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square, _tick)
 
     -- CalculateSquareExposure will sometimes return an outdoor square, which should not have
     -- a contamination value specified. If so we don't bother decreasing its contamination.
-    local isContaminationFinite = neighbor.square:getModData()[SWAB_Config.squareExposureModDataId] ~= nil
+    local isContaminationFinite = neighbor.square:getModData()["swab_square_exposure"] ~= nil
 
     if not squareExposurePrevious then
         -- No exposure, lets set ours to zero.
@@ -327,11 +327,11 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square, _tick)
         if isContaminationFinite then
             -- Our neighbor is not an outdoor source, so we spread exposure instead of simply pumping it up.
             local squareExposureDelta = PZMath.max(0, (neighbor.exposure - SWAB_Config.squareContaminationDeltaMinimum) - squareExposurePrevious) * 0.5
-            _square:getModData()[SWAB_Config.squareExposureModDataId] = squareExposurePrevious + squareExposureDelta
-            neighbor.square:getModData()[SWAB_Config.squareExposureModDataId] = neighbor.exposure - squareExposureDelta
+            _square:getModData()["swab_square_exposure"] = squareExposurePrevious + squareExposureDelta
+            neighbor.square:getModData()["swab_square_exposure"] = neighbor.exposure - squareExposureDelta
         else
             -- Our neighbor is an outdoor source, so we just pump it in.
-            _square:getModData()[SWAB_Config.squareExposureModDataId] = neighbor.exposure - SWAB_Config.squareContaminationDeltaMinimum
+            _square:getModData()["swab_square_exposure"] = neighbor.exposure - SWAB_Config.squareContaminationDeltaMinimum
         end
     end
 
@@ -340,7 +340,7 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square, _tick)
         if highlightedFloor then
             _square:getFloor():setHighlighted(true, false)
             local squareAlpha = (neighbor.exposure - 4)/3
-            if not PZMath.equal(squareExposurePrevious,_square:getModData()[SWAB_Config.squareExposureModDataId]) then
+            if not PZMath.equal(squareExposurePrevious,_square:getModData()["swab_square_exposure"]) then
                 _square:getFloor():setHighlightColor(1.0, 1.0, 0.0, squareAlpha)
             else
                 _square:getFloor():setHighlightColor(1.0, 0.0, 0.0, squareAlpha)
@@ -356,14 +356,14 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square, _tick)
             if filtration then
                 -- We found a filter
                 filtration = SWAB_Config.AirFiltrationMultiplier * filtration * PZMath.max(1, _tick - _square:getModData().swab_last_tick)
-                _square:getModData()[SWAB_Config.squareExposureModDataId] = PZMath.max(0, _square:getModData()[SWAB_Config.squareExposureModDataId] - filtration)
+                _square:getModData()["swab_square_exposure"] = PZMath.max(0, _square:getModData()["swab_square_exposure"] - filtration)
                 -- TODO: decrease fuel in generator
                 -- TODO: decrease battery
             end
         end 
     end
 
-    return not PZMath.equal(squareExposurePrevious,_square:getModData()[SWAB_Config.squareExposureModDataId])
+    return not PZMath.equal(squareExposurePrevious,_square:getModData()["swab_square_exposure"])
 end
 
 function SWAB_Building.UpdateRoomDone(_modData, _room, _squareCount)
@@ -392,11 +392,11 @@ function SWAB_Building.CalculateSquareExposure(_square)
         end
     end
 
-    if 1 < _square:getModData()[SWAB_Config.squareCeilingHeightModDataId] then
+    if 1 < _square:getModData()["swab_square_ceiling_height"] then
         -- There is a tile above this
         local neighborAbove = getCell():getGridSquare(_square:getX(), _square:getY(), _square:getZ() + 1)
         if neighborAbove then
-            local neighborAboveExposure = neighborAbove:getModData()[SWAB_Config.squareExposureModDataId]
+            local neighborAboveExposure = neighborAbove:getModData()["swab_square_exposure"]
             if neighborAboveExposure then
                 if not highestExposure or highestExposure < neighborAboveExposure then
                     -- The neighbor above us is more contaminated
@@ -416,12 +416,12 @@ function SWAB_Building.CalculateSquareExposureFromNeighbor(_square, _neighbor)
     end
 
     if _neighbor:getRoomID() == -1 then
-        if _neighbor:getModData()[SWAB_Config.squareFloorClaimDeltaModDataId] then
-            return _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
+        if _neighbor:getModData()["swab_square_floor_claim_delta"] then
+            return _neighbor:getModData()["swab_square_exposure"]
         end
         return 6
     else
-        return _neighbor:getModData()[SWAB_Config.squareExposureModDataId]
+        return _neighbor:getModData()["swab_square_exposure"]
     end
 end
 

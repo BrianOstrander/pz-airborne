@@ -43,7 +43,7 @@ function SWAB_RespiratorySicknessMoodle.EveryOneMinute()
     if SWAB_RespiratorySicknessMoodle.Initialize() then
         local moodle = MF.getMoodle("swab_respiratory_sickness")
         if moodle then
-            local modData = getPlayer():getModData()[SWAB_Config.playerModDataId]
+            local modData = getPlayer():getModData()["swab_player"]
             if modData and modData.respiratorySicknessLevel then
                 moodle:setValue(SWAB_Config.GetRespiratorySicknessEffects(modData.respiratorySicknessLevel).moodle)
             end
