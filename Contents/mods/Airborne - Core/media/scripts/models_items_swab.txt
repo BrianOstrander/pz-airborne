@@ -69,4 +69,11 @@ module SWAB
         texture = WorldItems/SWAB_ActivatedCharcoalPotBurnt,
         scale = 0.4,
     }
+
+    model MakeshiftFilter_Ground
+    {
+        mesh = WorldItems/TinnedTuna,
+        texture = WorldItems/SWAB_MakeshiftFilter,
+        scale = 0.3,
+    }
 }

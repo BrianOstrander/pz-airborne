@@ -142,4 +142,20 @@ module SWAB
 		StaticModel                 = CookingPot,
 		WorldStaticModel            = ActivatedCharcoalPot_Ground,
 	}
+
+	item MakeshiftFilter
+	{
+		DisplayName 				= MakeshiftFilter,
+		DisplayCategory 			= Accessory,
+		Type						= Drainable,
+		UseWhileEquipped			= FALSE,
+		UseDelta					= 1,
+		Weight 						= 0.3,
+		Icon 						= SWAB_MakeshiftFilter_icon,
+		StaticModel 				= CanClosed,
+		WorldStaticModel 			= MakeshiftFilter_Ground,
+		Tags 						= HasMetal,
+		SwabRespiratoryItemFilter 	= TRUE,
+		cantBeConsolided 			= TRUE,
+	}
 }

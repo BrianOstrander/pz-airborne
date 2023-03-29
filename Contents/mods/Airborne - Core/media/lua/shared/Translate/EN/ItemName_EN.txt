@@ -15,4 +15,6 @@ ItemName_EN = {
     ItemName_SWAB.ActivatedCharcoalJar              = "Activated Charcoal Jar",
 
     ItemName_SWAB.ActivatedCharcoalPot              = "Pot of Activated Charcoal",
+
+    ItemName_SWAB.MakeshiftFilter                   = "Makeshift Filter",
 }

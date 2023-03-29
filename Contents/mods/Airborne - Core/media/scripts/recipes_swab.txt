@@ -140,16 +140,17 @@ module SWAB
         Time:60,
     }
 
-    /*
     recipe SWAB MakeshiftFilter
     {
+        ActivatedCharcoal=5,
+        TinCanEmpty,
         RippedSheets/AlcoholRippedSheets,
-
-        Result:Hat_BandanaMaskTINT,
-        Sound:ClothesRipping,
-        Time:50.0,
-        AnimNode:RipSheets,
-        OnCreate:SWAB_Recipe.OnCreate.MakeshiftBandana,
+        DuctTape,
+        keep [Recipe.GetItemTypes.SharpKnife],
+        
+        Result:MakeshiftFilter,
+        Sound:OpenCannedFood,
+        Time:120.0,
+        AnimNode:Disassemble,
     }
-    */
 }

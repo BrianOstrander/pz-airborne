@@ -18,4 +18,6 @@ Recipes_EN = {
     Recipe_SWAB_MakeActivatedCharcoalPot = "Prepare Activated Charcoal",
     Recipe_SWAB_GetActivatedCharcoalFromPot = "Get Activated Charcoal"
     Recipe_SWAB_GetBurntActivatedCharcoalFromPot = "Clean Pot"
+
+    Recipe_SWAB_MakeshiftFilter = "Craft Makeshift Filter"
 }
