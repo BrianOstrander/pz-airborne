@@ -1,10 +1,15 @@
 module SWAB
 {   
+    /* -------------------------------------------------------- */
+    /* ------------------BOXING AND UNBOXING------------------- */
+    /* -------------------------------------------------------- */
+    
     recipe SWAB OpenStandardFilterBoxLarge
     {
         StandardFilterBoxLarge,
 
         Result:StandardFilter=6,
+        OnGiveXP:Recipe.OnGiveXP.None,
         Sound:PutItemInBag,
         Time:15.0,
     }
@@ -15,6 +20,7 @@ module SWAB
 
         Result:StandardFilterBoxLarge,
         OnTest:SWAB_Recipe.OnTest.PutStandardFiltersInBoxLarge,
+        OnGiveXP:Recipe.OnGiveXP.None,
         Sound:PutItemInBag,
         Time:15.0,
     }
@@ -24,6 +30,7 @@ module SWAB
         DustMaskBox,
 
         Result:Hat_DustMask=5,
+        OnGiveXP:Recipe.OnGiveXP.None,
         Sound:PutItemInBag,
         Time:5.0,
     }
@@ -34,6 +41,7 @@ module SWAB
 
         Result:DustMaskBox,
         OnTest:SWAB_Recipe.OnTest.PutMasksInBox,
+        OnGiveXP:Recipe.OnGiveXP.None,
         Sound:PutItemInBag,
         Time:5.0,
     }
@@ -43,6 +51,7 @@ module SWAB
         MedicalMaskBlueBox,
 
         Result:Hat_SurgicalMask_Blue=10,
+        OnGiveXP:Recipe.OnGiveXP.None,
         Sound:PutItemInBag,
         Time:5.0,
     }
@@ -53,6 +62,7 @@ module SWAB
 
         Result:MedicalMaskBlueBox,
         OnTest:SWAB_Recipe.OnTest.PutMasksInBox,
+        OnGiveXP:Recipe.OnGiveXP.None,
         Sound:PutItemInBag,
         Time:5.0,
     }
@@ -62,6 +72,7 @@ module SWAB
         MedicalMaskGreenBox,
 
         Result:Hat_SurgicalMask_Green=10,
+        OnGiveXP:Recipe.OnGiveXP.None,
         Sound:PutItemInBag,
         Time:5.0,
     }
@@ -72,26 +83,37 @@ module SWAB
 
         Result:MedicalMaskGreenBox,
         OnTest:SWAB_Recipe.OnTest.PutMasksInBox,
+        OnGiveXP:Recipe.OnGiveXP.None,
         Sound:PutItemInBag,
         Time:5.0,
     }
+
+    /* -------------------------------------------------------- */
+    /* ------------------------CLOTHING------------------------ */
+    /* -------------------------------------------------------- */
 
     recipe SWAB MakeshiftBandana
     {
         [Recipe.GetItemTypes.RipClothing_Cotton],
 
         Result:Hat_BandanaMaskTINT,
+        OnCreate:SWAB_Recipe.OnCreate.MakeshiftBandana,
+        OnGiveXP:Recipe.OnGiveXP.None,
+        AnimNode:RipSheets,
         Sound:ClothesRipping,
         Time:50.0,
-        AnimNode:RipSheets,
-        OnCreate:SWAB_Recipe.OnCreate.MakeshiftBandana,
     }
+
+    /* -------------------------------------------------------- */
+    /* -------------------ACTIVATED CHARCOAL------------------- */
+    /* -------------------------------------------------------- */
 
     recipe SWAB PourActivatedCharcoalIntoJar
     {
         ActivatedCharcoal=40,
 
         Result:ActivatedCharcoalJar,
+        OnGiveXP:Recipe.OnGiveXP.None,
         Sound:PutItemInBag,
         Time:30.0,
     }
@@ -101,6 +123,7 @@ module SWAB
         ActivatedCharcoalJar=10,
 
         Result:ActivatedCharcoal,
+        OnGiveXP:Recipe.OnGiveXP.None,
         Sound:PutItemInBag,
         Time:15.0,
     }
@@ -113,8 +136,9 @@ module SWAB
        Pot,
 
        Result:ActivatedCharcoalPot,
-       Time:130.0,
+       OnGiveXP:Recipe.OnGiveXP.None,
        Category:Survivalist,
+       Time:130.0,
     }
 
     recipe SWAB MakeActivatedCharcoalPot
@@ -125,8 +149,9 @@ module SWAB
        Pot,
 
        Result:ActivatedCharcoalPot,
-       Time:130.0,
+       OnGiveXP:Recipe.OnGiveXP.None,
        Category:Survivalist,
+       Time:130.0,
     }
 
     recipe SWAB GetActivatedCharcoalFromPot
@@ -137,36 +162,47 @@ module SWAB
         Category:Survivalist,
         OnCanPerform:SWAB_Recipe.OnCanPerform.GetActivatedCharcoalFromPot,
         OnCreate:SWAB_Recipe.OnCreate.GetActivatedCharcoalFromPot,
+        OnGiveXP:Recipe.OnGiveXP.Cooking3,
         Time:60,
     }
 
+    /* -------------------------------------------------------- */
+    /* -----------------OTHER ITEMS AND OBJECTS---------------- */
+    /* -------------------------------------------------------- */
+
     recipe SWAB MakeshiftFilter
     {
-        ActivatedCharcoal/ActivatedCharcoalJar=5,
+        keep [Recipe.GetItemTypes.SharpKnife],
         TinCanEmpty/BeerCanEmpty/PopEmpty/Pop2Empty/Pop3Empty,
+        ActivatedCharcoal/ActivatedCharcoalJar=5,
         RippedSheets/AlcoholRippedSheets,
         DuctTape,
-        keep [Recipe.GetItemTypes.SharpKnife],
         
         Result:MakeshiftFilter,
+        Category:Survivalist,
+        AnimNode:Disassemble,
+        Prop1:Source=1,
+        Prop2:Source=2,
         Sound:OpenCannedFood,
         Time:120.0,
-        AnimNode:Disassemble,
-        Category:Survivalist,
     }
 
     recipe SWAB MakeshiftAirPurifier
     {
+        keep [Recipe.GetItemTypes.Screwdriver],
+        keep [Recipe.GetItemTypes.Saw],
         ActivatedCharcoal/ActivatedCharcoalJar=20,
         ElectronicsScrap,
         Sheet,
         Rope/SheetRope,
-        keep [Recipe.GetItemTypes.Saw],
         
         Result:MakeshiftAirPurifier,
+        OnGiveXP:SWAB_Recipe.OnGiveXP.MakeshiftAirPurifier,
+        Category:Survivalist,
+        AnimNode:Disassemble,
+        Prop1:Source=1,
+        Prop2:ElectronicsScrap,
         Sound:Dismantle,
         Time:120.0,
-        AnimNode:Disassemble,
-        Category:Survivalist,
     }
 }

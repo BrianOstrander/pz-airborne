@@ -20,4 +20,5 @@ Recipes_EN = {
     Recipe_SWAB_GetBurntActivatedCharcoalFromPot = "Clean Pot"
 
     Recipe_SWAB_MakeshiftFilter = "Craft Makeshift Filter"
+    Recipe_SWAB_MakeshiftAirPurifier = "Craft Makeshift Air Purifier"
 }

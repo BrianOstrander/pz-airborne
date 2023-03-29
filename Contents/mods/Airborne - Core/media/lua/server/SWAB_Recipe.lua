@@ -2,6 +2,7 @@ SWAB_Recipe = SWAB_Recipe or {}
 SWAB_Recipe.OnTest = SWAB_Recipe.OnTest or {}
 SWAB_Recipe.OnCanPerform = SWAB_Recipe.OnCanPerform or {}
 SWAB_Recipe.OnCreate = SWAB_Recipe.OnCreate or {}
+SWAB_Recipe.OnGiveXP = SWAB_Recipe.OnGiveXP or {}
 
 function SWAB_Recipe.OnTest.PutStandardFiltersInBoxLarge(_item)
     if PZMath.equal(1, _item:getUsedDelta()) then
@@ -49,6 +50,8 @@ function SWAB_Recipe.OnCreate.MakeshiftBandana(_items, _result, _player, _select
     _result:getVisual():setTint(visualColor)
     
     _result:setCustomColor(true)
+
+    _player:getXp():AddXP(Perks.Tailoring, 1);
 end
 
 function SWAB_Recipe.OnCanPerform.GetActivatedCharcoalFromPot(_recipe, _player, _item)
@@ -64,4 +67,8 @@ function SWAB_Recipe.OnCreate.GetActivatedCharcoalFromPot(_items, _result, _play
 
 	_player:getInventory():AddItem("Base.Pot")
     _player:getInventory():Remove(_selectedItem)
+end
+
+function SWAB_Recipe.OnGiveXP.MakeshiftAirPurifier(_recipe, _ingredients, _result, _player)
+    _player:getXp():AddXP(Perks.Electricity, _player:getPerkLevel(Perks.Electricity) * 5);
 end
