@@ -55,10 +55,6 @@ function SWAB_Recipe.OnCanPerform.GetActivatedCharcoalFromPot(_recipe, _player, 
     return _item and _item:isCooked()
 end
 
--- function SWAB_Recipe.OnCanPerform.GetBurntActivatedCharcoalFromPot(_recipe, _player, _item)
---     return _item and _item:isBurnt()
--- end
-
 function SWAB_Recipe.OnCreate.GetActivatedCharcoalFromPot(_items, _result, _player, _selectedItem)
     -- The system seems aware that a pot is attatched to this item, and since a pot has a weight of 1,
     -- we subtract it from the item to find out how much we have left... incase the player like, ate
