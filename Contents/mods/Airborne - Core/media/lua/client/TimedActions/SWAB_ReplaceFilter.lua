@@ -28,12 +28,20 @@ end
 function SWAB_ReplaceFilter:perform()
     self.target:setJobDelta(0)
 
-    local filter = self.character:getInventory():AddItem("SWAB.StandardFilter")
-    filter:setUsedDelta(self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining)
-    filter:setName(getText("ContextMenu_SWAB_UsedFilter", getItemNameFromFullType(filter:getFullType())))
-    filter:setCustomName(true)
+    local filterType = self.target:getModData().SwabRespiratoryExposure_CurrentFilterType
+
+    if filterType then
+        -- Filter could be nil if the filter got contaminated while this action was being performed.
+        local filter = self.character:getInventory():AddItem(filterType)
+        filter:setUsedDelta(self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining)
+        if not PZMath.equal(1, filter:getUsedDelta()) then
+            filter:setName(getText("ContextMenu_SWAB_UsedFilter", getItemNameFromFullType(filterType)))
+            filter:setCustomName(true)
+        end
+    end
 
     self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining = self.filter:getUsedDelta()
+    self.target:getModData().SwabRespiratoryExposure_CurrentFilterType = self.filter:getFullType()
     self.target:setName(getItemNameFromFullType(self.target:getFullType()))
     self.target:setCustomName(false)
     

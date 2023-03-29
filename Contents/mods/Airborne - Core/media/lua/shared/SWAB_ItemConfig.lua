@@ -11,8 +11,8 @@ SWAB_ItemConfig["swab_base_washables"] = {
             SwabRespiratoryExposure_Falloff               = 3,
             SwabRespiratoryExposure_ProtectionDuration    = 4 / 24,
             SwabRespiratoryExposure_ProtectionRemaining   = 1,
-            SwabRespiratoryExposure_RefreshAction         = "wash",
             SwabRespiratoryExposure_AutoHydrationAllowed  = false,
+            SwabRespiratoryExposure_RefreshAction         = "wash",
             -- Bandanas can bea worn as a hat, so we need to specify this only works if worn as a mask.
             SwabRespiratoryExposure_RequiredBodyLocation  = "Mask",
         },
@@ -25,8 +25,8 @@ SWAB_ItemConfig["swab_base_washables"] = {
             SwabRespiratoryExposure_Falloff               = 2,
             SwabRespiratoryExposure_ProtectionDuration    = 12 / 24,
             SwabRespiratoryExposure_ProtectionRemaining   = 1,
-            SwabRespiratoryExposure_RefreshAction         = "none",
             SwabRespiratoryExposure_AutoHydrationAllowed  = false,
+            SwabRespiratoryExposure_RefreshAction         = "none",
         },
     },
     {
@@ -37,8 +37,8 @@ SWAB_ItemConfig["swab_base_washables"] = {
             SwabRespiratoryExposure_Falloff               = 3,
             SwabRespiratoryExposure_ProtectionDuration    = 1,
             SwabRespiratoryExposure_ProtectionRemaining   = 1,
-            SwabRespiratoryExposure_RefreshAction         = "none",
             SwabRespiratoryExposure_AutoHydrationAllowed  = false,
+            SwabRespiratoryExposure_RefreshAction         = "none",
         },
     },
 }
@@ -52,8 +52,9 @@ SWAB_ItemConfig["swab_base_filterables"] = {
             SwabRespiratoryExposure_Falloff               = 3,
             SwabRespiratoryExposure_ProtectionDuration    = 4,
             SwabRespiratoryExposure_ProtectionRemaining   = 1,
-            SwabRespiratoryExposure_RefreshAction         = "replace_filter",
             SwabRespiratoryExposure_AutoHydrationAllowed  = false,
+            SwabRespiratoryExposure_RefreshAction         = "replace_filter",
+            SwabRespiratoryExposure_CurrentFilterType     = "SWAB.StandardFilter",
         },
     },
     {
@@ -64,8 +65,9 @@ SWAB_ItemConfig["swab_base_filterables"] = {
             SwabRespiratoryExposure_Falloff               = 0,
             SwabRespiratoryExposure_ProtectionDuration    = 5,
             SwabRespiratoryExposure_ProtectionRemaining   = 1,
-            SwabRespiratoryExposure_RefreshAction         = "replace_filter",
             SwabRespiratoryExposure_AutoHydrationAllowed  = true,
+            SwabRespiratoryExposure_RefreshAction         = "replace_filter",
+            SwabRespiratoryExposure_CurrentFilterType     = "SWAB.StandardFilter",
         },
     },
     {
@@ -76,8 +78,9 @@ SWAB_ItemConfig["swab_base_filterables"] = {
             SwabRespiratoryExposure_Falloff               = 4,
             SwabRespiratoryExposure_ProtectionDuration    = 6,
             SwabRespiratoryExposure_ProtectionRemaining   = 1,
-            SwabRespiratoryExposure_RefreshAction         = "replace_filter",
             SwabRespiratoryExposure_AutoHydrationAllowed  = true,
+            SwabRespiratoryExposure_RefreshAction         = "replace_filter",
+            SwabRespiratoryExposure_CurrentFilterType     = "SWAB.StandardFilter",
         },
     },
 }

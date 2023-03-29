@@ -155,8 +155,7 @@ end
 
 function SWAB_InventoryContextMenu.GetBestFilter(_usedDeltaMinimum)
     local inventory = getPlayer():getInventory()
-    local result = inventory:getBestTypeEval("SWAB.StandardFilter", SWAB_InventoryContextMenu.EvaluateFilter)
-
+    local result = inventory:getBestEval(SWAB_InventoryContextMenu.EvaluateIsFilter, SWAB_InventoryContextMenu.EvaluateFilter)
     if result then
         if PZMath.equal(1, result:getUsedDelta()) then
             -- We already found an unused filter in our main inventory.
@@ -167,7 +166,7 @@ function SWAB_InventoryContextMenu.GetBestFilter(_usedDeltaMinimum)
         end
     end
 
-    subInventoryResult = inventory:getBestTypeEvalRecurse("SWAB.StandardFilter", SWAB_InventoryContextMenu.EvaluateFilter)
+    subInventoryResult = inventory:getBestEvalRecurse(SWAB_InventoryContextMenu.EvaluateIsFilter, SWAB_InventoryContextMenu.EvaluateFilter)
 
     if subInventoryResult then
         if _usedDeltaMinimum < subInventoryResult:getUsedDelta() then
@@ -209,6 +208,10 @@ end
 ------------------------------------------------------------------------
 ------------------------------PREDICATES--------------------------------
 ------------------------------------------------------------------------
+
+function SWAB_InventoryContextMenu.EvaluateIsFilter(_item)
+    return _item:getModData().SwabRespiratoryItemFilter == "TRUE"
+end
 
 function SWAB_InventoryContextMenu.EvaluateFilter(_filter1, _filter2)
     return _filter1:getUsedDelta() - _filter2:getUsedDelta()

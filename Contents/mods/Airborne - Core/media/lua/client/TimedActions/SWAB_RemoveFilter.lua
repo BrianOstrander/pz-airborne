@@ -27,16 +27,22 @@ end
 function SWAB_RemoveFilter:perform()
     self.target:setJobDelta(0)
 
-    local filter = self.character:getInventory():AddItem("SWAB.StandardFilter")
-    filter:setUsedDelta(self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining)
+    local filterType = self.target:getModData().SwabRespiratoryExposure_CurrentFilterType
 
-    if not PZMath.equal(1, filter:getUsedDelta()) then
-        filter:setName(getText("ContextMenu_SWAB_UsedFilter", getItemNameFromFullType(filter:getFullType())))
-		filter:setCustomName(true)
-	end
+    if filterType then
+        -- Filter could be nil if the filter got contaminated while this action was being performed.
+        local filter = self.character:getInventory():AddItem(filterType)
+        filter:setUsedDelta(self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining)
+
+        if not PZMath.equal(1, filter:getUsedDelta()) then
+            filter:setName(getText("ContextMenu_SWAB_UsedFilter", getItemNameFromFullType(filterType)))
+            filter:setCustomName(true)
+        end
+    end
     
     self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining = 0
-    self.target:setName(getText("ContextMenu_SWAB_MissingFilterable", getItemNameFromFullType(filter:getFullType())))
+    self.target:getModData().SwabRespiratoryExposure_CurrentFilterType = nil
+    self.target:setName(getText("ContextMenu_SWAB_MissingFilterable", getItemNameFromFullType(self.target:getFullType())))
 	self.target:setCustomName(true)
 
     -- needed to remove from queue / start next.

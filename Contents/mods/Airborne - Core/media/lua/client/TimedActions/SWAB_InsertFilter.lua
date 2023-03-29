@@ -29,6 +29,7 @@ function SWAB_InsertFilter:perform()
     self.target:setJobDelta(0)
 
     self.target:getModData().SwabRespiratoryExposure_ProtectionRemaining = self.filter:getUsedDelta()
+    self.target:getModData().SwabRespiratoryExposure_CurrentFilterType = self.filter:getFullType()
     self.target:setName(getItemNameFromFullType(self.target:getFullType()))
     self.target:setCustomName(false)
     
