@@ -351,14 +351,17 @@ function SWAB_Building.UpdateRoomSquare(_modData, _room, _square, _tick)
     if SWAB_Building.ElectricGridEnabled or _square:haveElectricity() then
         local squareObjects = _square:getObjects()
         for i = 0, squareObjects:size() - 1 do
-            local squareObject = squareObjects:get(i)
-            local filtration = squareObject:getProperties():Val("AirFiltration")
-            if filtration then
-                -- We found a filter
-                filtration = filtration * SWAB_Config.AirFiltrationMultiplier * getGameTime():getMultiplier() * PZMath.max(1, _tick - _square:getModData().swab_last_tick)
-                _square:getModData().swab_square_exposure = PZMath.max(0, _square:getModData().swab_square_exposure - filtration)
-                -- TODO: decrease fuel in generator
-                -- TODO: decrease battery
+            local squareObjectProperties = squareObjects:get(i):getProperties()
+            if squareObjectProperties then
+                -- Some of our filters are thumpable, some isoObjects, want to check so we don't try to getProperties from a fire object.
+                local filtration = squareObjectProperties:Val("AirFiltration")
+                if filtration then
+                    -- We found a filter
+                    filtration = filtration * SWAB_Config.AirFiltrationMultiplier * getGameTime():getMultiplier() * PZMath.max(1, _tick - _square:getModData().swab_last_tick)
+                    _square:getModData().swab_square_exposure = PZMath.max(0, _square:getModData().swab_square_exposure - filtration)
+                    -- TODO: decrease fuel in generator
+                    -- TODO: decrease battery
+                end
             end
         end 
     end
