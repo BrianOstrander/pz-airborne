@@ -142,7 +142,7 @@ module SWAB
 
     recipe SWAB MakeshiftFilter
     {
-        ActivatedCharcoal=5,
+        ActivatedCharcoal/ActivatedCharcoalJar=5,
         TinCanEmpty/BeerCanEmpty/PopEmpty/Pop2Empty/Pop3Empty,
         RippedSheets/AlcoholRippedSheets,
         DuctTape,
@@ -150,6 +150,21 @@ module SWAB
         
         Result:MakeshiftFilter,
         Sound:OpenCannedFood,
+        Time:120.0,
+        AnimNode:Disassemble,
+        Category:Survivalist,
+    }
+
+    recipe SWAB MakeshiftAirPurifier
+    {
+        ActivatedCharcoal/ActivatedCharcoalJar=20,
+        ElectronicsScrap,
+        Sheet,
+        Rope/SheetRope,
+        keep [Recipe.GetItemTypes.Saw],
+        
+        Result:MakeshiftAirPurifier,
+        Sound:Dismantle,
         Time:120.0,
         AnimNode:Disassemble,
         Category:Survivalist,
