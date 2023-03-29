@@ -52,7 +52,21 @@ module SWAB
     model ActivatedCharcoalPot_Ground
     {
         mesh = WorldItems/CookingPotFull,
-        texture = WorldItems/CookingPotSoup,
+        texture = WorldItems/SWAB_ActivatedCharcoalPot,
+        scale = 0.4,
+    }
+
+    model ActivatedCharcoalPot_GroundCooked
+    {
+        mesh = WorldItems/CookingPotFull,
+        texture = WorldItems/SWAB_ActivatedCharcoalPotCooked,
+        scale = 0.4,
+    }
+
+    model ActivatedCharcoalPot_GroundBurnt
+    {
+        mesh = WorldItems/CookingPotFull,
+        texture = WorldItems/SWAB_ActivatedCharcoalPotBurnt,
         scale = 0.4,
     }
 }

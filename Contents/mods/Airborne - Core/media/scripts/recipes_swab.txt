@@ -140,16 +140,6 @@ module SWAB
         Time:60,
     }
 
-    recipe SWAB GetBurntActivatedCharcoalFromPot
-    {
-        destroy ActivatedCharcoalPot,
-
-        Result:Pot,
-        Category:Survivalist,
-        OnCanPerform:SWAB_Recipe.OnCanPerform.GetBurntActivatedCharcoalFromPot,
-        Time:60,
-    }
-
     /*
     recipe SWAB MakeshiftFilter
     {

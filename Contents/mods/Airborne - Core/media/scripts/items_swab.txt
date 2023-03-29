@@ -135,7 +135,8 @@ module SWAB
 		ThirstChange                = 60,
 		UnhappyChange               = 40,
 		ReplaceOnUse                = Base.Pot,
-		MinutesToCook               = 120,
+		/* Maximum seems to be 60? */
+		MinutesToCook               = 60,
 		MinutesToBurn               = 480,
 		Tags                        = HasMetal,
 		StaticModel                 = CookingPot,
