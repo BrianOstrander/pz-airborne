@@ -11,6 +11,7 @@ SWAB_DebugScenarios.items = {
     -- "Hat_SurgicalMask_Green",
     -- "Hat_DustMask",
     "Hat_GasMask",
+    "SWAB.Hat_MakeshiftGasMask",
     -- "Generator",
     -- "SWAB.StandardFilter",
     -- "SWAB.StandardFilter",
