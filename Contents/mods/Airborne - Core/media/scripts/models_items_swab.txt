@@ -76,4 +76,11 @@ module SWAB
         texture = WorldItems/SWAB_MakeshiftFilter,
         scale = 0.3,
     }
+
+    model Hat_MakeshiftGasMask_Ground
+    {
+        mesh = WorldItems/Clothes/SWAB_Hat_MakeshiftGasMask_Ground,
+        texture = Clothes/SWAB_Hat_MakeshiftGasMask,
+        scale = 1,
+    }
 }

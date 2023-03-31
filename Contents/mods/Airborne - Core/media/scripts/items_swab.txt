@@ -161,17 +161,19 @@ module SWAB
 
 	item Hat_MakeshiftGasMask
 	{
-	    DisplayCategory = Accessory,
-		Type = Clothing,
-		DisplayName = Makeshift Gas Mask,
-		ClothingItem = SWAB_Hat_MakeshiftGasMask,
-		BodyLocation = MaskEyes,
-		Icon = GasMask,
-		CanHaveHoles = false,
-        BloodLocation = Head,
-        Insulation = 0.75,
-        WindResistance = 0.60,
-        WaterResistance = 1.0,
-		Tags = GasMask,
+		DisplayName 				= MakeshiftGasMask,
+	    DisplayCategory 			= Accessory,
+		Type 						= Clothing,
+		Icon 						= SWAB_Hat_MakeshiftFilter_icon,
+		Weight 						= 1.0,
+		ClothingItem 				= SWAB_Hat_MakeshiftGasMask,
+		BodyLocation 				= MaskEyes,
+		CanHaveHoles 				= false,
+        BloodLocation 				= Head,
+        Insulation 					= 0.75,
+        WindResistance 				= 0.60,
+        WaterResistance 			= 1.0,
+		WorldStaticModel 			= Hat_MakeshiftGasMask_Ground,
+		Tags 						= GasMask,
 	}
 }

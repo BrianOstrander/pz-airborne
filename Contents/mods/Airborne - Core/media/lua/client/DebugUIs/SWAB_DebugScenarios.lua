@@ -1,91 +1,149 @@
 debugScenarios = debugScenarios or {}
-
 SWAB_DebugScenarios = {}
 
-SWAB_DebugScenarios.items = {
-    "WristWatch_Right_DigitalBlack",
-    "Crowbar",
-    "Hammer",
-    "Screwdriver",
-    -- "Hat_BandanaMask",
-    -- "Hat_SurgicalMask_Green",
-    -- "Hat_DustMask",
-    "Hat_GasMask",
-    "SWAB.Hat_MakeshiftGasMask",
-    -- "Generator",
-    -- "SWAB.StandardFilter",
-    -- "SWAB.StandardFilter",
-    -- "SWAB.StandardFilter",
-    "SWAB.MakeshiftFilter",
-    -- "SWAB.MakeshiftFilter",
-    -- "SWAB.MakeshiftFilter",
+function SWAB_DebugScenarios.GetScenarios()
+    return {
+        {
+            name = "Clothing",
+            setSandbox = SWAB_DebugScenarios.SetSandbox,
+            onStart = SWAB_DebugScenarios.OnStart,
+            locations = {
+                {
+                    name = "Driveway",
+                    position = { x = 10660, y = 9392, z = 0 }, -- update this
+                },
+            },
+            items = {
+                "WristWatch_Right_DigitalBlack",
+                "SWAB.Hat_MakeshiftGasMask",
+                "Scissors",
+            },
+            duplicatePerGender = true,
+        },
+        {
+            name = "Crafting",
+            setSandbox = SWAB_DebugScenarios.SetSandbox,
+            onStart = SWAB_DebugScenarios.OnStart,
+            locations = {
+                {
+                    name = "Driveway",
+                    position = { x = 10660, y = 9392, z = 0 }, -- update this
+                },
+            },
+            items = {
+                "WristWatch_Right_DigitalBlack",
+            }
+        },
+        {
+            name = "Atmospherics",
+            setSandbox = SWAB_DebugScenarios.SetSandbox,
+            onStart = SWAB_DebugScenarios.OnStart,
+            locations = {
+                {
+                    name = "Shed",
+                    position = { x = 10660, y = 9392, z = 0 },
+                },
+                {
+                    name = "Motel",
+                    position = { x = 10612, y = 9823, z = 0 },
+                },
+                {
+                    name = "Firehouse",
+                    position = { x = 8146, y = 11753, z = 0 },
+                },
+                {
+                    name = "Warehouse",
+                    position = { x = 10612, y = 9324, z = 0 },
+                },
+                {
+                    name = "Prison",
+                    position = { x = 7708, y = 11893, z = 0 },
+                },
+                {
+                    name = "School",
+                    position = { x = 10609, y = 9975, z = 0 },
+                },
+                {
+                    name = "Crossroads",
+                    position = { x = 13935, y = 5920, z = 0 },
+                },
+                {
+                    name = "Field",
+                    position = { x = 8129, y = 11844, z = 0 },
+                },
+            },
+            items = {
+                "WristWatch_Right_DigitalBlack",
+                "SWAB.Hat_MakeshiftGasMask",
+                "Hat_GasMask",
+                "SWAB.ValuTechHomeAirPurifier",
+                "SWAB.MassGenFacIndustrialAirPurifier",
+                "SWAB.ValuTechPersonalAirPurifier",
+                "SWAB.MakeshiftAirPurifier",
+            }
+        },
+    }
+end
 
-    -- "SWAB.ValuTechHomeAirPurifier",
-    -- "SWAB.MassGenFacIndustrialAirPurifier",
-    -- "SWAB.ValuTechPersonalAirPurifier",
-    -- "SWAB.MakeshiftAirPurifier",
+function SWAB_DebugScenarios.SetSandbox()
+    SandboxVars.VehicleEasyUse = true
+    SandboxVars.Zombies = 5
+end
 
-    -- "SWAB.StandardFilterBoxLarge",
-    -- "SWAB.DustMaskBox",
-    -- "SWAB.MedicalMaskBlueBox",
-    -- "SWAB.MedicalMaskGreenBox",
+function SWAB_DebugScenarios.OnStart(_scenario, _isFemale)
+    getPlayer():setFemale(_isFemale)
+    getPlayer():setGodMod(true)
+    getPlayer():setUnlimitedCarry(true)
+    getPlayer():setNoClip(true)
+    getPlayer():setInvisible(true)
+    ISFastTeleportMove.cheat = true
+    --ISWorldMap.setHideUnvisitedAreas(false)
 
-    -- "SWAB.ActivatedCharcoalPot",
-    "SWAB.ActivatedCharcoal",
+    SWAB_DebugScenarios.CleanupInventory()
 
-    -- "Pot",
-    -- "Bleach",
-    -- "Charcoal",
-    -- "Plank",
-    -- "TreeBranch",
-    -- "UnusableWood",
+    for _, itemId in ipairs(_scenario.items) do
+        getPlayer():getInventory():AddItem(itemId)
+    end
 
-    -- "Twigs",
-    -- "Twigs",
-    -- "Twigs",
-    -- "Twigs",
-    -- "Twigs",
-    -- "Twigs",
-    -- "Twigs",
-    -- "Twigs",
-    -- "Twigs",
-    -- "Twigs",
-}
+    SWAB_DebugScenarios.GivePerks(
+        10,
+        {
+            Perks.Woodwork,
+            Perks.Mechanics,
+            Perks.Electricity,
+        }
+    )
 
-SWAB_DebugScenarios.scenarios = {
-    {
-        name = "Shed",
-        location = { x = 10660, y = 9392, z = 0 },
-    },
-    {
-        name = "Motel",
-        location = { x = 10612, y = 9823, z = 0 },
-    },
-    {
-        name = "Firehouse",
-        location = { x = 8146, y = 11753, z = 0 },
-    },
-    {
-        name = "Warehouse",
-        location = { x = 10612, y = 9324, z = 0 },
-    },
-    {
-        name = "Prison",
-        location = { x = 7708, y = 11893, z = 0 },
-    },
-    {
-        name = "School",
-        location = { x = 10609, y = 9975, z = 0 },
-    },
-    {
-        name = "Crossroads",
-        location = { x = 13935, y = 5920, z = 0 },
-    },
-    {
-        name = "Field",
-        location = { x = 8129, y = 11844, z = 0 },
-    },
-}
+    getPlayer():getKnownRecipes():add("Generator")
+
+    -- Cleans up zombies every minute.
+    Events.EveryOneMinute.Add(SWAB_DebugScenarios.EveryOneMinute)
+end
+
+function SWAB_DebugScenarios.GivePerks(_level, _perks)
+    for _, perk in ipairs(_perks) do
+        for i = 1, _level do
+            getPlayer():LevelPerk(perk)
+        end
+    end
+end
+
+function SWAB_DebugScenarios.CleanupInventory()
+    -- Not sure why, but debug scenarios have a bunch of clothing in their inventory.
+    local items = getPlayer():getInventory():getItems()
+    local itemsForRemoval = {}
+
+    for itemIndex = 0, items:size() - 1 do
+        local item = items:get(itemIndex)
+        if instanceof(item, "Clothing") and not getPlayer():isEquipped(item) then
+            table.insert(itemsForRemoval, item)
+        end
+    end
+
+    for _, item in ipairs(itemsForRemoval) do
+        getPlayer():getInventory():Remove(item)
+    end
+end
 
 -- Last player position
 SWAB_DebugScenarios.playerPosition = { x = 0, y = 0 }
@@ -129,49 +187,25 @@ function SWAB_DebugScenarios.CleanupZombies()
     end
 end
 
-function SWAB_DebugScenarios.SetSandbox()
-    SandboxVars.VehicleEasyUse = true
-    SandboxVars.Zombies = 5
-end
+function SWAB_DebugScenarios.InitializeScenario(_location, _scenario, _isFemale)
+    local name = "SWAB | ".._scenario.name.." - ".._location.name
 
-function SWAB_DebugScenarios.OnStart()
-    getPlayer():setGodMod(true)
-    getPlayer():setUnlimitedCarry(true)
-    getPlayer():setNoClip(true)
-    getPlayer():setInvisible(true)
-    ISFastTeleportMove.cheat = true
-    --ISWorldMap.setHideUnvisitedAreas(false)
-
-    -- Not sure why, but debug scenarios have a bunch of clothing in their inventory.
-    local items = getPlayer():getInventory():getItems()
-    local itemsForRemoval = {}
-
-    for itemIndex = 0, items:size() - 1 do
-        local item = items:get(itemIndex)
-        if instanceof(item, "Clothing") and not getPlayer():isEquipped(item) then
-            table.insert(itemsForRemoval, item)
+    if _scenario.duplicatePerGender then
+        name = name.." ( "
+        if _isFemale then
+            name = name.."Female"
+        else
+            name = name.."Male"
         end
+        name = name.." )"
     end
 
-    for _, item in ipairs(itemsForRemoval) do
-        getPlayer():getInventory():Remove(item)
-    end
-
-
-    for _, itemId in ipairs(SWAB_DebugScenarios.items) do
-        getPlayer():getInventory():AddItem(itemId)
-    end
-
-    for i = 1, 10 do
-        getPlayer():LevelPerk(Perks.Woodwork)
-        getPlayer():LevelPerk(Perks.Mechanics)
-        getPlayer():LevelPerk(Perks.Electricity)
-    end
-
-    getPlayer():getKnownRecipes():add("Generator")
-
-    -- Cleans up zombies every minute.
-    Events.EveryOneMinute.Add(SWAB_DebugScenarios.EveryOneMinute)
+    return {
+        name = name,
+        startLoc = _location.position,
+        setSandbox = _scenario.setSandbox,
+        onStart = function() _scenario.onStart(_scenario, _isFemale) end
+    }
 end
 
 function SWAB_DebugScenarios.Initialize()
@@ -183,13 +217,24 @@ function SWAB_DebugScenarios.Initialize()
         debugScenarios[scenario_key] = nil
     end
 
-    for index, scenario in ipairs(SWAB_DebugScenarios.scenarios) do
-        debugScenarios["swab_debug_scenario_"..index] = {
-            name = "SWAB - "..scenario.name,
-            startLoc = scenario.location,
-            setSandbox = SWAB_DebugScenarios.SetSandbox,
-            onStart = SWAB_DebugScenarios.OnStart
-        }
+    for scenarioIndex, scenario in ipairs(SWAB_DebugScenarios.GetScenarios()) do
+        for locationIndex, location in ipairs(scenario.locations) do
+            local debugScenarioKey = "swab_debug_scenario_"..scenarioIndex.."_"..locationIndex.."_"
+
+            debugScenarios[debugScenarioKey.."female"] = SWAB_DebugScenarios.InitializeScenario(
+                location,
+                scenario,
+                true
+            )
+
+            if scenario.duplicatePerGender then
+                debugScenarios[debugScenarioKey.."male"] = SWAB_DebugScenarios.InitializeScenario(
+                    location,
+                    scenario,
+                    false
+                )
+            end
+        end
     end
 
     for scenario_key, scenario in pairs(defaultScenarios) do

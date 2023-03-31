@@ -84,3 +84,21 @@ SWAB_ItemConfig["swab_base_filterables"] = {
         },
     },
 }
+
+SWAB_ItemConfig["swab_makeshift_filterables"] = {
+    -- These could be defined in the actual items script, but for my own sanity when balancing I'm
+    -- keeping all these values in this one place.
+    {
+        ids = { "SWAB.Hat_MakeshiftGasMask" },
+        parameters = {
+            SwabRespiratoryItem                           = true,
+            SwabRespiratoryExposure_Reduction             = -7,
+            SwabRespiratoryExposure_Falloff               = 3,
+            SwabRespiratoryExposure_ProtectionDuration    = 4,
+            SwabRespiratoryExposure_ProtectionRemaining   = 1,
+            SwabRespiratoryExposure_AutoHydrationAllowed  = false,
+            SwabRespiratoryExposure_RefreshAction         = "replace_filter",
+            SwabRespiratoryExposure_CurrentFilterType     = "SWAB.MakeshiftFilter",
+        },
+    },
+}
