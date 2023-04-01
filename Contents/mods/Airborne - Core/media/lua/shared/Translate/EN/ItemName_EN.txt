@@ -18,4 +18,5 @@ ItemName_EN = {
 
     ItemName_SWAB.MakeshiftFilter                   = "Makeshift Filter",
     ItemName_SWAB.Hat_MakeshiftGasMask              = "Makeshift Gas Mask",
+    ItemName_SWAB.MakeshiftOveralls                 = "Makeshift Overalls",
 }

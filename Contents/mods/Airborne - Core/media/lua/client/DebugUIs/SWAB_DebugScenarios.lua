@@ -5,7 +5,7 @@ function SWAB_DebugScenarios.GetScenarios()
     return {
         {
             name = "Clothing",
-            ignore = true,
+            ignore = false,
             setSandbox = SWAB_DebugScenarios.SetSandbox,
             onStart = SWAB_DebugScenarios.OnStart,
             locations = {
@@ -17,6 +17,7 @@ function SWAB_DebugScenarios.GetScenarios()
             items = {
                 "WristWatch_Right_DigitalBlack",
                 "SWAB.Hat_MakeshiftGasMask",
+                "SWAB.MakeshiftOveralls",
                 "Scissors",
             },
             duplicatePerGender = true,

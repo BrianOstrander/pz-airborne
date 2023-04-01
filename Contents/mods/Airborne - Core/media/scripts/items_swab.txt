@@ -139,9 +139,9 @@ module SWAB
 		/* Maximum seems to be 60? */
 		MinutesToCook               = 60,
 		MinutesToBurn               = 480,
-		Tags                        = HasMetal,
 		StaticModel                 = CookingPot,
 		WorldStaticModel            = ActivatedCharcoalPot_Ground,
+		Tags                        = HasMetal,
 	}
 
 	item MakeshiftFilter
@@ -154,11 +154,10 @@ module SWAB
 		Weight 						= 0.3,
 		Icon 						= SWAB_MakeshiftFilter_icon,
 		StaticModel 				= CanClosed,
-		WorldStaticModel 			= MakeshiftFilter_Ground,
-		Tags 						= HasMetal,
 		SwabRespiratoryItemFilter 	= TRUE,
 		cantBeConsolided 			= TRUE,
-		Tags 						= SWAB_Filter,
+		WorldStaticModel 			= MakeshiftFilter_Ground,
+		Tags 						= SWAB_Filter;HasMetal,
 	}
 
 	item Hat_MakeshiftGasMask
@@ -166,16 +165,37 @@ module SWAB
 		DisplayName 				= MakeshiftGasMask,
 	    DisplayCategory 			= Accessory,
 		Type 						= Clothing,
-		Icon 						= SWAB_Hat_MakeshiftFilter_icon,
+		Icon 						= SWAB_Hat_MakeshiftGasMask_icon,
 		Weight 						= 1.0,
 		ClothingItem 				= SWAB_Hat_MakeshiftGasMask,
 		BodyLocation 				= MaskEyes,
 		CanHaveHoles 				= false,
         BloodLocation 				= Head,
+		/* TODO: Balance */
         Insulation 					= 0.75,
         WindResistance 				= 0.60,
         WaterResistance 			= 1.0,
 		WorldStaticModel 			= Hat_MakeshiftGasMask_Ground,
 		Tags 						= GasMask,
 	}
+
+	item MakeshiftOveralls
+    {
+        DisplayName 				= MakeshiftOveralls,
+        DisplayCategory 			= Clothing,
+        Type 						= Clothing,
+        ClothingItem 				= SWAB_MakeshiftOveralls,
+        BodyLocation 				= Pants,
+        Icon 						= SWAB_MakeshiftOveralls_icon,
+        BloodLocation 				= Trousers;ShirtNoSleeves,
+		/* TODO: Balance */
+        RunSpeedModifier 			= 0.95,
+        BiteDefense 				= 10,
+        ScratchDefense 				= 20,
+        Insulation 					= 0.65,
+        WindResistance 				= 0.5,
+        FabricType 					= Cotton,
+        WaterResistance 			= 0.20,
+        WorldStaticModel 			= MakeshiftOveralls_Ground,
+    }
 }

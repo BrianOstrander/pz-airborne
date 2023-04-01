@@ -21,5 +21,6 @@ Recipes_EN = {
 
     Recipe_SWAB_MakeshiftFilter = "Craft Makeshift Filter"
     Recipe_SWAB_MakeshiftGasMask = "Craft Makeshift Gas Mask"
+    Recipe_SWAB_MakeshiftOveralls = "Craft Makeshift Overalls"
     Recipe_SWAB_MakeshiftAirPurifier = "Craft Makeshift Air Purifier"
 }

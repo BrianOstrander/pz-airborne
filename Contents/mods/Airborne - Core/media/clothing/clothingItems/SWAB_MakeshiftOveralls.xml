@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<clothingItem>
+	<m_MaleModel>Skinned\Clothes\SWAB_MakeshiftOveralls_Male</m_MaleModel>
+	<m_FemaleModel>Skinned\Clothes\SWAB_MakeshiftOveralls_Female</m_FemaleModel>
+	<m_GUID>46e26fd9-67b9-40c4-9604-c7ffc9b591d7</m_GUID>
+	<m_Static>false</m_Static>
+	<m_AllowRandomTint>false</m_AllowRandomTint>
+	<m_AttachBone></m_AttachBone>
+	<m_Masks>2</m_Masks>
+	<m_Masks>7</m_Masks>
+	<m_Masks>9</m_Masks>
+	<textureChoices>Clothes\SWAB_MakeshiftOveralls</textureChoices>
+</clothingItem>

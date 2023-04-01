@@ -123,6 +123,20 @@ module SWAB
         Time:120.0,
     }
 
+    recipe SWAB MakeshiftOveralls
+    {
+        keep [Recipe.GetItemTypes.SharpKnife],
+        Garbagebag=3,
+        RippedSheets/AlcoholRippedSheets=2,
+        DuctTape=4,
+        
+        Result:MakeshiftOveralls,
+        Category:Survivalist,
+        AnimNode:RipSheets,
+        Sound:ClothesRipping,
+        Time:120.0,
+    }
+
     /* -------------------------------------------------------- */
     /* -------------------ACTIVATED CHARCOAL------------------- */
     /* -------------------------------------------------------- */
