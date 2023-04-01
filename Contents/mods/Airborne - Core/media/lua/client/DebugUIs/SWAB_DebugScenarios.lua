@@ -5,12 +5,13 @@ function SWAB_DebugScenarios.GetScenarios()
     return {
         {
             name = "Clothing",
+            ignore = true,
             setSandbox = SWAB_DebugScenarios.SetSandbox,
             onStart = SWAB_DebugScenarios.OnStart,
             locations = {
                 {
                     name = "Driveway",
-                    position = { x = 10660, y = 9392, z = 0 }, -- update this
+                    position = { x = 10659, y = 9403, z = 0 },
                 },
             },
             items = {
@@ -22,20 +23,28 @@ function SWAB_DebugScenarios.GetScenarios()
         },
         {
             name = "Crafting",
+            ignore = false,
             setSandbox = SWAB_DebugScenarios.SetSandbox,
             onStart = SWAB_DebugScenarios.OnStart,
             locations = {
                 {
                     name = "Driveway",
-                    position = { x = 10660, y = 9392, z = 0 }, -- update this
+                    position = { x = 10659, y = 9403, z = 0 },
                 },
             },
             items = {
                 "WristWatch_Right_DigitalBlack",
+                "HuntingKnife",
+                { type = "DuctTape",                count = 25 },
+                { type = "Sheet",                   count = 25 },
+                { type = "WaterBottleEmpty",        count = 25 },
+                { type = "SWAB.StandardFilter",     count = 25 },
+                { type = "SWAB.MakeshiftFilter",    count = 25 },
             }
         },
         {
             name = "Atmospherics",
+            ignore = false,
             setSandbox = SWAB_DebugScenarios.SetSandbox,
             onStart = SWAB_DebugScenarios.OnStart,
             locations = {
@@ -101,8 +110,18 @@ function SWAB_DebugScenarios.OnStart(_scenario, _isFemale)
 
     SWAB_DebugScenarios.CleanupInventory()
 
-    for _, itemId in ipairs(_scenario.items) do
-        getPlayer():getInventory():AddItem(itemId)
+    for _, itemEntry in ipairs(_scenario.items) do
+        if type(itemEntry) == "string" then
+            getPlayer():getInventory():AddItem(itemEntry)
+        else
+            -- Must be a table with more specific spawn instructions.
+            for i = 1, (itemEntry.count or 1) do
+                local item = getPlayer():getInventory():AddItem(itemEntry.type)
+                if itemEntry.initialize then
+                    itemEntry.initialize(item)
+                end
+            end
+        end
     end
 
     SWAB_DebugScenarios.GivePerks(
@@ -218,21 +237,23 @@ function SWAB_DebugScenarios.Initialize()
     end
 
     for scenarioIndex, scenario in ipairs(SWAB_DebugScenarios.GetScenarios()) do
-        for locationIndex, location in ipairs(scenario.locations) do
-            local debugScenarioKey = "swab_debug_scenario_"..scenarioIndex.."_"..locationIndex.."_"
+        if not scenario.ignore then
+            for locationIndex, location in ipairs(scenario.locations) do
+                local debugScenarioKey = "swab_debug_scenario_"..scenarioIndex.."_"..locationIndex.."_"
 
-            debugScenarios[debugScenarioKey.."female"] = SWAB_DebugScenarios.InitializeScenario(
-                location,
-                scenario,
-                true
-            )
-
-            if scenario.duplicatePerGender then
-                debugScenarios[debugScenarioKey.."male"] = SWAB_DebugScenarios.InitializeScenario(
+                debugScenarios[debugScenarioKey.."female"] = SWAB_DebugScenarios.InitializeScenario(
                     location,
                     scenario,
-                    false
+                    true
                 )
+
+                if scenario.duplicatePerGender then
+                    debugScenarios[debugScenarioKey.."male"] = SWAB_DebugScenarios.InitializeScenario(
+                        location,
+                        scenario,
+                        false
+                    )
+                end
             end
         end
     end
