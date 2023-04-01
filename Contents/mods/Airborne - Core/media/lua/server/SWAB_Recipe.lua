@@ -1,8 +1,24 @@
-SWAB_Recipe = SWAB_Recipe or {}
-SWAB_Recipe.OnTest = SWAB_Recipe.OnTest or {}
-SWAB_Recipe.OnCanPerform = SWAB_Recipe.OnCanPerform or {}
-SWAB_Recipe.OnCreate = SWAB_Recipe.OnCreate or {}
-SWAB_Recipe.OnGiveXP = SWAB_Recipe.OnGiveXP or {}
+SWAB_Recipe                 = {}
+SWAB_Recipe.GetItemTypes    = {}
+SWAB_Recipe.OnTest          = {}
+SWAB_Recipe.OnCanPerform    = {}
+SWAB_Recipe.OnCreate        = {}
+SWAB_Recipe.OnGiveXP        = {}
+
+function SWAB_Recipe.AddExistingItemType(_scriptItems, _type)
+	local all = getScriptManager():getItemsByType(_type)
+	for index = 0, all:size() - 1 do
+		local scriptItem = all:get(index)
+		if not _scriptItems:contains(scriptItem) then
+			_scriptItems:add(scriptItem)
+		end
+	end
+end
+
+
+function SWAB_Recipe.GetItemTypes.Filters(_scriptItems)
+	_scriptItems:addAll(getScriptManager():getItemsTag("SWAB_Filter"))
+end
 
 function SWAB_Recipe.OnTest.PutStandardFiltersInBoxLarge(_item)
     if PZMath.equal(1, _item:getUsedDelta()) then
@@ -71,4 +87,18 @@ end
 
 function SWAB_Recipe.OnGiveXP.MakeshiftAirPurifier(_recipe, _ingredients, _result, _player)
     _player:getXp():AddXP(Perks.Electricity, _player:getPerkLevel(Perks.Electricity) * 5);
+end
+
+function SWAB_Recipe.OnCreate.MakeshiftGasMask(_items, _result, _player, _selectedItem)
+    local filter = nil
+    for itemIndex = 0, _items:size() - 1 do
+        local item = _items:get(itemIndex)
+        if item:getModData().SwabRespiratoryItemFilter == "TRUE" then
+            filter = item
+            break
+        end
+    end
+
+    _result:getModData().SwabRespiratoryExposure_CurrentFilterType = filter:getFullType()
+    _result:getModData().SwabRespiratoryExposure_ProtectionRemaining = filter:getUsedDelta() 
 end

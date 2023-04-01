@@ -17,5 +17,5 @@ ItemName_EN = {
     ItemName_SWAB.ActivatedCharcoalPot              = "Pot of Activated Charcoal",
 
     ItemName_SWAB.MakeshiftFilter                   = "Makeshift Filter",
-    ItemName_SWAB.MakeshiftGasMask                  = "Makeshift Gas Mask",
+    ItemName_SWAB.Hat_MakeshiftGasMask              = "Makeshift Gas Mask",
 }

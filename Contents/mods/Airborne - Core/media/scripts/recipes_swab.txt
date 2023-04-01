@@ -104,6 +104,25 @@ module SWAB
         Time:50.0,
     }
 
+    recipe SWAB MakeshiftGasMask
+    {
+        keep [Recipe.GetItemTypes.SharpKnife],
+        PopBottleEmpty/WaterBottleEmpty,
+        destroy [SWAB_Recipe.GetItemTypes.Filters]
+        Sheet,
+        DuctTape=2,
+        
+        Result:Hat_MakeshiftGasMask,
+        Category:Survivalist,
+        /*OnTest:SWAB_Recipe.OnTest.MakeshiftGasMask,*/
+        OnCreate:SWAB_Recipe.OnCreate.MakeshiftGasMask,
+        AnimNode:Disassemble,
+        Prop1:Source=1,
+        Prop2:Source=2,
+        Sound:OpenCannedFood,
+        Time:120.0,
+    }
+
     /* -------------------------------------------------------- */
     /* -------------------ACTIVATED CHARCOAL------------------- */
     /* -------------------------------------------------------- */
